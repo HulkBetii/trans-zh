@@ -1,0 +1,28 @@
+services:
+  ai-video-transcriber:
+    build: .
+    ports:
+      # Bind to the host loopback only. Every /api route is unauthenticated
+      # unless APP_AUTH_TOKEN is set, so do not publish this on 0.0.0.0.
+      - "127.0.0.1:8000:8000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      # Set this to require a token on /api/* (/api/health stays open for HEALTHCHECK)
+      APP_AUTH_TOKEN: ${APP_AUTH_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      WHISPER_MODEL_SIZE: ${WHISPER_MODEL_SIZE:-base}
+      WHISPER_DEVICE: ${WHISPER_DEVICE:-cpu}
+      WHISPER_COMPUTE_TYPE: ${WHISPER_COMPUTE_TYPE:-int8}
+      WORKER_THREADS: ${WORKER_THREADS:-8}
+      UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-200}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      DOUYIN_TIKTOK_API_BASE: ${DOUYIN_TIKTOK_API_BASE:-}
+    volumes:
+      - ./temp:/app/temp
+      - huggingface-cache:/root/.cache/huggingface
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:

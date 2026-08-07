@@ -1,0 +1,29 @@
+# --- Runtime data (may contain private transcripts, media and credentials) ---
+temp/
+.runtime/
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- Local config / secrets ---
+.env
+.env.*
+!.env.example
+*.cookies
+*_cookies.txt
+
+# --- Editor / OS cruft ---
+__MACOSX/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Logs ---
+*.log
