@@ -567,6 +567,9 @@ active_tasks = {}
 sse_connections = {}
 # 单个SSE连接的最大积压消息数；超出即视为客户端已失联
 SSE_QUEUE_MAXSIZE = _env_int("SSE_QUEUE_MAXSIZE", 64, 1, 10000)
+# 配音混音每批的片段数：每个片段占一个 -i，全部放进一条命令会超出
+# Windows 的 32KB 命令行上限（约 300 个片段即触顶）
+DUB_MIX_BATCH_SIZE = _env_int("DUB_MIX_BATCH_SIZE", 120, 1, 1000)
 
 
 def _cleanup_done_active_tasks() -> None:
@@ -2195,46 +2198,75 @@ async def _mix_dub_clips(
         scheduled_clips.append((item["start"], clip_path))
 
     mix_duration = max(duration, latest_end, 1.0)
-    ffmpeg_cmd = [
-        "ffmpeg", "-y", "-nostdin",
-        "-f", "lavfi", "-t", f"{mix_duration:.3f}", "-i", "anullsrc=r=48000:cl=mono",
-    ]
-    for _, clip_path in scheduled_clips:
-        ffmpeg_cmd.extend(["-i", str(clip_path)])
 
-    delayed_labels = []
-    filters = []
-    for index, (start, _) in enumerate(scheduled_clips, start=1):
-        label = f"a{index}"
-        delay_ms = max(0, int(round(start * 1000)))
-        filters.append(f"[{index}:a]adelay={delay_ms}:all=1,apad[{label}]")
-        delayed_labels.append(f"[{label}]")
+    async def _mix_batch(batch: list[tuple[float, Path]], output: Path, base_silence: bool) -> None:
+        """Mix one batch of positioned clips onto a silent bed of mix_duration."""
+        cmd = [
+            "ffmpeg", "-y", "-nostdin",
+            "-f", "lavfi", "-t", f"{mix_duration:.3f}", "-i", "anullsrc=r=48000:cl=mono",
+        ]
+        for _, clip_path in batch:
+            cmd.extend(["-i", str(clip_path)])
+        labels, filters = [], []
+        for index, (start, _) in enumerate(batch, start=1):
+            label = f"a{index}"
+            delay_ms = max(0, int(round(start * 1000)))
+            filters.append(f"[{index}:a]adelay={delay_ms}:all=1,apad[{label}]")
+            labels.append(f"[{label}]")
+        inputs = "[0:a]" + "".join(labels)
+        tail = ",alimiter=limit=0.95" if base_silence else ""
+        filters.append(
+            f"{inputs}amix=inputs={len(labels) + 1}:duration=first:"
+            f"dropout_transition=0:normalize=0{tail}[aout]"
+        )
+        cmd.extend([
+            "-filter_complex", ";".join(filters),
+            "-map", "[aout]", "-ar", "48000", "-ac", "2", "-c:a", "pcm_s16le", str(output),
+        ])
+        result = await asyncio.to_thread(
+            subprocess.run, cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        if result.returncode != 0 or not output.exists():
+            err = (result.stderr or result.stdout or "").strip()
+            raise RuntimeError(f"Build dub audio failed: {err[-1200:]}")
 
-    inputs = "[0:a]" + "".join(delayed_labels)
-    filters.append(
-        f"{inputs}amix=inputs={len(delayed_labels) + 1}:duration=first:"
-        "dropout_transition=0:normalize=0,alimiter=limit=0.95[aout]"
-    )
-    ffmpeg_cmd.extend([
-        "-filter_complex", ";".join(filters),
-        "-map", "[aout]",
-        "-ar", "48000",
-        "-ac", "2",
-        "-c:a", "pcm_s16le",
-        str(dub_path),
-    ])
-
-    result = await asyncio.to_thread(
-        subprocess.run,
-        ffmpeg_cmd,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    if result.returncode != 0 or not dub_path.exists():
-        err = (result.stderr or result.stdout or "").strip()
-        raise RuntimeError(f"Build dub audio failed: {err[-1200:]}")
+    # One "-i" per clip blows past the Windows 32k command-line limit at roughly
+    # 300 clips (a 35-minute video has ~900), so mix in batches and combine.
+    batch_size = max(1, DUB_MIX_BATCH_SIZE)
+    if len(scheduled_clips) <= batch_size:
+        await _mix_batch(scheduled_clips, dub_path, base_silence=True)
+    else:
+        partials = []
+        for offset in range(0, len(scheduled_clips), batch_size):
+            batch = scheduled_clips[offset:offset + batch_size]
+            part = work_dir / f"dub_part_{offset // batch_size:03d}.wav"
+            await _mix_batch(batch, part, base_silence=False)
+            partials.append(part)
+            if task_id:
+                await _set_dub_progress(
+                    task_id, "processing",
+                    78 + int((offset + len(batch)) / len(scheduled_clips) * 4),
+                    f"Aligning voice track {offset + len(batch)}/{len(scheduled_clips)}...",
+                )
+        logger.info("配音混音分 %s 批完成，开始合并", len(partials))
+        combine = ["ffmpeg", "-y", "-nostdin"]
+        for part in partials:
+            combine.extend(["-i", str(part)])
+        combine.extend([
+            "-filter_complex",
+            "".join(f"[{i}:a]" for i in range(len(partials)))
+            + f"amix=inputs={len(partials)}:duration=longest:"
+              "dropout_transition=0:normalize=0,alimiter=limit=0.95[aout]",
+            "-map", "[aout]", "-ar", "48000", "-ac", "2", "-c:a", "pcm_s16le", str(dub_path),
+        ])
+        result = await asyncio.to_thread(
+            subprocess.run, combine, capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        if result.returncode != 0 or not dub_path.exists():
+            err = (result.stderr or result.stdout or "").strip()
+            raise RuntimeError(f"Build dub audio failed (merge): {err[-1200:]}")
+        for part in partials:
+            part.unlink(missing_ok=True)
     if not _has_audible_audio(dub_path):
         raise RuntimeError("Built dub audio track is silent. Check TTS generation and subtitle text.")
 

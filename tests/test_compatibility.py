@@ -293,6 +293,61 @@ class TaskStoreDebounceTests(unittest.TestCase):
             self.assertEqual(json.loads(task_file.read_text(encoding="utf-8"))["t1"]["progress"], 3)
 
 
+class DubMixBatchingTests(unittest.TestCase):
+    """Regression: one ffmpeg '-i' per clip blew past the Windows 32k
+    command-line limit at roughly 300 clips, so dubbing any video longer than
+    about 20 minutes always failed with WinError 206."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._temp = tempfile.TemporaryDirectory(prefix="uodate dub mix ")
+        os.environ["APP_TEMP_DIR"] = cls._temp.name
+        import main as backend_main
+        cls.main = backend_main
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._temp.cleanup()
+
+    def _make_clips(self, work: Path, count: int):
+        import subprocess
+        src = work / "beep.wav"
+        subprocess.run(
+            ["ffmpeg", "-y", "-nostdin", "-loglevel", "error", "-f", "lavfi",
+             "-i", "sine=frequency=440:duration=0.3", "-ar", "48000", "-ac", "1", str(src)],
+            check=True, capture_output=True,
+        )
+        data = src.read_bytes()
+        clips = []
+        for i in range(count):
+            p = work / f"tts_{i:04d}.wav"
+            p.write_bytes(data)
+            clips.append(({"start": i * 0.5, "end": i * 0.5 + 0.3}, p, 0.3))
+        return clips
+
+    def test_more_clips_than_batch_size_still_mixes(self):
+        with tempfile.TemporaryDirectory(prefix="dub mix batch ") as tmp:
+            work = Path(tmp)
+            clips = self._make_clips(work, 10)
+            # Force the batching path: 10 clips across batches of 3.
+            with mock.patch.object(self.main, "DUB_MIX_BATCH_SIZE", 3):
+                out = asyncio.run(self.main._mix_dub_clips(clips, work, 8.0, task_id=None))
+            self.assertTrue(out.exists())
+            self.assertGreater(self.main._probe_duration(out), 4.0)
+            self.assertTrue(self.main._has_audible_audio(out))
+            # Intermediate batch files must be cleaned up.
+            self.assertEqual(list(work.glob("dub_part_*.wav")), [])
+
+    def test_single_batch_path_still_works(self):
+        with tempfile.TemporaryDirectory(prefix="dub mix single ") as tmp:
+            work = Path(tmp)
+            clips = self._make_clips(work, 3)
+            with mock.patch.object(self.main, "DUB_MIX_BATCH_SIZE", 120):
+                out = asyncio.run(self.main._mix_dub_clips(clips, work, 3.0, task_id=None))
+            self.assertTrue(out.exists())
+            self.assertTrue(self.main._has_audible_audio(out))
+
+
 class OcrSmokeTests(unittest.TestCase):
     def test_tesseract_reads_vietnamese_text(self):
         executable = ROOT / ".runtime" / "tesseract" / "tesseract.exe"
