@@ -110,11 +110,19 @@ class LLMProfile(BaseModel):
     timeout_sec: float = 120.0
 
     def api_key(self) -> str:
+        """Resolve the key from the environment.
+
+        An empty ``api_key_env`` means the endpoint needs no auth — Ollama, LM
+        Studio and vLLM all ignore the header. They do still reject a *missing*
+        Authorization header on some builds, so a placeholder goes out instead.
+        """
+        if not self.api_key_env:
+            return "local"
         key = os.environ.get(self.api_key_env, "").strip()
         if not key:
             raise RuntimeError(
                 f"Chưa có API key: biến môi trường {self.api_key_env} trống. "
-                f"Đặt nó rồi chạy lại."
+                f"Đặt nó rồi chạy lại, hoặc để api_key_env = \"\" nếu endpoint chạy local."
             )
         return key
 
