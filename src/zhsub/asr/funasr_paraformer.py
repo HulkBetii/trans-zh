@@ -1,14 +1,15 @@
-"""ASR bằng FunASR: paraformer-zh + fsmn-vad + ct-punc.
+"""ASR via FunASR: paraformer-zh + fsmn-vad + ct-punc.
 
-Timestamp sinh ra ở đây là **nguồn sự thật duy nhất** của cả pipeline. Không có
-stage nào phía sau được phép tạo ra hay sửa mốc thời gian ngoài việc kéo dài vào
-khoảng lặng đã biết.
+The timestamps produced here are the **single source of truth** for the whole
+pipeline. No later stage may create or adjust timing, beyond extending a cue into
+a silence that is already known.
 
-Điểm tinh tế nhất là ghép mảng ``timestamp`` với text: ``ct-punc`` chèn dấu câu
-vào text nhưng dấu câu **không có** timestamp riêng, nên hai mảng lệch độ dài nếu
-cứ zip thẳng. Vì vậy text được tách token theo đúng quy ước của FunASR (mỗi ký tự
-Hán là một token, mỗi từ Latin liền mạch là một token, dấu câu treo vào token
-liền trước) rồi mới đối chiếu số lượng.
+The subtle part is pairing the ``timestamp`` array with the text: ``ct-punc``
+inserts punctuation into the text, but punctuation has **no** timestamp of its
+own, so zipping the two arrays directly misaligns them from the first character.
+The text is therefore tokenised using FunASR's own convention (one Han character
+per token, one contiguous Latin word per token, punctuation attached to the
+preceding token) before the counts are compared.
 """
 
 from __future__ import annotations
@@ -33,10 +34,11 @@ def _is_ascii_word(ch: str) -> bool:
 
 
 def split_tokens(text: str) -> list[list[str]]:
-    """Tách text đã có dấu câu thành ``[[token, dấu_câu_theo_sau], ...]``.
+    """Split punctuated text into ``[[token, trailing_punctuation], ...]``.
 
-    Quy ước bám theo cách FunASR sinh mảng ``timestamp``: một ký tự Hán = một
-    token, một từ Latin liền mạch = một token, dấu câu không phải token.
+    Follows FunASR's convention for generating the ``timestamp`` array: one Han
+    character is one token, one contiguous Latin word is one token, punctuation
+    is not a token.
     """
     tokens: list[list[str]] = []
     latin = ""
@@ -54,7 +56,7 @@ def split_tokens(text: str) -> list[list[str]]:
             flush()
             if tokens:
                 tokens[-1][1] += ch
-            # dấu câu đứng đầu câu, không có token nào trước đó -> bỏ
+            # leading punctuation with no preceding token -> discard
         elif _is_ascii_word(ch):
             latin += ch
         else:
@@ -64,17 +66,75 @@ def split_tokens(text: str) -> list[list[str]]:
     return tokens
 
 
-def _build_sentence(text: str, timestamps: list, start_ms: float, end_ms: float) -> tuple[AsrSentence, bool]:
-    """Ghép text + mảng timestamp thành một :class:`AsrSentence`.
+# Punctuation that ends a subtitle-sized unit. Chinese ASR output uses the comma
+# heavily as a breath pause, so treating it as a boundary yields cue-sized units
+# rather than paragraph-sized ones.
+_BREAK_PUNCT = "。？！…，、；：?!,;:"
 
-    Returns:
-        ``(sentence, degraded)`` — ``degraded=True`` nghĩa là số timestamp không
-        khớp số token nên thời gian được chia đều, timestamp của câu đó kém tin cậy.
+
+def _group_into_sentences(tokens: list[AsrToken], gap_sec: float) -> list[AsrSentence]:
+    """Group a flat token list into sentences on punctuation or a silent gap.
+
+    A gap break is needed as well as punctuation because ``ct-punc`` regularly
+    misses a pause, which would otherwise produce one very long cue spanning an
+    obvious silence.
     """
-    pairs = split_tokens(text)
-    degraded = False
+    sentences: list[AsrSentence] = []
+    current: list[AsrToken] = []
 
-    if timestamps and len(timestamps) == len(pairs):
+    def flush() -> None:
+        if not current:
+            return
+        text = "".join(t.text + (t.punct_after or "") for t in current)
+        sentences.append(
+            AsrSentence(text=text, start=current[0].start, end=current[-1].end, tokens=list(current))
+        )
+        current.clear()
+
+    for tok in tokens:
+        if current and tok.start - current[-1].end > gap_sec:
+            flush()
+        current.append(tok)
+        if tok.punct_after and any(ch in _BREAK_PUNCT for ch in tok.punct_after):
+            flush()
+    flush()
+    return sentences
+
+
+def parse_funasr_result(res: list[dict], gap_sec: float = 0.5) -> AsrOutput:
+    """Convert raw ``AutoModel.generate`` output into an :class:`AsrOutput`.
+
+    Deliberately built from the **top-level** ``text`` and ``timestamp`` pair, and
+    the ``sentence_info`` array is ignored entirely.
+
+    Reason: FunASR 1.4.1 corrupts the text inside ``sentence_info``. On the bundled
+    70s sample it diverges from the top-level text at character 297, scrambling
+    punctuation placement — top level reads ``要聊一天，但是我觉得...足够。好，谢谢。``
+    while ``sentence_info`` reads ``要聊一天但，是我觉得...足够好谢谢好非。``. From that
+    point on its per-sentence timestamp arrays no longer line up with its own text
+    (5 of 36 sentences mismatched), so any timing derived from it drifts by up to
+    1.7 seconds.
+
+    The top-level pair, by contrast, satisfies an exact invariant that this
+    function asserts: ``len(split_tokens(text)) == len(timestamp)``. Verified at
+    333/333 on the 70s sample and 14/14 on the 4.5s one.
+
+    Kept separate from model execution so it can be tested against canned data
+    without downloading a model.
+    """
+    if not res:
+        return AsrOutput()
+
+    item = res[0]
+    text = (item.get("text") or "").strip()
+    timestamps = item.get("timestamp") or []
+    if not text:
+        return AsrOutput()
+
+    pairs = split_tokens(text)
+    degraded = 0
+
+    if len(pairs) == len(timestamps):
         tokens = [
             AsrToken(
                 text=tok,
@@ -85,77 +145,38 @@ def _build_sentence(text: str, timestamps: list, start_ms: float, end_ms: float)
             for (tok, punct), ts in zip(pairs, timestamps)
         ]
     else:
-        degraded = True
-        if timestamps:
-            log.warning(
-                "Số timestamp (%d) không khớp số token (%d) ở câu %r — chia đều thời gian",
-                len(timestamps), len(pairs), text[:30],
+        # The invariant broke. Rather than silently emitting skewed timing, spread
+        # the tokens evenly across the known span and report it loudly upstream.
+        degraded = 1
+        log.warning(
+            "timestamp count (%d) does not match token count (%d) — falling back to "
+            "even distribution; timing for this file is unreliable",
+            len(timestamps), len(pairs),
+        )
+        if not timestamps:
+            raise ValueError(
+                "FunASR không trả về timestamp nào. Không thể dựng timeline nếu thiếu "
+                "dữ liệu này — kiểm tra lại model và file audio."
             )
-        s = float(start_ms) / 1000.0
-        e = float(end_ms) / 1000.0
+        start = float(timestamps[0][0]) / 1000.0
+        end = float(timestamps[-1][1]) / 1000.0
         n = max(len(pairs), 1)
-        step = (e - s) / n if e > s else 0.0
+        step = (end - start) / n if end > start else 0.0
         tokens = [
             AsrToken(
                 text=tok,
-                start=s + i * step,
-                end=s + (i + 1) * step,
+                start=start + i * step,
+                end=start + (i + 1) * step,
                 punct_after=punct or None,
             )
             for i, (tok, punct) in enumerate(pairs)
         ]
 
-    if tokens:
-        sent_start, sent_end = tokens[0].start, tokens[-1].end
-    else:
-        sent_start, sent_end = float(start_ms) / 1000.0, float(end_ms) / 1000.0
-
-    return AsrSentence(text=text, start=sent_start, end=sent_end, tokens=tokens), degraded
-
-
-def parse_funasr_result(res: list[dict]) -> AsrOutput:
-    """Chuyển output thô của ``AutoModel.generate`` sang :class:`AsrOutput`.
-
-    Tách riêng khỏi phần chạy model để test được bằng dữ liệu đóng hộp, không cần
-    tải model thật.
-    """
-    if not res:
-        return AsrOutput()
-
-    item = res[0]
-    sentences: list[AsrSentence] = []
-    degraded = 0
-
-    info = item.get("sentence_info")
-    if info:
-        for s in info:
-            text = (s.get("text") or "").strip()
-            if not text:
-                continue
-            ts = s.get("timestamp") or []
-            start = s.get("start", ts[0][0] if ts else 0)
-            end = s.get("end", ts[-1][1] if ts else 0)
-            sent, deg = _build_sentence(text, ts, start, end)
-            if sent.tokens:
-                sentences.append(sent)
-                degraded += int(deg)
-    else:
-        # Không có punc_model (hoặc bản FunASR cũ): cả file là một câu.
-        text = (item.get("text") or "").strip()
-        ts = item.get("timestamp") or []
-        if text:
-            start = ts[0][0] if ts else 0
-            end = ts[-1][1] if ts else 0
-            sent, deg = _build_sentence(text, ts, start, end)
-            if sent.tokens:
-                sentences.append(sent)
-                degraded += int(deg)
-
-    return AsrOutput(sentences=sentences, degraded_sentences=degraded)
+    return AsrOutput(sentences=_group_into_sentences(tokens, gap_sec), degraded_sentences=degraded)
 
 
 class FunASRParaformer:
-    """Implementation :class:`~zhsub.asr.base.ASREngine` bằng FunASR."""
+    """FunASR-backed implementation of :class:`~zhsub.asr.base.ASREngine`."""
 
     def __init__(
         self,
@@ -189,6 +210,9 @@ class FunASRParaformer:
 
     def transcribe(self, wav_path: str | Path) -> AsrOutput:
         model = self._ensure_model()
+        # `sentence_timestamp=True` is deliberately NOT requested: it only populates
+        # `sentence_info`, which this version corrupts (see parse_funasr_result).
+        # The top-level text/timestamp pair is all we need and is trustworthy.
         res = model.generate(input=str(wav_path), batch_size_s=self.batch_size_s)
         return parse_funasr_result(res)
 

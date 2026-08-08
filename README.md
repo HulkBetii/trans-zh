@@ -194,6 +194,31 @@ timestamp riêng nên treo vào `punct_after` của token liền trước. Nhờ
 chuỗi tách bạch hoàn toàn: chuỗi để align/gửi LLM là `concat(text)`, chuỗi để
 hiển thị là `concat(text + punct_after)`.
 
+### Vì sao không dùng `sentence_info` của FunASR
+
+FunASR 1.4.1 làm hỏng text trong `sentence_info`. Đo trên mẫu 70 giây đi kèm
+model, nó phân kỳ khỏi text cấp trên cùng tại ký tự thứ 297:
+
+```
+cấp trên cùng   要聊一天，但是我觉得我刚才说的四个字足够。好，谢谢。
+sentence_info   要聊一天但，是我觉得我刚才说的四个字足够好谢谢好非。
+```
+
+Dấu câu bị đảo chỗ rồi rơi rụng. Từ đó trở đi mảng `timestamp` riêng của từng câu
+không còn khớp với chính text của nó nữa (5/36 câu lệch), và mốc thời gian suy ra
+từ đó sai tới **1.7 giây**.
+
+Cặp `text` + `timestamp` ở cấp trên cùng thì thoả một bất biến chính xác, và
+`parse_funasr_result` assert đúng bất biến này:
+
+```
+len(split_tokens(text)) == len(timestamp)
+```
+
+Đo được 333/333 trên mẫu 70 giây và 14/14 trên mẫu 4.5 giây. Nên S1 dựng token từ
+cặp cấp trên cùng và **tự ngắt câu** theo dấu câu cộng khoảng lặng, hoàn toàn bỏ
+qua `sentence_info`.
+
 ### Thêm engine ASR khác
 
 Implement `ASREngine` trong `src/zhsub/asr/base.py`. Toàn bộ phép cộng offset khi

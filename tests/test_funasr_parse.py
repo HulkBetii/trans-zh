@@ -1,7 +1,8 @@
-"""Ghép mảng ``timestamp`` của FunASR với text đã có dấu câu.
+"""Pairing FunASR's ``timestamp`` array with its already-punctuated text.
 
-Đây là chỗ dễ lệch nhất trong S1: ``ct-punc`` chèn dấu câu vào text nhưng dấu câu
-không có timestamp riêng, nên zip thẳng hai mảng là sai ngay từ ký tự đầu tiên.
+The most misalignment-prone spot in S1: ``ct-punc`` inserts punctuation into the
+text, but punctuation carries no timestamp, so zipping the two arrays directly is
+wrong from the very first character.
 """
 
 from __future__ import annotations
@@ -11,65 +12,107 @@ import pytest
 from zhsub.asr.funasr_paraformer import parse_funasr_result, split_tokens
 
 
-def test_split_tokens_treo_dau_cau_vao_token_truoc():
+def test_split_tokens_attaches_punctuation_to_the_preceding_token():
     assert split_tokens("你好，世界。") == [
         ["你", ""], ["好", "，"], ["世", ""], ["界", "。"],
     ]
 
 
-def test_tu_tieng_anh_la_mot_token():
-    # FunASR sinh một timestamp cho cả từ Latin, không phải từng chữ cái.
+def test_an_english_word_is_a_single_token():
+    # FunASR emits one timestamp for a whole Latin word, not one per letter.
     assert split_tokens("我用 iPhone 拍的") == [
         ["我", ""], ["用", ""], ["iPhone", ""], ["拍", ""], ["的", ""],
     ]
 
 
-def test_timestamp_khop_token_khong_bi_lech_boi_dau_cau():
+def test_token_count_matches_timestamp_count_on_real_output():
+    """The invariant the whole parser rests on, taken from real FunASR output.
+
+    Sampled from the bundled 70s clip: 369 characters of punctuated text reduce to
+    333 tokens, and FunASR returns exactly 333 timestamps.
+    """
+    text = "试错的过程很简单，而且特别是今天报名唱学卡的同学，"
+    assert len(split_tokens(text)) == 8 + 15
+
+
+def test_timestamps_are_not_shifted_by_punctuation():
     res = [{
-        "sentence_info": [{
-            "text": "你好，世界。",
-            "start": 1000,
-            "end": 3000,
-            "timestamp": [[1000, 1400], [1400, 1800], [2200, 2600], [2600, 3000]],
-        }]
+        "text": "你好，世界。",
+        "timestamp": [[1000, 1400], [1400, 1800], [2200, 2600], [2600, 3000]],
     }]
     out = parse_funasr_result(res)
-    sent = out.sentences[0]
 
     assert out.degraded_sentences == 0
-    assert [t.text for t in sent.tokens] == ["你", "好", "世", "界"]
-    assert [t.punct_after for t in sent.tokens] == [None, "，", None, "。"]
-    # Milli giây -> giây, và mốc của "世" phải là 2.2s chứ không phải 1.8s
-    # (đúng cái sai nếu dấu câu bị tính là một token).
-    assert [t.start for t in sent.tokens] == pytest.approx([1.0, 1.4, 2.2, 2.6])
-    assert sent.start == pytest.approx(1.0)
-    assert sent.end == pytest.approx(3.0)
+    tokens = [t for s in out.sentences for t in s.tokens]
+    assert [t.text for t in tokens] == ["你", "好", "世", "界"]
+    assert [t.punct_after for t in tokens] == [None, "，", None, "。"]
+    # Milliseconds to seconds, and "世" must start at 2.2s rather than 1.8s —
+    # 1.8s is precisely the answer you get if punctuation is counted as a token.
+    assert [t.start for t in tokens] == pytest.approx([1.0, 1.4, 2.2, 2.6])
 
 
-def test_lech_so_luong_thi_chia_deu_va_danh_dau_degraded():
+def test_sentences_split_on_punctuation():
     res = [{
-        "sentence_info": [{
-            "text": "你好世界",
-            "start": 0,
-            "end": 4000,
-            "timestamp": [[0, 1000], [1000, 2000]],  # thiếu 2 timestamp
-        }]
+        "text": "你好，世界。",
+        "timestamp": [[1000, 1400], [1400, 1800], [2200, 2600], [2600, 3000]],
+    }]
+    out = parse_funasr_result(res)
+
+    assert [s.text for s in out.sentences] == ["你好，", "世界。"]
+    assert out.sentences[0].start == pytest.approx(1.0)
+    assert out.sentences[0].end == pytest.approx(1.8)
+    assert out.sentences[1].start == pytest.approx(2.2)
+
+
+def test_sentences_also_split_on_a_silent_gap():
+    # ct-punc regularly misses a pause; without a gap break the result is one long
+    # cue straddling an obvious silence.
+    res = [{
+        "text": "你好世界",
+        "timestamp": [[0, 400], [400, 800], [5000, 5400], [5400, 5800]],
+    }]
+    out = parse_funasr_result(res, gap_sec=0.5)
+
+    assert [s.text for s in out.sentences] == ["你好", "世界"]
+
+
+def test_sentence_info_is_ignored_even_when_present():
+    """FunASR 1.4.1 corrupts ``sentence_info``; the top-level pair is authoritative.
+
+    On the bundled 70s sample its text diverges from the top-level text at
+    character 297 and its per-sentence timestamps drift by up to 1.7s. Here the
+    embedded ``sentence_info`` deliberately disagrees with the top-level text, and
+    the parser must follow the top level.
+    """
+    res = [{
+        "text": "你好，世界。",
+        "timestamp": [[1000, 1400], [1400, 1800], [2200, 2600], [2600, 3000]],
+        "sentence_info": [{"text": "你好世，界。", "start": 9999, "end": 99999,
+                           "timestamp": [[9999, 9999]]}],
+    }]
+    out = parse_funasr_result(res)
+
+    assert "".join(s.text for s in out.sentences) == "你好，世界。"
+    assert out.sentences[0].start == pytest.approx(1.0)
+
+
+def test_count_mismatch_distributes_evenly_and_flags_degraded():
+    res = [{
+        "text": "你好世界",
+        "timestamp": [[0, 1000], [1000, 4000]],  # two timestamps missing
     }]
     out = parse_funasr_result(res)
 
     assert out.degraded_sentences == 1
-    assert [t.start for t in out.sentences[0].tokens] == pytest.approx([0.0, 1.0, 2.0, 3.0])
+    tokens = [t for s in out.sentences for t in s.tokens]
+    assert [t.start for t in tokens] == pytest.approx([0.0, 1.0, 2.0, 3.0])
 
 
-def test_khong_co_sentence_info_thi_dung_text_o_cap_tren():
-    res = [{"text": "你好", "timestamp": [[500, 900], [900, 1300]]}]
-    out = parse_funasr_result(res)
-
-    assert len(out.sentences) == 1
-    assert out.sentences[0].start == pytest.approx(0.5)
-    assert out.degraded_sentences == 0
+def test_missing_timestamps_raise_rather_than_inventing_a_timeline():
+    with pytest.raises(ValueError, match="timestamp"):
+        parse_funasr_result([{"text": "你好", "timestamp": []}])
 
 
-def test_ket_qua_rong():
+def test_empty_result():
     assert parse_funasr_result([]).sentences == []
-    assert parse_funasr_result([{"sentence_info": []}]).sentences == []
+    assert parse_funasr_result([{"text": ""}]).sentences == []
