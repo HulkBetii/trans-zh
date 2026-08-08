@@ -220,17 +220,22 @@ def cjk_ratio(text: str) -> float:
     return sum(1 for ch in text if "一" <= ch <= "鿿") / len(text)
 
 
-def looks_untranslated(text: str) -> bool:
+def looks_untranslated(text: str, keep_source: tuple[str, ...] = ()) -> bool:
     """Whether a translation still carries Chinese it should not.
 
-    A ratio alone is too lenient: an otherwise-Vietnamese line ending in
-    "hoang诞无比" scores only 0.13 and would slip through, yet it is plainly a
-    failure. In a Vietnamese or English subtitle any run of Han characters is wrong
-    unless it came from a ``keep_source`` glossary entry, and those are short — so a
-    small absolute count catches the leaks a ratio misses.
+    In a Vietnamese or English subtitle **any** Han character is wrong unless it
+    came from a ``keep_source`` glossary entry, so those are removed first and
+    anything left over counts.
+
+    A ratio threshold is far too lenient here. Measured on real qwen2.5-7b output:
+    "hoang诞无比" scores 0.13, and the model's most common failure is a single
+    character welded into a Vietnamese word — "trốn狱" — which no ratio or
+    small-count rule would ever catch.
     """
-    han = sum(1 for ch in text if "一" <= ch <= "鿿")
-    return han >= 3 or (len(text) > 0 and han / len(text) > 0.3)
+    for term in keep_source:
+        if term:
+            text = text.replace(term, "")
+    return any("一" <= ch <= "鿿" for ch in text)
 
 
 def _translate_batch(
@@ -290,6 +295,7 @@ def translate_segments(
 ) -> list[TranslationItem]:
     system = build_system_prompt(glossary, lang)
     review_system = system + REVIEW_SUFFIX
+    keep_source = tuple(t.zh for t in glossary.terms if t.keep_source)
     by_id = {s.id: s for s in segments}
     results: dict[int, TranslationItem] = {}
 
@@ -324,14 +330,16 @@ def translate_segments(
         # source instead of translating it. Retrying just those entries is far cheaper
         # than re-running the batch, and leaving them through would ship Chinese
         # subtitles labelled Vietnamese.
-        leaked = [s for s in batch if looks_untranslated(drafts.get(s.id, ""))]
+        leaked = [s for s in batch if looks_untranslated(drafts.get(s.id, ""), keep_source)]
         if leaked:
             log.warning("S4[%s]: %d câu chưa được dịch, gọi lại riêng", lang, len(leaked))
             try:
                 redone = _translate_batch(
                     provider, system, leaked, before, after, cfg, budgets=budgets
                 )
-                drafts.update({k: v for k, v in redone.items() if not looks_untranslated(v)})
+                drafts.update(
+                    {k: v for k, v in redone.items() if not looks_untranslated(v, keep_source)}
+                )
             except (TranslationFailure, LLMError) as exc:
                 log.warning("S4[%s]: gọi lại không cứu được: %s", lang, exc)
 
@@ -345,7 +353,8 @@ def translate_segments(
                 # whichever version actually is the target language.
                 final = {
                     k: (drafts[k]
-                        if looks_untranslated(v) and not looks_untranslated(drafts.get(k, ""))
+                        if looks_untranslated(v, keep_source)
+                        and not looks_untranslated(drafts.get(k, ""), keep_source)
                         else v)
                     for k, v in final.items()
                 }

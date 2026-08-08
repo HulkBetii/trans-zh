@@ -76,10 +76,12 @@ class TranslateConfig(BaseModel):
     review_pass: bool = True
     max_retries: int = 3
     # MUST be bumped whenever a prompt changes, otherwise stale cache entries are
-    # served. v2: prompts and JSON keys moved to English, and scene context moved
-    # out of the JSON payload, after both were measured to break translation on
-    # small local models.
-    prompt_version: int = 2
+    # served — silently, which is the worst kind of wrong.
+    #   v2: prompts and JSON keys moved to English, and scene context moved out of
+    #       the JSON payload, after both were measured to break translation on
+    #       small local models.
+    #   v3: per-entry "max_chars" budget added to the prompt.
+    prompt_version: int = 3
 
 
 class LangLimits(BaseModel):

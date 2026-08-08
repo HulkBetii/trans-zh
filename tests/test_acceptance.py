@@ -308,12 +308,27 @@ def test_budget_reaches_the_model():
     assert all("max_chars" in entry for entry in payload["to_translate"])
 
 
-def test_leftover_chinese_is_detected_even_when_it_is_a_minority():
-    """A ratio alone misses the common case of a trailing Chinese fragment."""
+def test_any_leftover_chinese_counts_as_untranslated():
+    """A ratio or small-count rule misses the model's most common failure.
+
+    All three of these came out of real qwen2.5-7b output. "trốn狱" welds a single
+    Han character into a Vietnamese word — no threshold catches it, yet it is
+    exactly the defect that would ship.
+    """
     assert not s4_translate.looks_untranslated("Anh ta là trùm sò của giới vượt ngục")
     assert s4_translate.looks_untranslated("他是美国越狱史上的扛把子")
-    # Observed in a real run: an otherwise-Vietnamese line ending in Chinese.
     assert s4_translate.looks_untranslated("càng ngày càng hoang诞无比")
+    assert s4_translate.looks_untranslated("hoặc trốn狱, hoặc chết")
+
+
+def test_keep_source_terms_are_not_flagged_as_untranslated():
+    """A glossary entry marked keep_source is supposed to stay in Chinese."""
+    assert not s4_translate.looks_untranslated(
+        "Món 麻婆豆腐 rất nổi tiếng", keep_source=("麻婆豆腐",)
+    )
+    assert s4_translate.looks_untranslated(
+        "Món 麻婆豆腐 rất 好吃", keep_source=("麻婆豆腐",)
+    )
 
 
 def test_target_language_is_named_explicitly_in_the_prompt():
