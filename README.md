@@ -12,8 +12,8 @@ Nguyên tắc bất di bất dịch: **timestamp chỉ đến từ ASR, không b
 LLM chỉ được trả về text và vị trí ngắt trên chuỗi ký tự; mọi mốc thời gian đều
 tra ngược về mảng token của S1.
 
-> **Trạng thái: Giai đoạn 0 (benchmark).** Mới có S0 (ingest), S1 (ASR) và
-> harness đo lường. S2–S5 thuộc giai đoạn build đầy đủ, chưa làm.
+> **Trạng thái:** S0–S5 đã hoạt động, CLI đầy đủ (`run` / `batch` / `resume` /
+> `asr` / `jobs`). Benchmark ở `bench/` đã chọn `paraformer-zh` làm engine ASR.
 
 ---
 
@@ -90,12 +90,48 @@ Y hệt, chỉ thay bước ffmpeg bằng `apt install ffmpeg`.
 
 ---
 
-## Dùng
-
-### Chỉ chạy ASR, để kiểm tra timeline
+## Cấu hình LLM
 
 ```bash
+cp zhsub.toml.example zhsub.toml
+```
+
+Rồi điền `[llm.segment]` và `[llm.translate]`. Hai khâu cấu hình riêng vì ngắt câu
+(S2) là việc cơ học, chỉ khâu dịch (S4) mới cần model mạnh.
+
+Chạy hoàn toàn local, không tốn tiền API:
+
+```bash
+winget install Ollama.Ollama
+setx OLLAMA_MODELS D:\ollama-models
+ollama pull qwen2.5:7b-instruct
+```
+
+Rồi trỏ `base_url = "http://localhost:11434/v1"` và `api_key_env = ""`.
+
+**Đặt `OLLAMA_MODELS` ra ngoài ổ hệ thống trước khi pull.** Mặc định Ollama lưu
+vào `%USERPROFILE%\.ollama`, và một model 7B chiếm ~5GB.
+
+## Dùng
+
+```bash
+# một file
+uv run zhsub run video.mp4 --target vi,en --out ./output
+
+# song ngữ: dòng trên tiếng Trung, dòng dưới bản dịch
+uv run zhsub run video.mp4 --target vi --bilingual
+
+# cả thư mục, 2 job song song
+uv run zhsub batch ./inbox --target vi --concurrency 2
+
+# chạy lại từ một stage sau khi sửa glossary.json
+uv run zhsub resume <job_id> --from translate
+
+# chỉ ASR, để kiểm tra timeline
 uv run zhsub asr video.mp4 --out raw.srt
+
+# xem trạng thái job
+uv run zhsub jobs
 ```
 
 Nhận file local hoặc URL (Bilibili...). Video cần đăng nhập thì đặt
@@ -104,6 +140,25 @@ bạn đang đăng nhập sẵn; pipeline không bao giờ tự nhập tài kho�
 
 Kết quả trung gian nằm ở `work/<job_id>/`. `job_id` sinh tất định theo nguồn nên
 chạy lại cùng một file là dùng lại kết quả cũ thay vì làm lại từ đầu.
+
+### Sửa glossary rồi dịch lại
+
+Đây là vòng lặp quan trọng nhất để bản dịch chuẩn:
+
+1. Chạy `zhsub run` một lần.
+2. Mở `work/<job_id>/glossary.json`, sửa tên riêng và thuật ngữ cho đúng. Sửa cả
+   `address_terms` nếu xưng hô tiếng Việt chưa hợp.
+3. `uv run zhsub resume <job_id> --from translate`
+
+Cache dịch có `glossary_hash` trong khoá nên sửa glossary sẽ tự động dịch lại
+đúng những câu bị ảnh hưởng, không dịch lại phần còn nguyên.
+
+### `batch` sau khi mất điện
+
+Chạy lại đúng lệnh cũ. Job đã `done` bị bỏ qua, job kẹt ở `running` với heartbeat
+quá hạn được thu hồi về `pending`, và stage nào đã có file JSON hợp lệ thì không
+chạy lại. Process bị giết không bao giờ chạy được cleanup, nên trạng thái phải
+suy ra từ heartbeat chứ không thể trông vào shutdown hook.
 
 ---
 

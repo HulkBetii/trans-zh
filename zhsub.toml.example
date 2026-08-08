@@ -83,6 +83,7 @@ max_cps = 9.0
 #
 # provider: "openai" (mọi endpoint OpenAI-compatible) | "anthropic"
 # api_key_env: tên BIẾN MÔI TRƯỜNG chứa key, không phải key.
+#              Để "" nếu endpoint chạy local và không cần xác thực.
 # ---------------------------------------------------------------------------
 [llm.segment]
 provider = "openai"
@@ -102,7 +103,24 @@ temperature = 0.3
 max_retries = 3
 timeout_sec = 180
 
-# Ví dụ dùng Anthropic cho khâu dịch (cần đặt ANTHROPIC_API_KEY):
+# --- Chạy hoàn toàn local bằng Ollama (không tốn tiền API) -----------------
+# Cài: winget install Ollama.Ollama
+# Kho model nên đặt ngoài ổ hệ thống: đặt biến môi trường OLLAMA_MODELS,
+# ví dụ D:\ollama-models — model 7B chiếm khoảng 5GB.
+# Tải model: ollama pull qwen2.5:7b-instruct
+#
+# [llm.translate]
+# provider = "openai"
+# base_url = "http://localhost:11434/v1"
+# api_key_env = ""              # Ollama không cần key
+# model = "qwen2.5:7b-instruct"
+# temperature = 0.3
+# timeout_sec = 600             # model local chậm hơn API nhiều
+#
+# Model local nhỏ hay phá vỡ ràng buộc tập id ở S4. Nếu thấy log báo chia đôi
+# batch liên tục thì giảm translate.batch_size xuống 10-15.
+
+# --- Anthropic cho khâu dịch (cần đặt ANTHROPIC_API_KEY) -------------------
 # [llm.translate]
 # provider = "anthropic"
 # base_url = "https://api.anthropic.com"
