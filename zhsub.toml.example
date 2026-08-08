@@ -1,0 +1,111 @@
+# Copy sang `zhsub.toml` rồi sửa. API key đọc từ biến môi trường, KHÔNG để trong file này.
+# Giai đoạn benchmark (bench/) không dùng phần [llm.*] — chỉ cần khi chạy S2 trở đi.
+
+[paths]
+work_dir = "work"
+cache_dir = ".cache"
+jobs_db = "jobs.db"
+
+# ---------------------------------------------------------------------------
+# S0 — ingest
+# ---------------------------------------------------------------------------
+[ingest]
+sample_rate = 16000
+channels = 1
+# Bilibili / URL: yt-dlp lấy cookie từ browser đang đăng nhập.
+# Để "" nếu chỉ tải video công khai. Giá trị hợp lệ: chrome, edge, firefox, brave...
+cookies_from_browser = "edge"
+
+# ---------------------------------------------------------------------------
+# S1 — ASR. Timestamp sinh ra ở đây là nguồn sự thật duy nhất cho toàn pipeline.
+# ---------------------------------------------------------------------------
+[asr]
+engine = "funasr-paraformer"
+model = "paraformer-zh"
+vad_model = "fsmn-vad"
+punc_model = "ct-punc"
+device = "auto"          # auto | cuda | cpu
+batch_size_s = 300       # cửa sổ gộp VAD của FunASR (giây)
+
+# FunASR đã tự cắt theo VAD và trả timestamp tuyệt đối. Lớp chunk bên ngoài chỉ
+# bật khi file dài hơn ngưỡng này — bọc thêm một tầng offset là tự chuốc bug.
+outer_chunk_threshold_sec = 5400   # 90 phút
+outer_chunk_sec = 1800             # 30 phút
+outer_chunk_overlap_sec = 2.0
+
+# ---------------------------------------------------------------------------
+# S2 — ngắt câu lại theo ngữ nghĩa
+# ---------------------------------------------------------------------------
+[segment]
+min_duration_sec = 0.8
+max_duration_sec = 7.0
+merge_gap_sec = 0.25
+# Chuỗi gửi cho LLM được chia nhỏ tại khoảng lặng VAD dài hơn ngưỡng này.
+chunk_at_silence_sec = 0.5
+max_chars_per_llm_call = 1800
+# Dưới ngưỡng khớp này thì coi như LLM trả về sai chuỗi, không repair nữa.
+repair_min_ratio = 0.95
+max_retries = 2
+
+# ---------------------------------------------------------------------------
+# S4 — dịch
+# ---------------------------------------------------------------------------
+[translate]
+batch_size = 40
+context_before = 10
+context_after = 5
+review_pass = true       # lượt 2: tự rà và chỉnh lại
+max_retries = 3          # hết retry thì chia đôi batch
+prompt_version = 1       # BẮT BUỘC bump khi sửa prompt, nếu không sẽ ăn cache cũ
+
+# ---------------------------------------------------------------------------
+# S5 — render. Giới hạn tách theo ngôn ngữ: 42 ký tự / CPS 21 là chuẩn chữ
+# Latin, quá rộng cho dòng tiếng Trung (chuẩn CJK ~20 ký tự / CPS 9).
+# ---------------------------------------------------------------------------
+[render]
+max_lines = 2
+
+[render.limits.vi]
+max_chars_per_line = 42
+max_cps = 21.0
+
+[render.limits.en]
+max_chars_per_line = 42
+max_cps = 21.0
+
+[render.limits.zh]
+max_chars_per_line = 20
+max_cps = 9.0
+
+# ---------------------------------------------------------------------------
+# LLM. Model dùng để ngắt câu và model dùng để dịch cấu hình riêng: S2 là việc
+# cơ học (chèn dấu ngắt) nên dùng model rẻ, S4 mới cần model mạnh.
+#
+# provider: "openai" (mọi endpoint OpenAI-compatible) | "anthropic"
+# api_key_env: tên BIẾN MÔI TRƯỜNG chứa key, không phải key.
+# ---------------------------------------------------------------------------
+[llm.segment]
+provider = "openai"
+base_url = "https://api.openai.com/v1"
+api_key_env = "OPENAI_API_KEY"
+model = "SET_ME"          # ví dụ một model nhỏ, rẻ
+temperature = 0.0
+max_retries = 3
+timeout_sec = 120
+
+[llm.translate]
+provider = "openai"
+base_url = "https://api.openai.com/v1"
+api_key_env = "OPENAI_API_KEY"
+model = "SET_ME"          # model mạnh nhất bạn có quyền dùng
+temperature = 0.3
+max_retries = 3
+timeout_sec = 180
+
+# Ví dụ dùng Anthropic cho khâu dịch (cần đặt ANTHROPIC_API_KEY):
+# [llm.translate]
+# provider = "anthropic"
+# base_url = "https://api.anthropic.com"
+# api_key_env = "ANTHROPIC_API_KEY"
+# model = "SET_ME"
+# temperature = 0.3

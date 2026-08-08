@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+
+# State & output của pipeline
+work/
+output/
+jobs.db
+jobs.db-journal
+jobs.db-wal
+.cache/
+zhsub.toml
+
+# Dữ liệu benchmark (media lớn; ref.srt được commit riêng nếu muốn)
+bench/data/*
+!bench/data/.gitkeep
+!bench/data/README.md
+
+.pytest_cache/
+.vscode/
+.idea/
