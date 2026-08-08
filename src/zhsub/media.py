@@ -1,0 +1,111 @@
+"""Bọc ffmpeg / ffprobe.
+
+Tách riêng khỏi S0 vì bench cũng cần đổi clip sang WAV mà không muốn kéo theo cả
+stage ingest.
+"""
+
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+
+class MediaError(RuntimeError):
+    pass
+
+
+def _require(tool: str) -> str:
+    path = shutil.which(tool)
+    if path is None:
+        raise MediaError(
+            f"Không tìm thấy {tool} trong PATH. Trên Windows: winget install Gyan.FFmpeg "
+            f"rồi mở lại terminal."
+        )
+    return path
+
+
+def _run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if proc.returncode != 0:
+        tail = (proc.stderr or "").strip().splitlines()[-15:]
+        raise MediaError(f"{Path(cmd[0]).name} lỗi (exit {proc.returncode}):\n" + "\n".join(tail))
+    return proc
+
+
+def probe_duration(path: str | Path) -> float:
+    """Độ dài media, tính bằng giây."""
+    ffprobe = _require("ffprobe")
+    proc = _run(
+        [
+            ffprobe,
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "json",
+            str(path),
+        ]
+    )
+    try:
+        return float(json.loads(proc.stdout)["format"]["duration"])
+    except (KeyError, ValueError, json.JSONDecodeError) as exc:
+        raise MediaError(f"Không đọc được độ dài của {path}: {exc}") from exc
+
+
+def to_wav(
+    src: str | Path,
+    dst: str | Path,
+    sample_rate: int = 16000,
+    channels: int = 1,
+) -> Path:
+    """Chuẩn hoá về WAV PCM 16-bit, mặc định 16kHz mono — định dạng FunASR cần.
+
+    Ghi ra file tạm rồi ``replace`` để lần chạy bị ngắt giữa chừng không để lại
+    WAV cụt mà stage sau lại tưởng là hợp lệ.
+    """
+    ffmpeg = _require("ffmpeg")
+    dst = Path(dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dst.with_name(dst.name + ".tmp.wav")
+    try:
+        _run(
+            [
+                ffmpeg,
+                "-nostdin",
+                "-y",
+                "-i", str(src),
+                "-vn",
+                "-ac", str(channels),
+                "-ar", str(sample_rate),
+                "-acodec", "pcm_s16le",
+                "-f", "wav",
+                str(tmp),
+            ]
+        )
+        tmp.replace(dst)
+    finally:
+        tmp.unlink(missing_ok=True)
+    return dst
+
+
+def slice_wav(src: str | Path, dst: str | Path, start_sec: float, duration_sec: float) -> Path:
+    """Cắt một đoạn WAV. Chỉ dùng cho lớp chunk ngoài với file cực dài.
+
+    ``-ss`` đặt **trước** ``-i`` để ffmpeg seek nhanh; với WAV PCM thì seek là
+    chính xác mẫu nên không sợ lệch mốc như khi seek trên container nén.
+    """
+    ffmpeg = _require("ffmpeg")
+    dst = Path(dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    _run(
+        [
+            ffmpeg,
+            "-nostdin", "-y",
+            "-ss", f"{start_sec:.6f}",
+            "-t", f"{duration_sec:.6f}",
+            "-i", str(src),
+            "-c", "copy",
+            str(dst),
+        ]
+    )
+    return dst
