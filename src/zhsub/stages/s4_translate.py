@@ -34,6 +34,16 @@ class TranslationFailure(RuntimeError):
     """Raised when a batch cannot be translated with the id set intact."""
 
 
+def compute_segments_hash(segments_doc: SegmentsDoc) -> str:
+    """Hash only what a translation actually depends on: the ids and their text.
+
+    Timings are excluded on purpose — a cue that merely shifted does not need
+    re-translating, and including them would throw away the cache on every
+    re-render.
+    """
+    return sha256_json_canonical([[s.id, s.text_zh] for s in segments_doc.segments])
+
+
 def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
     lines: list[str] = []
     if glossary.terms:
@@ -266,6 +276,8 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False) -> dict[st
     glossary = read_doc(glossary_path, GlossaryDoc) if glossary_path.is_file() else GlossaryDoc()
     glossary_hash = sha256_json_canonical(glossary.model_dump(by_alias=True, mode="json"))
 
+    segments_hash = compute_segments_hash(segments_doc)
+
     from ..llm.factory import build_provider
 
     provider = build_provider(cfg.llm.translate, "translate")
@@ -275,8 +287,15 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False) -> dict[st
     for lang in langs:
         out_json = work_dir / f"translations.{lang}.json"
         if out_json.is_file() and not force:
-            out[lang] = read_doc(out_json, TranslationsDoc)
-            continue
+            existing = read_doc(out_json, TranslationsDoc)
+            # Re-running S2 renumbers and re-splits segments, so anything translated
+            # against the old segmentation is stale. Reusing it would break the 1-1
+            # relation the timeline depends on. The text cache still absorbs the
+            # cost: only genuinely changed segments are paid for again.
+            if existing.segments_hash == segments_hash:
+                out[lang] = existing
+                continue
+            log.info("S4[%s]: segments.json đã đổi — dịch lại (cache vẫn dùng được)", lang)
 
         items = translate_segments(
             segments_doc.segments, lang, provider, glossary, cfg, cache, glossary_hash
@@ -286,6 +305,7 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False) -> dict[st
             model=provider.model,
             prompt_version=cfg.translate.prompt_version,
             glossary_hash=glossary_hash,
+            segments_hash=segments_hash,
             items=items,
         )
         write_doc(out_json, doc)

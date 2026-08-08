@@ -238,6 +238,11 @@ class TranslationsDoc(_Doc):
     model: str
     prompt_version: int
     glossary_hash: str
+    # Hash of the (id, text_zh) pairs this file was produced from. Re-running S2
+    # changes the segmentation, which silently invalidates every translation below
+    # it; without this the stale file is reused and the 1-1 relation breaks.
+    # Deliberately excludes timings: a cue that only moved needs no re-translation.
+    segments_hash: str = ""
     items: list[TranslationItem]
 
 

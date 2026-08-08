@@ -129,6 +129,64 @@ def _fix_break_positions(doc: AsrDoc, breaks: list[int], lo: int, hi: int) -> li
     return sorted(set(fixed))
 
 
+def _best_split_point(doc: AsrDoc, lo: int, hi: int) -> int:
+    """Pick the least damaging place to cut ``[lo, hi)``, biased toward the middle.
+
+    Preference order mirrors how a human would break the line: a sentence end, then
+    a clause mark, then an audible pause. Ties go to whichever candidate sits
+    closest to the midpoint so the two halves come out balanced.
+    """
+    mid = (lo + hi) // 2
+    best: tuple[int, int, int] | None = None
+    for i in range(lo + 1, hi):
+        prev = doc.tokens[i - 1]
+        score = 0
+        if prev.punct_after:
+            if any(p in prev.punct_after for p in "。？！"):
+                score += 4
+            elif any(p in prev.punct_after for p in "，、；："):
+                score += 2
+        gap = doc.tokens[i].start - prev.end
+        if gap >= 0.3:
+            score += 3
+        elif gap >= 0.15:
+            score += 1
+        if score == 0:
+            continue
+        candidate = (score, -abs(i - mid), i)
+        if best is None or candidate > best:
+            best = candidate
+    return best[2] if best is not None else mid
+
+
+def _enforce_max_duration(
+    doc: AsrDoc, ranges: list[tuple[int, int]], max_duration_sec: float
+) -> list[tuple[int, int]]:
+    """Split any range longer than the ceiling, recursively.
+
+    Without this, ``max_duration_sec`` only ever acts as a guard against *merging*
+    too far, and an under-segmenting model sails straight past it. Observed on a
+    real 3-minute clip: a single cue of 129 tokens spanning 26.5s against a 7s
+    limit, which then overflowed every line-length rule downstream.
+    """
+    out: list[tuple[int, int]] = []
+    stack = list(reversed(ranges))
+    while stack:
+        lo, hi = stack.pop()
+        duration = doc.tokens[hi - 1].end - doc.tokens[lo].start
+        # Below four tokens there is nothing meaningful left to cut.
+        if duration <= max_duration_sec or hi - lo < 4:
+            out.append((lo, hi))
+            continue
+        split = _best_split_point(doc, lo, hi)
+        if not (lo < split < hi):
+            out.append((lo, hi))
+            continue
+        stack.append((split, hi))
+        stack.append((lo, split))
+    return out
+
+
 def _segment_chunk(
     doc: AsrDoc, lo: int, hi: int, provider: LLMProvider | None, cfg: Config
 ) -> tuple[list[int], str]:
@@ -156,13 +214,23 @@ def _segment_chunk(
             if token_breaks:
                 return token_breaks, method
             best_method = method
-        log.warning(
-            "S2: chunk [%d:%d] khớp %.3f < %.2f (lần %d) — thử lại",
-            lo, hi, ratio, cfg.segment.repair_min_ratio, attempt + 1,
-        )
+            # Distinct failure from a corrupted echo: the model returned the string
+            # intact but inserted no break at all. Saying "khớp 1.000 < 0.95" here
+            # would be nonsense, so name what actually went wrong.
+            log.warning(
+                "S2: chunk [%d:%d] LLM trả về nguyên vẹn nhưng không chèn chỗ ngắt nào "
+                "(lần %d) — thử lại", lo, hi, attempt + 1,
+            )
+        else:
+            log.warning(
+                "S2: chunk [%d:%d] khớp %.3f < %.2f (lần %d) — thử lại",
+                lo, hi, ratio, cfg.segment.repair_min_ratio, attempt + 1,
+            )
 
+    # Report what actually produced the breaks. Carrying the LLM's method label
+    # through a rule fallback makes segments.json claim a provenance it does not have.
     log.warning("S2: chunk [%d:%d] rơi xuống ngắt theo rule", lo, hi)
-    return _rule_based_breaks(doc, lo, hi, cfg), best_method if best_method != "rule_fallback" else "rule_fallback"
+    return _rule_based_breaks(doc, lo, hi, cfg), "rule_fallback"
 
 
 def build_segments(doc: AsrDoc, provider: LLMProvider | None, cfg: Config) -> SegmentsDoc:
@@ -181,6 +249,10 @@ def build_segments(doc: AsrDoc, provider: LLMProvider | None, cfg: Config) -> Se
 
     bounds = sorted({0, *[b for b in all_breaks if 0 < b <= len(doc.tokens)], len(doc.tokens)})
     ranges = [(a, b) for a, b in zip(bounds, bounds[1:]) if b > a]
+
+    # The ceiling has to be enforced here, not merely respected while merging: a
+    # model that under-segments produces ranges already far past it.
+    ranges = _enforce_max_duration(doc, ranges, cfg.segment.max_duration_sec)
 
     spans = [Span(doc.tokens[a].start, doc.tokens[b - 1].end) for a, b in ranges]
     groups = merge_adjacent(spans, cfg.segment.merge_gap_sec, cfg.segment.max_duration_sec)

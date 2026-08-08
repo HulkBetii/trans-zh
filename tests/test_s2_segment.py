@@ -11,13 +11,26 @@ from zhsub.stages.s2_segment import build_segments
 from .fake_llm import SegmentingProvider
 
 
+_PUNCT = "。，、；：？！"
+
+
 def _asr_doc(text: str, start: float = 1.0, step: float = 0.25, gap_at: int | None = None) -> AsrDoc:
-    tokens = []
+    """Build an AsrDoc the way S1 really does.
+
+    Punctuation must hang off the previous token's ``punct_after`` rather than
+    becoming a token of its own — that is what ct-punc produces, and any splitting
+    heuristic that reads punctuation depends on it.
+    """
+    tokens: list[Token] = []
     t = start
-    for i, ch in enumerate(text):
-        if gap_at is not None and i == gap_at:
+    for ch in text:
+        if ch in _PUNCT:
+            if tokens:
+                tokens[-1].punct_after = (tokens[-1].punct_after or "") + ch
+            continue
+        if gap_at is not None and len(tokens) == gap_at:
             t += 2.0  # a clear silence
-        tokens.append(Token(i=i, text=ch, start=round(t, 3), end=round(t + step, 3)))
+        tokens.append(Token(i=len(tokens), text=ch, start=round(t, 3), end=round(t + step, 3)))
         t += step
     return AsrDoc(
         engine=EngineInfo(name="fake", version="0", models={}, device="cpu"),
@@ -98,3 +111,40 @@ def test_max_duration_is_respected():
 
     for seg in result.segments:
         assert seg.end - seg.start <= cfg.segment.max_duration_sec + 1e-6
+
+
+def test_max_duration_holds_when_the_llm_returns_no_breaks_at_all():
+    """The ceiling must not depend on the model cooperating.
+
+    Observed on a real 3-minute clip: qwen2.5-7b returned almost no break markers
+    for one chunk, producing a single 26.5s cue against a 7s limit, which then blew
+    through every line-length rule downstream. `max_duration_sec` was only guarding
+    merges, never forcing a split.
+    """
+
+    class _NoBreaks(SegmentingProvider):
+        def _call(self, system, user, cache_system, json_mode=False):
+            return user  # echoes the stream back untouched
+
+    doc = _asr_doc("他是美国越狱史上的扛把子，被称为美国最会逃的男人。" * 3, step=0.35)
+    cfg = Config()
+    result = build_segments(doc, _NoBreaks(), cfg)
+
+    longest = max(s.end - s.start for s in result.segments)
+    assert longest <= cfg.segment.max_duration_sec + 1e-6, f"còn cue dài {longest:.2f}s"
+    covered = [i for s in result.segments for i in range(*s.token_range)]
+    assert covered == list(range(len(doc.tokens))), "cắt xong vẫn phải phủ đủ token"
+
+
+def test_long_range_is_split_at_punctuation_not_arbitrarily():
+    doc = _asr_doc("他是美国越狱史上的扛把子。被称为美国最会逃的男人", step=0.4)
+
+    class _NoBreaks(SegmentingProvider):
+        def _call(self, system, user, cache_system, json_mode=False):
+            return user
+
+    result = build_segments(doc, _NoBreaks(), Config())
+
+    # The full stop sits after 12 characters; a cut there should be preferred over
+    # a blind midpoint split.
+    assert any(s.text_zh.endswith("。") for s in result.segments)
