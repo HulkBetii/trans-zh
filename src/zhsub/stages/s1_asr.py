@@ -152,12 +152,6 @@ def run(work_dir: Path, cfg: Config, force: bool = False) -> AsrDoc:
 
     engine = build_engine(cfg)
     out = transcribe_file(wav_path, ingest.media.duration_sec, engine, cfg)
-    if out.degraded_sentences:
-        log.warning(
-            "%d câu phải chia đều timestamp do lệch số token — timeline chỗ đó kém chính xác",
-            out.degraded_sentences,
-        )
-
     doc = build_asr_doc(out, engine, ingest.media.duration_sec)
     write_doc(out_json, doc)
     log.info("S1 xong: %d token, %d câu thô", len(doc.tokens), len(doc.raw_segments))

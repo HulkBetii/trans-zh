@@ -42,7 +42,6 @@ def test_timestamps_are_not_shifted_by_punctuation():
     }]
     out = parse_funasr_result(res)
 
-    assert out.degraded_sentences == 0
     tokens = [t for s in out.sentences for t in s.tokens]
     assert [t.text for t in tokens] == ["你", "好", "世", "界"]
     assert [t.punct_after for t in tokens] == [None, "，", None, "。"]

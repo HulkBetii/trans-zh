@@ -140,7 +140,6 @@ def parse_funasr_result(res: list[dict], gap_sec: float = 0.5) -> AsrOutput:
         return AsrOutput()
 
     pairs = split_tokens(text)
-    degraded = 0
 
     if len(pairs) == len(timestamps):
         tokens = [
@@ -165,7 +164,7 @@ def parse_funasr_result(res: list[dict], gap_sec: float = 0.5) -> AsrOutput:
             f"Báo lại kèm đoạn text để sửa split_tokens."
         )
 
-    return AsrOutput(sentences=_group_into_sentences(tokens, gap_sec), degraded_sentences=degraded)
+    return AsrOutput(sentences=_group_into_sentences(tokens, gap_sec))
 
 
 class FunASRParaformer:

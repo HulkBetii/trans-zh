@@ -38,10 +38,6 @@ class AsrSentence:
 @dataclass(slots=True)
 class AsrOutput:
     sentences: list[AsrSentence] = field(default_factory=list)
-    # Sentences where the timestamp count did not match the token count and time
-    # had to be distributed evenly. Recorded in asr.json so the result's
-    # trustworthiness is visible rather than assumed.
-    degraded_sentences: int = 0
 
 
 @runtime_checkable
@@ -109,7 +105,6 @@ def shift_output(out: AsrOutput, offset: float) -> AsrOutput:
             )
             for s in out.sentences
         ],
-        degraded_sentences=out.degraded_sentences,
     )
 
 
@@ -126,11 +121,9 @@ def merge_outputs(parts: list[tuple[float, AsrOutput]]) -> AsrOutput:
     characters.
     """
     merged: list[AsrSentence] = []
-    degraded = 0
     frontier = float("-inf")
 
     for offset, out in parts:
-        degraded += out.degraded_sentences
         for sent in shift_output(out, offset).sentences:
             if sent.start < frontier - 1e-6:
                 continue
@@ -138,4 +131,4 @@ def merge_outputs(parts: list[tuple[float, AsrOutput]]) -> AsrOutput:
             frontier = max(frontier, sent.end)
 
     merged.sort(key=lambda s: (s.start, s.end))
-    return AsrOutput(sentences=merged, degraded_sentences=degraded)
+    return AsrOutput(sentences=merged)
