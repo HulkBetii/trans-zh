@@ -1,8 +1,8 @@
-"""Schema của toàn bộ file JSON trung gian trong ``work/<job_id>/``.
+"""Schemas for every intermediate JSON file under ``work/<job_id>/``.
 
-Nguyên tắc xuyên suốt: **timestamp chỉ đến từ ASR**. ``AsrDoc.tokens`` là mảng
-neo duy nhất; mọi stage sau chỉ được tham chiếu tới nó bằng index, không bao giờ
-tự sinh ra hoặc parse mốc thời gian từ chỗ khác.
+Core invariant: **timestamps only ever come from ASR**. ``AsrDoc.tokens`` is the
+single anchor array; later stages reference it by index and must never invent or
+parse timing from anywhere else.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ Lang = Literal["vi", "en"]
 
 
 class _Doc(BaseModel):
-    """Base cho mọi file JSON được ghi ra đĩa."""
+    """Base class for every JSON document written to disk."""
 
     schema_version: int = Field(default=SCHEMA_VERSION, alias="schema")
 
@@ -56,13 +56,14 @@ class IngestDoc(_Doc):
 
 
 class Token(BaseModel):
-    """Một ký tự **có timestamp** từ ASR.
+    """A single **timestamped** unit from ASR.
 
-    Dấu câu do ``ct-punc`` chèn không có timestamp riêng nên được treo vào
-    ``punct_after`` của token liền trước. Nhờ vậy hai chuỗi tách bạch hoàn toàn:
+    Punctuation inserted by ``ct-punc`` carries no timestamp of its own, so it
+    hangs off the preceding token as ``punct_after``. That keeps two streams
+    cleanly separated:
 
-    * chuỗi để align / gửi cho LLM  = concat(``text``)
-    * chuỗi để hiển thị             = concat(``text`` + ``punct_after``)
+    * stream used for alignment / sent to the LLM = concat(``text``)
+    * stream used for display                     = concat(``text`` + ``punct_after``)
     """
 
     i: int
@@ -73,12 +74,12 @@ class Token(BaseModel):
 
 
 class RawSegment(BaseModel):
-    """Câu do ASR tự ngắt (theo khoảng lặng VAD), trước khi S2 ngắt lại."""
+    """A sentence as split by ASR itself (on VAD silence), before S2 re-splits."""
 
     id: int
     start: float
     end: float
-    token_range: tuple[int, int]  # nửa mở [lo, hi)
+    token_range: tuple[int, int]  # half-open [lo, hi)
 
 
 class EngineInfo(BaseModel):
@@ -93,8 +94,8 @@ class AsrDoc(_Doc):
     audio_duration_sec: float
     tokens: list[Token]
     raw_segments: list[RawSegment]
-    # Các khoảng có tiếng nói do VAD phát hiện, [[start, end], ...]. Cần cho
-    # cả việc chia chunk ở S2 lẫn việc kéo dài phụ đề vào khoảng lặng ở S5.
+    # Speech intervals detected by VAD, [[start, end], ...]. Needed both for
+    # chunking the LLM input in S2 and for extending subtitles into silence in S5.
     vad_speech: list[tuple[float, float]] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -103,29 +104,29 @@ class AsrDoc(_Doc):
         for t in self.tokens:
             if t.start < prev - 1e-6:
                 raise ValueError(
-                    f"token {t.i} có start={t.start} lùi so với token trước ({prev}); "
-                    "gần như chắc chắn là lỗi cộng offset khi ghép chunk"
+                    f"token {t.i} starts at {t.start}, behind the previous token ({prev}); "
+                    "almost certainly a chunk-offset arithmetic bug"
                 )
             if t.end < t.start - 1e-6:
-                raise ValueError(f"token {t.i} có end < start ({t.end} < {t.start})")
+                raise ValueError(f"token {t.i} has end < start ({t.end} < {t.start})")
             prev = t.start
         return self
 
     def char_stream(self) -> str:
-        """Chuỗi ký tự liên tục, không dấu câu — dùng để align và gửi cho LLM."""
+        """Continuous character stream, no punctuation — for alignment and the LLM."""
         return "".join(t.text for t in self.tokens)
 
     def display_text(self, lo: int, hi: int) -> str:
-        """Text có dấu câu cho khoảng token nửa mở ``[lo, hi)``."""
+        """Punctuated text for the half-open token range ``[lo, hi)``."""
         return "".join(t.text + (t.punct_after or "") for t in self.tokens[lo:hi])
 
     def char_to_token(self) -> list[int]:
-        """Index ký tự trong :meth:`char_stream` -> index token.
+        """Map character index in :meth:`char_stream` to token index.
 
-        Cần vì token không phải lúc nào cũng dài một ký tự: tiếng Trung thì một
-        ký tự một token, nhưng một từ tiếng Anh xen giữa ("OK", "iPhone") là một
-        token nhiều ký tự. Bỏ qua chuyện này thì mọi index do LLM trả về sẽ lệch
-        đúng ở những video có xen tiếng Anh.
+        Necessary because tokens are not always one character wide: Chinese is
+        one character per token, but an embedded English word ("OK", "iPhone")
+        is a single multi-character token. Ignoring this shifts every index the
+        LLM returns, on exactly those videos that mix in English.
         """
         mapping: list[int] = []
         for t in self.tokens:
@@ -133,10 +134,10 @@ class AsrDoc(_Doc):
         return mapping
 
     def char_times(self) -> list[float]:
-        """Thời điểm bắt đầu của từng ký tự trong :meth:`char_stream`.
+        """Start time of each character in :meth:`char_stream`.
 
-        Token nhiều ký tự thì nội suy tuyến tính trong khoảng thời gian của token
-        — không có thông tin nào mịn hơn để mà dùng.
+        Multi-character tokens are interpolated linearly across the token's
+        duration — there is no finer information available.
         """
         times: list[float] = []
         for t in self.tokens:
@@ -176,7 +177,7 @@ class SegmentsDoc(_Doc):
 
 
 # ---------------------------------------------------------------------------
-# S3 — glossary.json  (người dùng sửa tay được)
+# S3 — glossary.json  (hand-editable by the user)
 # ---------------------------------------------------------------------------
 
 TermType = Literal["person", "place", "org", "term", "dish", "product", "other"]
@@ -188,23 +189,24 @@ class GlossaryTerm(BaseModel):
     vi: str = ""
     en: str = ""
     type: TermType = "other"
-    keep_source: bool = False  # giữ nguyên dạng tiếng Trung, không dịch
+    keep_source: bool = False  # leave in Chinese, do not translate
     note: str = ""
 
 
 class AddressTerm(BaseModel):
-    """Xưng hô tiếng Việt là quan hệ **cặp**, không nhét vừa shape của
-    :class:`GlossaryTerm`, nên để riêng."""
+    """Vietnamese address terms are a **pairwise** relation and do not fit the
+    ``{zh, pinyin, vi, en}`` shape of :class:`GlossaryTerm`, hence a separate
+    section."""
 
     speaker: str
     addressee: str
-    vi_self: str  # người nói tự xưng
-    vi_other: str  # người nói gọi đối phương
-    basis: str = ""  # căn cứ suy ra, để người dùng kiểm chứng và sửa
+    vi_self: str  # how the speaker refers to themselves
+    vi_other: str  # how the speaker addresses the other party
+    basis: str = ""  # the reasoning, so the user can check and correct it
 
 
 class StyleDecision(BaseModel):
-    # tên "register" bị pydantic cảnh báo vì trùng attribute của BaseModel
+    # named ``speech_register`` because plain ``register`` shadows a BaseModel attribute
     speech_register: str = ""
     narrator_self_vi: str = ""
     audience_vi: str = ""

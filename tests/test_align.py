@@ -1,4 +1,4 @@
-"""S2 phải khôi phục được vị trí ngắt ngay cả khi LLM trả về chuỗi không nguyên vẹn."""
+"""S2 must recover break positions even when the LLM does not echo the string intact."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from zhsub.text.align import index_map, recover_breaks, similarity
 SENT = "今天我们来聊聊麻婆豆腐这道菜的做法"
 
 
-def test_llm_tra_ve_nguyen_ven():
+def test_llm_echoes_the_string_intact():
     resp = "今天我们来聊聊|麻婆豆腐这道菜的做法"
     breaks, ratio = recover_breaks(SENT, resp)
 
@@ -16,27 +16,28 @@ def test_llm_tra_ve_nguyen_ven():
     assert SENT[: breaks[0]] == "今天我们来聊聊"
 
 
-def test_bo_dau_ngat_o_dau_va_cuoi_chuoi():
-    # Ngắt ở vị trí 0 hoặc cuối chuỗi không tạo ra segment nào, phải bị loại.
+def test_breaks_at_the_very_start_or_end_are_dropped():
+    # A break at index 0 or at the end produces no segment, so it must be discarded.
     breaks, ratio = recover_breaks(SENT, "|" + SENT + "|")
 
     assert ratio == 1.0
     assert breaks == []
 
 
-def test_llm_tu_y_sua_chu_van_khoi_phuc_duoc_cho_ngat():
-    # LLM đổi 麻婆豆腐 -> 麻辣豆腐; các chỗ ngắt ngoài vùng bị sửa vẫn phải giữ được.
+def test_breaks_survive_the_llm_rewriting_characters():
+    # The LLM turns 麻婆豆腐 into 麻辣豆腐; breaks outside the rewritten span must hold.
     resp = "今天我们来聊聊|麻辣豆腐|这道菜的做法"
     breaks, ratio = recover_breaks(SENT, resp)
 
     assert ratio < 1.0
     assert 7 in breaks
     assert SENT[7:11] == "麻婆豆腐"
-    assert 11 in breaks, "chỗ ngắt ngay sau vùng bị sửa vẫn phải neo đúng"
+    assert 11 in breaks, "a break immediately after a rewritten span must still anchor"
 
 
-def test_cho_ngat_roi_han_vao_vung_khong_khop_thi_bo():
-    # Cả đoạn giữa bị viết lại; thà mất chỗ ngắt còn hơn đặt sai rồi kéo lệch timestamp.
+def test_breaks_landing_inside_a_rewritten_span_are_dropped():
+    # The middle is rewritten wholesale. Losing a break beats placing one wrongly
+    # and dragging a timestamp with it.
     resp = "今天我们来聊聊|完全不同的内容在这里|的做法"
     breaks, _ = recover_breaks(SENT, resp)
 
@@ -44,9 +45,9 @@ def test_cho_ngat_roi_han_vao_vung_khong_khop_thi_bo():
     assert breaks == sorted(set(breaks))
 
 
-def test_index_map_khong_bi_autojunk_pha():
-    # Ký tự tiếng Trung phổ biến (的) lặp nhiều lần trong chuỗi dài. Với autojunk
-    # mặc định của difflib, chúng bị coi là rác và alignment hỏng hoàn toàn.
+def test_index_map_is_not_broken_by_autojunk():
+    # Common Chinese characters (的) repeat throughout a long string. With difflib's
+    # default autojunk they are treated as noise and alignment collapses entirely.
     a = ("的是了我" * 60) + "独特标记"
     mapping = index_map(a, a)
 

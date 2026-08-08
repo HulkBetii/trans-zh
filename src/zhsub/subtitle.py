@@ -1,9 +1,9 @@
-"""Đọc/ghi file phụ đề.
+"""Subtitle file I/O.
 
-Đọc file được sửa tay là chỗ dễ vỡ nhất: Subtitle Edit trên Windows hay lưu
-UTF-8 kèm BOM, còn phụ đề tiếng Trung tải trên mạng thì thường là GB18030. Đoán
-sai encoding thì toàn bộ CER trong benchmark thành vô nghĩa, nên thử lần lượt
-theo thứ tự và báo rõ nếu thất bại.
+Reading hand-edited files is the fragile part: Subtitle Edit on Windows likes to
+save UTF-8 with a BOM, and Chinese subtitles found online are usually GB18030.
+Guessing the encoding wrong makes every CER number in the benchmark meaningless,
+so candidates are tried in order and failure is reported loudly.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ _ENCODINGS = ("utf-8-sig", "utf-8", "gb18030", "big5", "cp1252")
 
 @dataclass(slots=True)
 class Cue:
-    start: float  # giây
+    start: float  # seconds
     end: float
     text: str
 
@@ -36,7 +36,7 @@ def _detect_encoding(path: Path) -> str:
 
 
 def read_subtitle(path: str | Path) -> list[Cue]:
-    """Đọc .srt / .ass. Trả về danh sách cue theo thứ tự thời gian."""
+    """Read .srt / .ass. Returns cues in chronological order."""
     import pysubs2
 
     path = Path(path)
@@ -61,8 +61,8 @@ def _fmt_ts(seconds: float) -> str:
 
 
 def write_srt(cues: list[Cue], path: str | Path) -> Path:
-    """Ghi SRT bằng UTF-8 có BOM — Subtitle Edit và các player Windows nhận đúng
-    tiếng Trung/tiếng Việt mà không phải chọn encoding tay."""
+    """Write SRT as UTF-8 with BOM, so Subtitle Edit and Windows players render
+    Chinese and Vietnamese correctly without the user picking an encoding."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     lines: list[str] = []

@@ -1,8 +1,8 @@
-"""Harness benchmark: so paraformer-zh với faster-whisper large-v3.
+"""Benchmark harness: paraformer-zh versus faster-whisper large-v3.
 
     uv run python -m bench.run --media bench/data/clip.mp4 --ref bench/data/ref.srt
 
-In bảng markdown ra stdout.
+Prints a markdown table to stdout.
 """
 
 from __future__ import annotations
@@ -29,7 +29,9 @@ class Row:
     note: str = ""
 
 
-def _run_paraformer(wav: Path, cfg: Config) -> tuple[list[tuple[str, float, float]], str, float, float]:
+def _run_paraformer(
+    wav: Path, cfg: Config
+) -> tuple[list[tuple[str, float, float]], str, float, float]:
     from zhsub.asr.funasr_paraformer import FunASRParaformer
 
     engine = FunASRParaformer(
@@ -40,7 +42,7 @@ def _run_paraformer(wav: Path, cfg: Config) -> tuple[list[tuple[str, float, floa
         batch_size_s=cfg.asr.batch_size_s,
     )
     t0 = time.perf_counter()
-    engine._ensure_model()  # tải model trước để không tính vào RTF
+    engine._ensure_model()  # load up front so it is excluded from RTF
     load_sec = time.perf_counter() - t0
 
     t1 = time.perf_counter()
@@ -118,7 +120,7 @@ def main() -> int:
             else:
                 print(f"  bỏ qua engine lạ: {name}")
                 continue
-        except Exception as exc:  # noqa: BLE001 - báo lỗi rồi chạy tiếp engine khác
+        except Exception as exc:  # noqa: BLE001 - report and continue with other engines
             print(f"  LỖI: {type(exc).__name__}: {exc}")
             continue
 

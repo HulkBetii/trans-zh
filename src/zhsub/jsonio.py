@@ -1,10 +1,10 @@
-"""Đọc/ghi file JSON trung gian.
+"""Reading and writing the intermediate JSON files.
 
-Ghi luôn theo kiểu atomic (temp file cùng thư mục + ``os.replace``). Trên Windows
-``os.replace`` gọi ``MoveFileEx`` với ``MOVEFILE_REPLACE_EXISTING`` nên thao tác
-là nguyên tử khi cùng volume. Đây là điều kiện để ``batch`` resume được sau khi
-crash hoặc mất điện: một stage hoặc chưa ghi gì, hoặc đã ghi xong hoàn chỉnh —
-không bao giờ để lại file JSON cụt.
+Writes are always atomic (temp file in the same directory + ``os.replace``). On
+Windows ``os.replace`` maps to ``MoveFileEx`` with ``MOVEFILE_REPLACE_EXISTING``,
+so it is atomic within a volume. This is what makes ``batch`` resumable after a
+crash or power loss: a stage has either written nothing or written a complete
+file — never a truncated JSON that a later stage would happily parse.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ def write_json_atomic(path: str | Path, data: dict | list) -> None:
 
 
 def write_doc(path: str | Path, doc: BaseModel) -> None:
-    """Ghi pydantic model, dùng alias để trường ``schema_version`` ra thành ``schema``."""
+    """Write a pydantic model, using aliases so ``schema_version`` serialises as ``schema``."""
     write_json_atomic(path, doc.model_dump(by_alias=True, mode="json"))
 
 
@@ -57,11 +57,11 @@ def sha256_text(text: str) -> str:
 
 
 def sha256_json_canonical(data: dict | list) -> str:
-    """Hash nội dung JSON đã chuẩn hoá.
+    """Hash of canonicalised JSON content.
 
-    Dùng cho ``glossary_hash``: người dùng sửa ``glossary.json`` bằng tay thường
-    quên bump trường ``version``, nên cache invalidation phải dựa vào nội dung
-    thật chứ không tin số version.
+    Used for ``glossary_hash``: users editing ``glossary.json`` by hand routinely
+    forget to bump the ``version`` field, so cache invalidation must key off the
+    actual content rather than a number we cannot trust.
     """
     canon = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return sha256_text(canon)

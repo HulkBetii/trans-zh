@@ -1,8 +1,9 @@
-"""S1 — ASR: WAV -> ``asr.json`` với timestamp cấp token.
+"""S1 — ASR: WAV -> ``asr.json`` with token-level timestamps.
 
-Mặc định giao hết việc cắt VAD cho FunASR (``AutoModel`` + ``vad_model`` đã trả
-timestamp tuyệt đối sẵn). Lớp chunk bên ngoài chỉ bật khi file dài hơn ngưỡng
-trong config — mỗi tầng offset thêm vào là một chỗ có thể cộng sai.
+VAD segmentation is left to FunASR by default (``AutoModel`` + ``vad_model``
+already returns absolute timestamps). The outer chunk layer only kicks in for
+files longer than the configured threshold — every extra offset layer is one more
+place the arithmetic can go wrong.
 """
 
 from __future__ import annotations
@@ -37,10 +38,10 @@ def build_engine(cfg: Config) -> ASREngine:
 
 
 def build_asr_doc(out: AsrOutput, engine: ASREngine, duration_sec: float) -> AsrDoc:
-    """Chuyển :class:`AsrOutput` sang :class:`AsrDoc` (hàm thuần, test được).
+    """Convert an :class:`AsrOutput` into an :class:`AsrDoc`. Pure, hence testable.
 
-    Token được đánh index toàn cục liên tục; ``raw_segments`` chỉ trỏ vào dải
-    index đó chứ không giữ bản sao text — một nguồn sự thật duy nhất.
+    Tokens get a single continuous global index; ``raw_segments`` only point into
+    that range rather than keeping their own copy of the text — one source of truth.
     """
     tokens: list[Token] = []
     raw_segments: list[RawSegment] = []
@@ -88,12 +89,12 @@ def build_asr_doc(out: AsrOutput, engine: ASREngine, duration_sec: float) -> Asr
 def _merge_intervals(
     intervals: list[tuple[float, float]], gap: float = 0.0
 ) -> list[tuple[float, float]]:
-    """Gộp các khoảng chồng nhau hoặc dính nhau.
+    """Merge overlapping or touching intervals.
 
-    ``vad_speech`` ở đây suy ra từ mốc đầu/cuối của từng câu chứ không chạy lại
-    riêng một lượt VAD: chạy VAD lần hai tốn gần bằng chạy ASR mà hai mục đích sử
-    dụng (chia chunk ở S2, kéo dài phụ đề vào khoảng lặng ở S5) chỉ cần biết chỗ
-    nào **có** tiếng nói, độ mịn cấp câu là đủ.
+    ``vad_speech`` is derived from sentence boundaries rather than a second
+    dedicated VAD pass: running VAD again costs nearly as much as the ASR itself,
+    while both consumers (chunking in S2, extending cues into silence in S5) only
+    need to know *where speech is*, for which sentence granularity is enough.
     """
     if not intervals:
         return []
@@ -114,7 +115,7 @@ def transcribe_file(
     cfg: Config,
     scratch_dir: Path | None = None,
 ) -> AsrOutput:
-    """Nhận dạng cả file, tự chia chunk khi cần. Timestamp luôn tuyệt đối."""
+    """Transcribe a whole file, chunking when needed. Timestamps are always absolute."""
     windows = plan_chunks(
         duration_sec,
         cfg.asr.outer_chunk_threshold_sec,
@@ -124,7 +125,7 @@ def transcribe_file(
     if len(windows) == 1:
         return engine.transcribe(wav_path)
 
-    log.info("File dài %.1f phút -> chia %d chunk", duration_sec / 60, len(windows))
+    log.info("Audio dài %.1f phút -> chia %d chunk", duration_sec / 60, len(windows))
     scratch = scratch_dir or wav_path.parent / "chunks"
     scratch.mkdir(parents=True, exist_ok=True)
     parts: list[tuple[float, AsrOutput]] = []
@@ -153,7 +154,7 @@ def run(work_dir: Path, cfg: Config, force: bool = False) -> AsrDoc:
     out = transcribe_file(wav_path, ingest.media.duration_sec, engine, cfg)
     if out.degraded_sentences:
         log.warning(
-            "%d câu có timestamp phải chia đều do lệch số token — timeline chỗ đó kém chính xác",
+            "%d câu phải chia đều timestamp do lệch số token — timeline chỗ đó kém chính xác",
             out.degraded_sentences,
         )
 

@@ -1,8 +1,8 @@
-"""Engine ASR giả, dùng để test riêng phép toán offset.
+"""A fake ASR engine used to test the offset arithmetic in isolation.
 
-Không cần GPU, không cần model, không phụ thuộc chất lượng nhận dạng — chỉ kiểm
-tra đúng một thứ: timestamp trả về có phải là **thời gian tuyệt đối so với đầu
-file** hay không.
+No GPU, no model, no dependence on recognition quality — it verifies exactly one
+thing: whether returned timestamps are **absolute relative to the start of the
+file**.
 """
 
 from __future__ import annotations
@@ -12,17 +12,18 @@ from pathlib import Path
 from zhsub.asr.base import AsrOutput, AsrSentence, AsrToken
 from zhsub.media import probe_duration
 
-SENTENCE_PERIOD = 10.0  # một câu mỗi 10 giây
-SENTENCE_OFFSET = 1.0  # câu đầu bắt đầu ở giây thứ 1 của chunk
+SENTENCE_PERIOD = 10.0  # one sentence every 10 seconds
+SENTENCE_OFFSET = 1.0  # first sentence starts 1 second into the chunk
 SENTENCE_LEN = 2.0
 CHARS = "今天天气很好"
 
 
 class FakeEngine:
-    """Sinh câu ở các mốc cố định **so với đầu chunk được truyền vào**.
+    """Emits sentences at fixed offsets **relative to the chunk it is handed**.
 
-    Nếu ``transcribe_file`` cộng offset đúng thì mốc tuyệt đối phải bằng
-    ``chunk_start + mốc tương đối``; cộng sai bao nhiêu cũng lộ ra ngay.
+    If ``transcribe_file`` adds offsets correctly, the absolute timestamps must
+    equal ``chunk_start + relative offset``; any error in that arithmetic shows up
+    immediately.
     """
 
     def __init__(self, device: str = "cpu") -> None:

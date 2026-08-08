@@ -1,13 +1,14 @@
-"""Chuẩn hoá text tiếng Trung trước khi đo CER.
+"""Chinese text normalisation, applied before measuring CER.
 
-Không làm mấy bước này thì CER đo nhiễu chứ không đo chất lượng nhận dạng:
+Skip these steps and CER measures noise rather than recognition quality:
 
-* ``faster-whisper`` large-v3 hay trả **phồn thể**, ``paraformer-zh`` trả giản thể
-  → chênh nhau hàng loạt ký tự dù nội dung y hệt.
-* ``ct-punc`` chèn dấu câu, còn reference viết tay thì tuỳ người
-  → dấu câu chiếm phần lớn sai số nếu không strip.
-* Một engine viết "2024", engine kia viết "二零二四"
-  → lệch hệ thống, engine nào cũng bị phạt oan tuỳ cách người viết ref.
+* ``faster-whisper`` large-v3 often emits **traditional** characters while
+  ``paraformer-zh`` emits simplified — hundreds of character mismatches for
+  identical content.
+* ``ct-punc`` inserts punctuation, hand-written references vary
+  — punctuation would dominate the error rate.
+* One engine writes "2024", the other writes "二零二四"
+  — a systematic penalty that depends on how the reference happened to be typed.
 """
 
 from __future__ import annotations
@@ -18,8 +19,8 @@ from functools import lru_cache
 
 _ZH_DIGITS = "零一二三四五六七八九"
 
-# Dấu câu CJK + Latin. Dùng ranh giới Unicode category cho phần Latin nên chỉ
-# cần liệt kê tường minh các ký tự CJK.
+# CJK punctuation. The Latin side is handled by Unicode category, so only the
+# CJK characters need listing explicitly.
 _CJK_PUNCT = "。，、；：？！“”‘’（）《》〈〉【】「」『』…—～·﹏､｡"
 
 
@@ -29,18 +30,18 @@ def _opencc_t2s():
         from opencc import OpenCC
 
         return OpenCC("t2s")
-    except Exception:  # pragma: no cover - chỉ chạy khi thiếu opencc
+    except Exception:  # pragma: no cover - only hit when opencc is missing
         return None
 
 
 def to_simplified(text: str) -> str:
-    """Phồn thể -> giản thể. Thiếu opencc thì trả nguyên văn."""
+    """Traditional to simplified. Returns the input unchanged if opencc is absent."""
     cc = _opencc_t2s()
     return cc.convert(text) if cc is not None else text
 
 
 def to_halfwidth(text: str) -> str:
-    """Fullwidth ASCII -> halfwidth. ``NFKC`` cũng gộp luôn vài dạng tương đương."""
+    """Full-width ASCII to half-width. ``NFKC`` also folds a few equivalent forms."""
     return unicodedata.normalize("NFKC", text)
 
 
@@ -57,14 +58,15 @@ def strip_punct(text: str) -> str:
 
 
 def digits_to_zh(text: str) -> str:
-    """Chuỗi chữ số Ả Rập -> đọc từng chữ số bằng chữ Hán ("2024" -> "二零二四").
+    """Rewrite Arabic digit runs as digit-by-digit Chinese ("2024" -> "二零二四").
 
-    Chuẩn hoá một chiều như vậy để hai engine viết khác kiểu vẫn so được với nhau.
+    Normalising in one direction lets two engines with different conventions be
+    compared at all.
 
-    Hạn chế đã biết: chữ số Hán dạng *giá trị* thì không đụng tới, nên nếu ref
-    viết "二十五" mà ASR trả "25" (-> "二五") vẫn tính là sai. Đây là trường hợp
-    hiếm và sai số nhỏ; đảo chiều (Hán -> Ả Rập) sẽ phải suy luận giá trị và dễ
-    sai hơn nhiều.
+    Known limitation: Chinese numerals expressing a *value* are left alone, so a
+    reference reading "二十五" against ASR output "25" (-> "二五") still counts as
+    an error. That case is rare and the penalty is small; going the other way
+    would require inferring numeric values and is considerably more error-prone.
     """
     return re.sub(r"\d+", lambda m: "".join(_ZH_DIGITS[int(d)] for d in m.group()), text)
 
@@ -74,7 +76,7 @@ def collapse_space(text: str) -> str:
 
 
 def normalize_for_cer(text: str) -> str:
-    """Toàn bộ chuỗi chuẩn hoá, áp dụng y hệt cho cả reference lẫn hypothesis."""
+    """The full normalisation chain, applied identically to reference and hypothesis."""
     text = to_halfwidth(text)
     text = to_simplified(text)
     text = strip_punct(text)
@@ -84,10 +86,11 @@ def normalize_for_cer(text: str) -> str:
 
 
 def normalize_for_align(text: str) -> str:
-    """Bản nhẹ hơn, dùng khi align chuỗi để tra ngược timestamp.
+    """Lighter variant, used when aligning streams to look up timestamps.
 
-    Giữ nguyên số lượng ký tự càng nhiều càng tốt nên **không** đụng tới chữ số:
-    ``digits_to_zh`` làm chuỗi dài ra và phá vỡ ánh xạ 1-1 về mảng token.
+    Preserves character count as far as possible, so it deliberately leaves
+    digits alone: ``digits_to_zh`` lengthens the string and breaks the one-to-one
+    mapping back onto the token array.
     """
     text = to_halfwidth(text)
     text = to_simplified(text)

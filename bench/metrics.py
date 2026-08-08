@@ -1,10 +1,11 @@
-"""Đo CER và sai số onset.
+"""CER and onset-error measurement.
 
-**Sai số onset đo ở cấp ký tự, không so ``start`` của segment.** paraformer ngắt
-câu theo khoảng lặng VAD còn faster-whisper ngắt theo cửa sổ 30 giây; so mốc bắt
-đầu của segment giữa hai engine là đang đo *chính sách ngắt câu* chứ không đo *độ
-chuẩn của timestamp*. Cách làm ở đây: align chuỗi ký tự tham chiếu với chuỗi ký
-tự dự đoán, rồi lấy thời điểm của **ký tự đầu tiên** của mỗi cue tham chiếu.
+**Onset error is measured per character, not by comparing segment ``start``
+times.** paraformer splits sentences on VAD silence while faster-whisper splits on
+a 30-second window; comparing segment starts between the two measures
+*segmentation policy*, not *timestamp accuracy*. Instead the reference character
+stream is aligned against the predicted character stream, and the time of the
+**first character** of each reference cue is read off.
 """
 
 from __future__ import annotations
@@ -21,9 +22,9 @@ from zhsub.text.normalize import normalize_for_align, normalize_for_cer
 class OnsetResult:
     median_ms: float
     p90_ms: float
-    within_200ms: float  # tỉ lệ %
+    within_200ms: float  # percentage
     within_500ms: float
-    coverage: float  # % cue tham chiếu match được
+    coverage: float  # percentage of reference cues that could be matched
     n_matched: int
     n_ref: int
 
@@ -31,10 +32,11 @@ class OnsetResult:
 def expand_tokens_to_chars(
     tokens: list[tuple[str, float, float]],
 ) -> tuple[list[str], list[float]]:
-    """``[(text, start, end)]`` -> ``(danh sách ký tự, thời điểm từng ký tự)``.
+    """``[(text, start, end)]`` -> ``(characters, per-character times)``.
 
-    Token nhiều ký tự (từ tiếng Anh xen giữa, hoặc "từ" của whisper vốn hay gộp
-    vài chữ Hán) được nội suy tuyến tính — không có thông tin nào mịn hơn.
+    Multi-character tokens — embedded English words, or whisper "words" which
+    routinely bundle several Han characters — are interpolated linearly. There is
+    no finer information available.
     """
     chars: list[str] = []
     times: list[float] = []
@@ -56,11 +58,11 @@ def expand_tokens_to_chars(
 def _normalize_keeping_times(
     chars: list[str], times: list[float]
 ) -> tuple[str, list[float]]:
-    """Chuẩn hoá từng ký tự một để giữ nguyên ánh xạ ký tự <-> thời gian.
+    """Normalise character by character so the character/time mapping survives.
 
-    Chuẩn hoá cả chuỗi một lượt sẽ làm độ dài thay đổi (dấu câu bị bỏ, NFKC gộp
-    ký tự) và ``times`` lệch ngay. Ký tự nào chuẩn hoá xong ra rỗng thì bỏ luôn
-    cả thời gian tương ứng.
+    Normalising the whole string at once changes its length (punctuation removed,
+    NFKC folding) and ``times`` desynchronises immediately. A character that
+    normalises to nothing drops its timestamp with it.
     """
     out_chars: list[str] = []
     out_times: list[float] = []
@@ -68,15 +70,15 @@ def _normalize_keeping_times(
         norm = normalize_for_align(ch)
         if not norm:
             continue
-        # t2s trên một ký tự Hán gần như luôn ra một ký tự; lấy ký tự đầu để
-        # đảm bảo bất biến 1-1 giữa chuỗi và mảng thời gian.
+        # t2s on a single Han character is essentially always one character; taking
+        # the first keeps the one-to-one invariant between stream and time array.
         out_chars.append(norm[0])
         out_times.append(t)
     return "".join(out_chars), out_times
 
 
 def compute_cer(ref_cues: list[Cue], hyp_text: str) -> float:
-    """CER sau khi chuẩn hoá **giống hệt nhau** ở cả hai phía."""
+    """CER after applying **identical** normalisation to both sides."""
     import jiwer
 
     ref = normalize_for_cer("".join(c.text for c in ref_cues))
@@ -91,9 +93,9 @@ def compute_onset(
     pred_chars: list[str],
     pred_times: list[float],
 ) -> OnsetResult:
-    """Sai số onset giữa reference và dự đoán, đo ở cấp ký tự."""
+    """Onset error between reference and prediction, measured per character."""
     ref_chars: list[str] = []
-    cue_first_index: list[tuple[int, float]] = []  # (index ký tự đầu, thời điểm ref)
+    cue_first_index: list[tuple[int, float]] = []  # (first char index, reference time)
     for cue in ref_cues:
         norm = normalize_for_align(cue.text)
         if not norm:
@@ -110,9 +112,9 @@ def compute_onset(
     for first_idx, ref_start in cue_first_index:
         pred_idx = mapping.get(first_idx)
         if pred_idx is None or pred_idx >= len(pred_time_list):
-            # Ký tự đầu của cue không khớp được -> bỏ, không đoán bừa. Nội suy
-            # sang ký tự lân cận sẽ thêm nhiễu cỡ vài trăm ms, đúng bằng độ phân
-            # giải mà metric này đang cố đo.
+            # The cue's first character did not match — drop it rather than guess.
+            # Interpolating to a neighbouring character injects a few hundred ms of
+            # noise, which is exactly the resolution this metric is trying to measure.
             continue
         errors_ms.append(abs(pred_time_list[pred_idx] - ref_start) * 1000.0)
 

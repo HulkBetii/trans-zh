@@ -1,14 +1,16 @@
-"""Align hai chuỗi ký tự bằng ``difflib``.
+"""Character-level alignment of two strings via ``difflib``.
 
-Dùng chung ở hai chỗ:
+Used in two places:
 
-* **S2 repair** — LLM được yêu cầu trả về đúng chuỗi đã gửi kèm dấu ngắt, nhưng
-  thực tế nó hay tự ý đổi 全角/半角, đổi chữ số, "sửa lỗi chính tả" nó tưởng là
-  sai. So khớp tuyệt đối rồi retry mù không giải quyết được mấy chuyện đó; align
-  lại thì các đoạn khớp vẫn khôi phục được vị trí ngắt.
-* **bench** — map chuỗi ký tự tham chiếu sang chuỗi ký tự dự đoán để đo sai số
-  onset ở cấp ký tự, thay vì so ``start`` của segment (vốn đo cách ngắt câu chứ
-  không đo độ chuẩn timestamp).
+* **S2 repair** — the LLM is asked to echo back the exact string it was sent with
+  break markers inserted, but in practice it silently switches full-width to
+  half-width forms, rewrites digits, and "corrects" perceived typos. Exact
+  comparison plus blind retries does not fix any of that; re-aligning recovers
+  the break positions from whatever still matches.
+* **bench** — maps the reference character stream onto the predicted character
+  stream so onset error can be measured per character, instead of comparing
+  segment ``start`` times (which measures segmentation policy, not timestamp
+  accuracy).
 """
 
 from __future__ import annotations
@@ -17,17 +19,17 @@ from difflib import SequenceMatcher
 
 
 def _matcher(a: str, b: str) -> SequenceMatcher:
-    # autojunk=False là bắt buộc. Mặc định SequenceMatcher coi phần tử xuất hiện
-    # trong >1% chuỗi là "junk" khi chuỗi dài >= 200 phần tử. Với tiếng Trung,
-    # các ký tự thường gặp (的, 了, 是...) sẽ bị loại và alignment hỏng nặng.
+    # autojunk=False is mandatory. By default SequenceMatcher treats any element
+    # appearing in >1% of a sequence of 200+ elements as "junk". For Chinese that
+    # discards the most common characters (的, 了, 是...) and wrecks the alignment.
     return SequenceMatcher(None, a, b, autojunk=False)
 
 
 def index_map(a: str, b: str) -> dict[int, int]:
-    """Map index trong ``a`` sang index trong ``b`` trên các block khớp nhau.
+    """Map indices in ``a`` to indices in ``b`` across the matching blocks.
 
-    Ký tự nào không nằm trong block khớp thì không có mặt trong kết quả — bên
-    gọi tự quyết định xử lý thế nào.
+    Characters outside a matching block are simply absent from the result; the
+    caller decides how to handle them.
     """
     out: dict[int, int] = {}
     for ai, bi, size in _matcher(a, b).get_matching_blocks():
@@ -41,21 +43,22 @@ def similarity(a: str, b: str) -> float:
 
 
 def recover_breaks(sent: str, resp: str, sep: str = "|") -> tuple[list[int], float]:
-    """Lấy vị trí ngắt câu từ output của LLM, quy về index trong chuỗi gốc.
+    """Extract sentence-break positions from an LLM response, as indices into the original.
 
     Args:
-        sent: chuỗi đã gửi cho LLM (không dấu ngắt, không dấu câu).
-        resp: chuỗi LLM trả về, có chèn ``sep``.
-        sep: ký tự đánh dấu chỗ ngắt.
+        sent: the string sent to the LLM (no break markers, no punctuation).
+        resp: the string the LLM returned, with ``sep`` inserted.
+        sep: the break marker character.
 
     Returns:
-        ``(breaks, ratio)`` — ``breaks`` là danh sách index tăng dần trong
-        ``sent``, mỗi index là vị trí **bắt đầu một segment mới**. ``ratio`` là
-        độ khớp giữa chuỗi gửi đi và chuỗi nhận về sau khi bỏ ``sep``; bằng 1.0
-        nghĩa là LLM trả về nguyên vẹn.
+        ``(breaks, ratio)`` where ``breaks`` is an ascending list of indices into
+        ``sent``, each marking the **start of a new segment**, and ``ratio`` is
+        the similarity between what was sent and what came back with ``sep``
+        stripped. A ratio of 1.0 means the LLM echoed the string intact.
 
-    Vị trí ngắt rơi vào vùng không khớp thì bị bỏ, không đoán bừa — thà mất một
-    chỗ ngắt còn hơn đặt sai chỗ rồi kéo lệch timestamp.
+    Breaks that land inside a non-matching region are dropped rather than guessed:
+    losing a break is better than placing one wrongly and dragging a timestamp
+    with it.
     """
     stripped_chars: list[str] = []
     breaks_in_resp: list[int] = []
@@ -72,14 +75,15 @@ def recover_breaks(sent: str, resp: str, sep: str = "|") -> tuple[list[int], flo
     if stripped == sent:
         return _clean(breaks_in_resp), 1.0
 
-    m = index_map(stripped, sent)  # index trong resp-stripped -> index trong sent
+    m = index_map(stripped, sent)  # index in stripped response -> index in sent
     ratio = similarity(sent, stripped)
     mapped: list[int] = []
     for b in breaks_in_resp:
         if b in m:
             mapped.append(m[b])
         elif (b - 1) in m:
-            # Chỗ ngắt nằm ngay sau một ký tự khớp được -> đặt sau ký tự đó.
+            # The break sits right after a character that did match — place it
+            # immediately after that character's counterpart.
             mapped.append(m[b - 1] + 1)
-        # còn lại: rơi vào vùng LLM sửa đổi -> bỏ qua
+        # otherwise: the break fell inside a region the LLM rewrote -> drop it
     return _clean(mapped), ratio

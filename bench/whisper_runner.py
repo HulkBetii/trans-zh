@@ -1,8 +1,9 @@
-"""Chạy faster-whisper cho benchmark.
+"""Run faster-whisper for the benchmark.
 
-Script dùng một lần, **cố ý không** implement :class:`~zhsub.asr.base.ASREngine`.
-v1 chỉ có FunASR trong thư viện; whisper có mặt ở đây thuần tuý để có số mà so
-sánh. Nếu benchmark cho thấy whisper thắng thì lúc đó mới thêm nó vào ``asr/``.
+A throwaway script that **deliberately** does not implement
+:class:`~zhsub.asr.base.ASREngine`. v1 ships FunASR only; whisper exists here
+purely to produce comparison numbers. If the benchmark says whisper wins, that is
+when it earns a place in ``asr/``.
 """
 
 from __future__ import annotations
@@ -19,11 +20,11 @@ def transcribe(
     device: str = "cuda",
     compute_type: str | None = None,
 ) -> tuple[list[tuple[str, float, float]], str, float]:
-    """Returns ``(tokens, full_text, elapsed_sec)`` với ``tokens = [(text, start, end)]``.
+    """Returns ``(tokens, full_text, elapsed_sec)`` with ``tokens = [(text, start, end)]``.
 
-    ``word_timestamps=True`` là bắt buộc: timestamp cấp segment mặc định của
-    faster-whisper quá thô để so sánh công bằng với timestamp cấp token của
-    paraformer.
+    ``word_timestamps=True`` is mandatory: faster-whisper's default segment-level
+    timestamps are far too coarse to compare fairly against paraformer's
+    token-level ones.
     """
     from faster_whisper import WhisperModel
 
@@ -43,7 +44,7 @@ def transcribe(
 
     tokens: list[tuple[str, float, float]] = []
     parts: list[str] = []
-    for seg in segments:  # generator — vòng lặp này mới là lúc thực sự chạy
+    for seg in segments:  # a generator — this loop is where the work actually happens
         parts.append(seg.text)
         if seg.words:
             for w in seg.words:

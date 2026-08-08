@@ -1,12 +1,13 @@
-"""Interface ASR + phần toán ghép chunk.
+"""ASR interface plus the chunk-offset arithmetic.
 
-``FunASRParaformer`` là implementation đầu tiên và duy nhất ở v1. Thêm
-``SenseVoice`` / ``FasterWhisper`` sau chỉ cần implement :class:`ASREngine`,
-không đụng tới stage nào khác.
+``FunASRParaformer`` is the first and only implementation in v1. Adding
+``SenseVoice`` or ``FasterWhisper`` later means implementing :class:`ASREngine`
+and nothing else — no stage needs to change.
 
-Toàn bộ phép cộng offset nằm ở đây dưới dạng **hàm thuần**, tách khỏi engine, để
-test được bằng fake engine — không cần GPU, không cần audio thật. Đây là chỗ dễ
-sinh bug lệch timestamp nhất nên nó phải là phần dễ test nhất.
+All offset arithmetic lives here as **pure functions**, separate from any engine,
+so it can be tested with a fake engine: no GPU, no real audio. This is the single
+easiest place to introduce a silent timestamp bug, so it is also the easiest
+place to test.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from typing import Protocol, runtime_checkable
 
 @dataclass(slots=True)
 class AsrToken:
-    """Một token có timestamp. Tiếng Trung thường là 1 ký tự, tiếng Anh là 1 từ."""
+    """One timestamped token: usually a single character in Chinese, a word in English."""
 
     text: str
     start: float
@@ -28,7 +29,7 @@ class AsrToken:
 
 @dataclass(slots=True)
 class AsrSentence:
-    text: str  # có dấu câu, để hiển thị
+    text: str  # punctuated, for display
     start: float
     end: float
     tokens: list[AsrToken] = field(default_factory=list)
@@ -37,8 +38,9 @@ class AsrSentence:
 @dataclass(slots=True)
 class AsrOutput:
     sentences: list[AsrSentence] = field(default_factory=list)
-    # Số câu mà số lượng timestamp không khớp số lượng token, phải chia đều thời
-    # gian. Con số này được ghi vào asr.json để biết kết quả có đáng tin không.
+    # Sentences where the timestamp count did not match the token count and time
+    # had to be distributed evenly. Recorded in asr.json so the result's
+    # trustworthiness is visible rather than assumed.
     degraded_sentences: int = 0
 
 
@@ -50,12 +52,12 @@ class ASREngine(Protocol):
     device: str
 
     def transcribe(self, wav_path: str | Path) -> AsrOutput:
-        """Nhận dạng toàn bộ file. Timestamp tính từ đầu **file được truyền vào**."""
+        """Transcribe a whole file. Timestamps are relative to the start of **that file**."""
         ...
 
 
 # ---------------------------------------------------------------------------
-# Ghép chunk — hàm thuần
+# Chunk merging — pure functions
 # ---------------------------------------------------------------------------
 
 
@@ -65,21 +67,21 @@ def plan_chunks(
     chunk_sec: float,
     overlap_sec: float,
 ) -> list[tuple[float, float]]:
-    """Chia file thành các cửa sổ ``[start, end)`` tính bằng giây.
+    """Split a file into ``[start, end)`` windows, in seconds.
 
-    Dưới ``threshold_sec`` thì trả về đúng một cửa sổ phủ cả file: FunASR đã tự
-    cắt theo VAD và trả timestamp tuyệt đối rồi, bọc thêm một tầng offset nữa chỉ
-    tổ tạo bug.
+    Below ``threshold_sec`` this returns a single window covering the whole file:
+    FunASR already segments on VAD and returns absolute timestamps, so wrapping
+    another offset layer around it only creates opportunities to get it wrong.
 
-    Các cửa sổ chồng nhau ``overlap_sec`` để câu nằm vắt qua ranh giới không bị
-    mất; phần trùng do :func:`merge_outputs` khử.
+    Windows overlap by ``overlap_sec`` so a sentence straddling a boundary is not
+    lost; :func:`merge_outputs` removes the resulting duplicates.
     """
     if duration_sec <= 0:
         return [(0.0, 0.0)]
     if duration_sec <= threshold_sec:
         return [(0.0, duration_sec)]
     if chunk_sec <= overlap_sec:
-        raise ValueError(f"chunk_sec ({chunk_sec}) phải lớn hơn overlap_sec ({overlap_sec})")
+        raise ValueError(f"chunk_sec ({chunk_sec}) must be greater than overlap_sec ({overlap_sec})")
 
     step = chunk_sec - overlap_sec
     windows: list[tuple[float, float]] = []
@@ -94,7 +96,7 @@ def plan_chunks(
 
 
 def shift_output(out: AsrOutput, offset: float) -> AsrOutput:
-    """Dời mọi timestamp đi ``offset`` giây. Không sửa tại chỗ."""
+    """Shift every timestamp by ``offset`` seconds. Does not mutate the input."""
     if offset == 0.0:
         return out
     return AsrOutput(
@@ -112,15 +114,16 @@ def shift_output(out: AsrOutput, offset: float) -> AsrOutput:
 
 
 def merge_outputs(parts: list[tuple[float, AsrOutput]]) -> AsrOutput:
-    """Ghép kết quả từng chunk lại, timestamp quy về **tuyệt đối so với đầu file**.
+    """Merge per-chunk results, producing timestamps **absolute to the start of the file**.
 
     Args:
-        parts: danh sách ``(offset_giây, kết_quả_chunk)``, kết quả mang timestamp
-            tương đối so với đầu chunk.
+        parts: ``(offset_seconds, chunk_result)`` pairs, where each result carries
+            timestamps relative to the start of its own chunk.
 
-    Câu nào bắt đầu trước điểm kết thúc của câu đã nhận trước đó thì bị loại —
-    đó là phần lặp ở vùng chồng lấn. Cắt theo mốc thời gian chứ không so text, vì
-    hai chunk nhận dạng cùng một đoạn audio thường ra chữ hơi khác nhau.
+    A sentence starting before the end of the last accepted sentence is dropped
+    as an overlap duplicate. The cut is made on time rather than text because two
+    chunks transcribing the same audio usually produce slightly different
+    characters.
     """
     merged: list[AsrSentence] = []
     degraded = 0

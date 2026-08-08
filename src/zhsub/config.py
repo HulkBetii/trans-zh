@@ -1,7 +1,8 @@
-"""Config đọc từ TOML.
+"""TOML-backed configuration.
 
-Model dùng để ngắt câu (S2) và model dùng để dịch (S4) cấu hình tách rời: S2 là
-việc cơ học nên model rẻ là đủ, S4 mới cần model mạnh.
+The model used for re-segmentation (S2) and the model used for translation (S4)
+are configured separately: S2 is mechanical work where a cheap model suffices,
+only S4 needs a strong one.
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ class AsrConfig(BaseModel):
     outer_chunk_overlap_sec: float = 2.0
 
     def resolve_device(self) -> str:
-        """``auto`` -> cuda nếu có, ngược lại cpu. ``ZHSUB_DEVICE`` ghi đè tất cả."""
+        """``auto`` picks cuda when available. ``ZHSUB_DEVICE`` overrides everything."""
         forced = os.environ.get("ZHSUB_DEVICE", "").strip().lower()
         want = forced or self.device
         if want == "cpu":
@@ -60,8 +61,10 @@ class SegmentConfig(BaseModel):
     min_duration_sec: float = 0.8
     max_duration_sec: float = 7.0
     merge_gap_sec: float = 0.25
+    # The stream sent to the LLM is split at VAD silences longer than this.
     chunk_at_silence_sec: float = 0.5
     max_chars_per_llm_call: int = 1800
+    # Below this match ratio the response is treated as unusable rather than repaired.
     repair_min_ratio: float = 0.95
     max_retries: int = 2
 
@@ -72,6 +75,7 @@ class TranslateConfig(BaseModel):
     context_after: int = 5
     review_pass: bool = True
     max_retries: int = 3
+    # MUST be bumped whenever a prompt changes, otherwise stale cache entries are served.
     prompt_version: int = 1
 
 
@@ -82,8 +86,8 @@ class LangLimits(BaseModel):
 
 class RenderConfig(BaseModel):
     max_lines: int = 2
-    # 42 ký tự / CPS 21 là chuẩn chữ Latin. Dòng tiếng Trung phải chặt hơn
-    # nhiều (chuẩn CJK ~20 ký tự / CPS 9), nếu không sẽ tràn ở chế độ bilingual.
+    # 42 chars / 21 CPS is a Latin-script convention. Chinese lines need to be far
+    # tighter (CJK convention is ~20 chars / 9 CPS) or they overflow in bilingual mode.
     limits: dict[str, LangLimits] = Field(
         default_factory=lambda: {
             "vi": LangLimits(),
@@ -140,10 +144,10 @@ class Config(BaseModel):
 
     @classmethod
     def load(cls, path: str | Path | None = None) -> Config:
-        """Đọc config. Không truyền path thì tìm ``zhsub.toml`` rồi tới file example.
+        """Load config, falling back to ``zhsub.toml`` then the example file.
 
-        Không tìm thấy gì cả vẫn chạy được bằng giá trị mặc định — cần thiết cho
-        giai đoạn benchmark, vốn không đụng tới LLM.
+        Finding neither is fine — defaults are usable, which matters for the
+        benchmark stage since it never touches an LLM.
         """
         if path is not None:
             return cls._from_file(Path(path))

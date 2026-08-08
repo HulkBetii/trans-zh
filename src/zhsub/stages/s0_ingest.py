@@ -1,4 +1,4 @@
-"""S0 — ingest: nguồn bất kỳ -> WAV 16kHz mono + ``ingest.json``."""
+"""S0 — ingest: any source -> 16kHz mono WAV + ``ingest.json``."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from ..config import Config
-from ..jsonio import write_doc
+from ..jsonio import read_doc, write_doc
 from ..media import MediaError, probe_duration, to_wav
 from ..models import IngestDoc, MediaInfo, SourceInfo
 
@@ -23,10 +23,11 @@ def is_url(source: str) -> bool:
 
 
 def make_job_id(source: str) -> str:
-    """Job id **tất định** theo nguồn.
+    """Derive a **deterministic** job id from the source.
 
-    Chạy lại cùng một file thì rơi vào đúng job cũ và resume được, thay vì đẻ ra
-    thư mục work mới rồi làm lại từ đầu. Muốn chạy sạch thì xoá ``work/<job_id>/``.
+    Re-running the same file lands in the same job and resumes, instead of
+    spawning a fresh work directory and redoing everything. To start clean,
+    delete ``work/<job_id>/``.
     """
     key = source if is_url(source) else str(Path(source).resolve()).lower()
     digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:8]
@@ -36,10 +37,10 @@ def make_job_id(source: str) -> str:
 
 
 def _download(source: str, dest_dir: Path, cookies_from_browser: str) -> Path:
-    """Tải audio bằng yt-dlp.
+    """Fetch audio with yt-dlp.
 
-    ``--cookies-from-browser`` đọc cookie có sẵn trong browser của người dùng;
-    pipeline không bao giờ tự nhập tài khoản hay mật khẩu.
+    ``--cookies-from-browser`` reads cookies already present in the user's
+    browser; the pipeline never enters an account or password itself.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     out_tmpl = str(dest_dir / "source.%(ext)s")
@@ -70,9 +71,10 @@ def _download(source: str, dest_dir: Path, cookies_from_browser: str) -> Path:
 
 
 def run(source: str, work_dir: Path, cfg: Config, job_id: str | None = None) -> IngestDoc:
-    """Chuẩn hoá ``source`` về WAV và ghi ``ingest.json``.
+    """Normalise ``source`` to WAV and write ``ingest.json``.
 
-    Bỏ qua nếu đã có ``ingest.json`` + WAV hợp lệ, để resume không tải lại video.
+    Skipped when a valid ``ingest.json`` and WAV already exist, so resuming does
+    not re-download the video.
     """
     job_id = job_id or make_job_id(source)
     work_dir.mkdir(parents=True, exist_ok=True)
@@ -80,8 +82,6 @@ def run(source: str, work_dir: Path, cfg: Config, job_id: str | None = None) -> 
     out_json = work_dir / "ingest.json"
 
     if out_json.is_file() and wav_path.is_file() and wav_path.stat().st_size > 44:
-        from ..jsonio import read_doc
-
         return read_doc(out_json, IngestDoc)
 
     if is_url(source):

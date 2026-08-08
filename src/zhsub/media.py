@@ -1,7 +1,7 @@
-"""Bọc ffmpeg / ffprobe.
+"""Thin wrappers around ffmpeg / ffprobe.
 
-Tách riêng khỏi S0 vì bench cũng cần đổi clip sang WAV mà không muốn kéo theo cả
-stage ingest.
+Kept separate from S0 because the benchmark also needs to convert a clip to WAV
+without pulling in the whole ingest stage.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ def _run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
 
 
 def probe_duration(path: str | Path) -> float:
-    """Độ dài media, tính bằng giây."""
+    """Media duration in seconds."""
     ffprobe = _require("ffprobe")
     proc = _run(
         [
@@ -58,10 +58,10 @@ def to_wav(
     sample_rate: int = 16000,
     channels: int = 1,
 ) -> Path:
-    """Chuẩn hoá về WAV PCM 16-bit, mặc định 16kHz mono — định dạng FunASR cần.
+    """Normalise to 16-bit PCM WAV, 16kHz mono by default — what FunASR expects.
 
-    Ghi ra file tạm rồi ``replace`` để lần chạy bị ngắt giữa chừng không để lại
-    WAV cụt mà stage sau lại tưởng là hợp lệ.
+    Writes to a temp file and renames, so an interrupted run cannot leave behind a
+    truncated WAV that a later stage would treat as valid.
     """
     ffmpeg = _require("ffmpeg")
     dst = Path(dst)
@@ -89,10 +89,11 @@ def to_wav(
 
 
 def slice_wav(src: str | Path, dst: str | Path, start_sec: float, duration_sec: float) -> Path:
-    """Cắt một đoạn WAV. Chỉ dùng cho lớp chunk ngoài với file cực dài.
+    """Extract a span of WAV. Only used by the outer chunk layer on very long files.
 
-    ``-ss`` đặt **trước** ``-i`` để ffmpeg seek nhanh; với WAV PCM thì seek là
-    chính xác mẫu nên không sợ lệch mốc như khi seek trên container nén.
+    ``-ss`` goes **before** ``-i`` so ffmpeg seeks on input; for PCM WAV that seek
+    is sample-accurate, so there is none of the drift you get seeking inside a
+    compressed container.
     """
     ffmpeg = _require("ffmpeg")
     dst = Path(dst)
