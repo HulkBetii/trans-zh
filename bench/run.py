@@ -23,7 +23,8 @@ from .metrics import OnsetResult, compute_cer, compute_onset, expand_tokens_to_c
 class Row:
     engine: str
     cer: float
-    onset: OnsetResult
+    onset_all: OnsetResult
+    onset_paused: OnsetResult
     rtf: float
     load_sec: float
     note: str = ""
@@ -58,20 +59,49 @@ def _fmt(value: float, digits: int = 1) -> str:
     return "n/a" if value != value else f"{value:.{digits}f}"
 
 
-def _table(rows: list[Row]) -> str:
+def _table(rows: list[Row], which: str) -> str:
     head = (
         "| Engine | CER | Onset median | Onset p90 | ≤200ms | ≤500ms | Coverage | RTF |\n"
         "|---|---:|---:|---:|---:|---:|---:|---:|"
     )
     lines = [head]
     for r in rows:
-        o = r.onset
+        o = r.onset_all if which == "all" else r.onset_paused
         lines.append(
             f"| {r.engine} | {_fmt(r.cer * 100, 2)}% | {_fmt(o.median_ms)} ms | "
             f"{_fmt(o.p90_ms)} ms | {_fmt(o.within_200ms)}% | {_fmt(o.within_500ms)}% | "
             f"{_fmt(o.coverage)}% ({o.n_matched}/{o.n_ref}) | {_fmt(r.rtf, 3)} |"
         )
     return "\n".join(lines)
+
+
+def _describe_reference(ref_cues) -> str:
+    """Report whether the reference looks hand-timed or auto-generated.
+
+    A downloaded CC track measures agreement with another ASR system rather than
+    ground truth, and its cue starts are mostly text-break points instead of speech
+    onsets. That changes what every number below means, so it has to be stated.
+    """
+    from .metrics import cues_after_a_real_pause
+
+    punct = "。，、；：？！…"
+    n_punct = sum(1 for c in ref_cues if any(ch in punct for ch in c.text))
+    gaps = [b.start - a.end for a, b in zip(ref_cues, ref_cues[1:])]
+    contiguous = sum(1 for g in gaps if abs(g) < 1e-6)
+    n_paused = sum(cues_after_a_real_pause(ref_cues))
+
+    pct_punct = 100.0 * n_punct / max(len(ref_cues), 1)
+    pct_contig = 100.0 * contiguous / max(len(gaps), 1)
+    verdict = (
+        "**CC máy sinh** (không dấu câu, mốc dính liền)"
+        if pct_punct < 5 and pct_contig > 50
+        else "có vẻ được căn tay"
+    )
+    return (
+        f"**Reference**: {len(ref_cues)} cue — {verdict}  \n"
+        f"  cue có dấu câu: {pct_punct:.1f}% · gap == 0: {pct_contig:.1f}% · "
+        f"cue sau khoảng nghỉ thật: {n_paused}"
+    )
 
 
 def main() -> int:
@@ -129,7 +159,8 @@ def main() -> int:
             Row(
                 engine=label,
                 cer=compute_cer(ref_cues, text),
-                onset=compute_onset(ref_cues, chars, times),
+                onset_all=compute_onset(ref_cues, chars, times),
+                onset_paused=compute_onset(ref_cues, chars, times, only_after_pause=True),
                 rtf=elapsed / duration if duration else float("nan"),
                 load_sec=load_sec,
             )
@@ -141,15 +172,22 @@ def main() -> int:
 
     print("\n" + "=" * 72)
     print(f"\n**Audio**: `{args.media}` — {duration / 60:.1f} phút  ")
-    print(f"**Reference**: `{args.ref}` — {len(ref_cues)} cue  ")
+    print(_describe_reference(ref_cues))
     print(f"**Device**: {device}\n")
-    print(_table(rows))
+
+    print("### Bảng 1 — tất cả cue tham chiếu\n")
+    print(_table(rows, "all"))
+    print("\n### Bảng 2 — chỉ cue đứng sau khoảng nghỉ thật\n")
+    print(_table(rows, "paused"))
     print(
         "\n*CER đo sau khi chuẩn hoá hai phía giống nhau (phồn→giản, bỏ dấu câu, "
         "chữ số Ả Rập→Hán). Onset đo ở cấp ký tự qua alignment, không so mốc bắt "
         "đầu của segment. Coverage là tỉ lệ cue tham chiếu có ký tự đầu khớp được; "
-        "coverage thấp thì hai cột median/p90 kém đại diện. RTF = thời gian xử lý "
-        "/ độ dài audio, không tính thời gian nạp model.*"
+        "coverage thấp thì median/p90 kém đại diện. RTF = thời gian xử lý / độ dài "
+        "audio, không tính thời gian nạp model.*\n"
+        "\n*Bảng 2 mới là bảng đáng tin khi reference là CC máy sinh: ở đó mốc bắt "
+        "đầu của cue tương ứng với lúc lời nói trở lại sau khoảng lặng, còn trong "
+        "bảng 1 phần lớn mốc chỉ là chỗ công cụ CC ngắt text.*"
     )
     return 0
 

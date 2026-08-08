@@ -88,19 +88,48 @@ def compute_cer(ref_cues: list[Cue], hyp_text: str) -> float:
     return float(jiwer.cer(ref, hyp))
 
 
+def cues_after_a_real_pause(ref_cues: list[Cue], min_gap_sec: float = 0.08) -> list[bool]:
+    """Flag reference cues whose start follows an actual silence.
+
+    Auto-generated CC tracks (the common case for a downloaded reference) are
+    wall-to-wall: each cue starts exactly where the previous one ended, so most
+    "start times" are just where the tool chose to break the text, not where
+    speech began. Only a cue preceded by a real gap forced the tool to detect an
+    onset, so only those starts carry timing information worth measuring against.
+    """
+    flags = [True]
+    for prev, cur in zip(ref_cues, ref_cues[1:]):
+        flags.append(cur.start - prev.end >= min_gap_sec)
+    return flags
+
+
 def compute_onset(
     ref_cues: list[Cue],
     pred_chars: list[str],
     pred_times: list[float],
+    only_after_pause: bool = False,
+    min_gap_sec: float = 0.08,
 ) -> OnsetResult:
-    """Onset error between reference and prediction, measured per character."""
+    """Onset error between reference and prediction, measured per character.
+
+    With ``only_after_pause`` the measurement is restricted to cues that follow a
+    real silence — see :func:`cues_after_a_real_pause` for why that matters when
+    the reference is an auto-generated CC track.
+    """
+    keep = (
+        cues_after_a_real_pause(ref_cues, min_gap_sec)
+        if only_after_pause
+        else [True] * len(ref_cues)
+    )
+
     ref_chars: list[str] = []
     cue_first_index: list[tuple[int, float]] = []  # (first char index, reference time)
-    for cue in ref_cues:
+    for cue, usable in zip(ref_cues, keep):
         norm = normalize_for_align(cue.text)
         if not norm:
             continue
-        cue_first_index.append((len(ref_chars), cue.start))
+        if usable:
+            cue_first_index.append((len(ref_chars), cue.start))
         ref_chars.extend(norm)
 
     ref_stream = "".join(ref_chars)
