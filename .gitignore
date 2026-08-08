@@ -18,6 +18,7 @@ zhsub.toml
 bench/data/*
 !bench/data/.gitkeep
 !bench/data/README.md
+bench/_work/
 
 .pytest_cache/
 .vscode/
