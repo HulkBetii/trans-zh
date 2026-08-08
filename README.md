@@ -171,6 +171,7 @@ Some platforms need cookies for restricted videos. Set them here or paste them i
 | `SUBTITLE_FONT_FAMILY` / `SUBTITLE_FONTS_DIR` | auto-detected | Burned-in subtitle font |
 | `TASKS_SAVE_INTERVAL` | `2.0` | Seconds to coalesce task-store writes. `0` writes on every update. |
 | `SSE_QUEUE_MAXSIZE` | `64` | Backlog per live-progress client before it is dropped |
+| `DUB_MIX_BATCH_SIZE` | `120` | TTS clips mixed per ffmpeg call. Each clip is one `-i`, so a single call for a long video would exceed the OS command-line limit (~32k on Windows). |
 
 ---
 
