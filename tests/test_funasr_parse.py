@@ -96,20 +96,36 @@ def test_sentence_info_is_ignored_even_when_present():
     assert out.sentences[0].start == pytest.approx(1.0)
 
 
-def test_count_mismatch_distributes_evenly_and_flags_degraded():
+def test_apostrophe_stays_inside_an_english_word():
+    """"'" has Unicode category Po, so a naive punctuation-first check splits
+    "don't" into "don" + "t" and invents a token FunASR never emitted.
+
+    On a 35-minute clip with English speech that was exactly 19 phantom tokens,
+    which broke the token==timestamp invariant and cost the whole timeline.
+    """
+    assert split_tokens("don't") == [["don't", ""]]
+    assert split_tokens("i'm ok") == [["i'm", ""], ["ok", ""]]
+    # A leading quote is still punctuation, not the start of a word.
+    assert split_tokens("他说'好") == [["他", ""], ["说", "'"], ["好", ""]]
+
+
+def test_count_mismatch_raises_instead_of_inventing_a_timeline():
+    """A mismatch must fail loudly rather than smear tokens across the file.
+
+    Spreading evenly produces a plausible-looking, wholly fabricated timeline: a
+    0.2% discrepancy on a 35-minute clip once became a uniform 259
+    tokens-per-minute smear measuring 28 seconds of onset error.
+    """
     res = [{
         "text": "你好世界",
         "timestamp": [[0, 1000], [1000, 4000]],  # two timestamps missing
     }]
-    out = parse_funasr_result(res)
-
-    assert out.degraded_sentences == 1
-    tokens = [t for s in out.sentences for t in s.tokens]
-    assert [t.start for t in tokens] == pytest.approx([0.0, 1.0, 2.0, 3.0])
+    with pytest.raises(ValueError, match="không khớp"):
+        parse_funasr_result(res)
 
 
 def test_missing_timestamps_raise_rather_than_inventing_a_timeline():
-    with pytest.raises(ValueError, match="timestamp"):
+    with pytest.raises(ValueError, match="không khớp"):
         parse_funasr_result([{"text": "你好", "timestamp": []}])
 
 

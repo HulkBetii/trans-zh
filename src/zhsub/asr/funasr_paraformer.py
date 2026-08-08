@@ -30,7 +30,9 @@ def _is_punct(ch: str) -> bool:
 
 
 def _is_ascii_word(ch: str) -> bool:
-    return ch.isascii() and (ch.isalnum() or ch == "'")
+    # The apostrophe is deliberately excluded here and handled in split_tokens,
+    # where it only counts as a word character mid-word.
+    return ch.isascii() and ch.isalnum()
 
 
 def split_tokens(text: str) -> list[list[str]]:
@@ -52,13 +54,19 @@ def split_tokens(text: str) -> list[list[str]]:
     for ch in text:
         if ch.isspace():
             flush()
+        elif _is_ascii_word(ch) or (ch == "'" and latin):
+            # The apostrophe check must come BEFORE the punctuation check. "'" has
+            # Unicode category Po, so testing punctuation first splits "don't" into
+            # "don" + "t" and invents a token FunASR never emitted. On a 35-minute
+            # clip containing English speech that was exactly 19 phantom tokens
+            # (don't / i'm / that's / they're), breaking the token==timestamp
+            # invariant. Requiring `latin` keeps a leading quote as punctuation.
+            latin += ch
         elif _is_punct(ch):
             flush()
             if tokens:
                 tokens[-1][1] += ch
             # leading punctuation with no preceding token -> discard
-        elif _is_ascii_word(ch):
-            latin += ch
         else:
             flush()
             tokens.append([ch, ""])
@@ -145,32 +153,17 @@ def parse_funasr_result(res: list[dict], gap_sec: float = 0.5) -> AsrOutput:
             for (tok, punct), ts in zip(pairs, timestamps)
         ]
     else:
-        # The invariant broke. Rather than silently emitting skewed timing, spread
-        # the tokens evenly across the known span and report it loudly upstream.
-        degraded = 1
-        log.warning(
-            "timestamp count (%d) does not match token count (%d) — falling back to "
-            "even distribution; timing for this file is unreliable",
-            len(timestamps), len(pairs),
+        # Never spread tokens evenly to paper over a mismatch. That produces a
+        # timeline that looks plausible and is entirely fabricated: on a 35-minute
+        # clip a 19-token discrepancy (0.2%) once turned into a uniform 259
+        # tokens-per-minute smear whose onset error measured 28 SECONDS. A job that
+        # fails is recoverable; a job that silently invents timing is not.
+        raise ValueError(
+            f"Số token ({len(pairs)}) không khớp số timestamp ({len(timestamps)}) "
+            f"do FunASR trả về. Không dựng timeline từ dữ liệu lệch — lệch bao nhiêu "
+            f"cũng có nghĩa là cách tách token không khớp với model. "
+            f"Báo lại kèm đoạn text để sửa split_tokens."
         )
-        if not timestamps:
-            raise ValueError(
-                "FunASR không trả về timestamp nào. Không thể dựng timeline nếu thiếu "
-                "dữ liệu này — kiểm tra lại model và file audio."
-            )
-        start = float(timestamps[0][0]) / 1000.0
-        end = float(timestamps[-1][1]) / 1000.0
-        n = max(len(pairs), 1)
-        step = (end - start) / n if end > start else 0.0
-        tokens = [
-            AsrToken(
-                text=tok,
-                start=start + i * step,
-                end=start + (i + 1) * step,
-                punct_after=punct or None,
-            )
-            for i, (tok, punct) in enumerate(pairs)
-        ]
 
     return AsrOutput(sentences=_group_into_sentences(tokens, gap_sec), degraded_sentences=degraded)
 
