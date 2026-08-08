@@ -1,8 +1,8 @@
-"""CLI của zhsub.
+"""zhsub command line interface.
 
-Giai đoạn 0 mới có lệnh ``asr``: đủ để sinh SRT thô làm nguyên liệu cho bước căn
-tay reference của benchmark. Các lệnh ``run`` / ``batch`` / ``resume`` thuộc giai
-đoạn build đầy đủ.
+Stage 0 only ships the ``asr`` command: enough to produce the draft SRT that
+feeds the benchmark's hand-timing step. ``run`` / ``batch`` / ``resume`` belong to
+the full build stage.
 """
 
 from __future__ import annotations
@@ -22,6 +22,16 @@ app = typer.Typer(
 )
 
 
+@app.callback()
+def _root() -> None:
+    """No-op root callback.
+
+    Without it, Typer collapses a single-command app into a bare CLI and `zhsub
+    asr file.mp4` parses "asr" as the source argument. It also keeps the command
+    surface stable for `run` / `batch` / `resume` later.
+    """
+
+
 def _setup_logging(verbose: bool) -> None:
     from rich.logging import RichHandler
 
@@ -31,7 +41,7 @@ def _setup_logging(verbose: bool) -> None:
         datefmt="%H:%M:%S",
         handlers=[RichHandler(rich_tracebacks=True, show_path=False)],
     )
-    # FunASR/modelscope log rất ồn ở mức INFO
+    # FunASR and modelscope are extremely chatty at INFO level.
     for noisy in ("modelscope", "funasr", "httpx", "urllib3"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
