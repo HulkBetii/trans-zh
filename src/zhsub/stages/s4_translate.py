@@ -47,7 +47,7 @@ def compute_segments_hash(segments_doc: SegmentsDoc) -> str:
 def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
     lines: list[str] = []
     if glossary.terms:
-        lines.append("THUẬT NGỮ BẮT BUỘC DÙNG ĐÚNG:")
+        lines.append("GLOSSARY — use these renderings exactly:")
         for t in glossary.terms:
             target = t.zh if t.keep_source else (t.vi if lang == "vi" else t.en)
             if not target:
@@ -58,17 +58,19 @@ def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
     if lang == "vi":
         style = glossary.style
         if style.speech_register or style.narrator_self_vi or style.audience_vi:
-            lines.append("\nGIỌNG ĐIỆU VÀ XƯNG HÔ:")
+            lines.append("\nREGISTER AND ADDRESS:")
             if style.speech_register:
-                lines.append(f"  giọng điệu: {style.speech_register}")
+                lines.append(f"  tone: {style.speech_register}")
             if style.narrator_self_vi:
-                lines.append(f"  người kể tự xưng: {style.narrator_self_vi}")
+                lines.append(f"  narrator refers to themselves as: {style.narrator_self_vi}")
             if style.audience_vi:
-                lines.append(f"  gọi khán giả: {style.audience_vi}")
+                lines.append(f"  narrator addresses the audience as: {style.audience_vi}")
         if glossary.address_terms:
-            lines.append("\nXƯNG HÔ GIỮA NHÂN VẬT (giữ nhất quán cả video):")
+            lines.append("\nADDRESS TERMS BETWEEN CHARACTERS (keep consistent for the whole video):")
             for a in glossary.address_terms:
-                lines.append(f"  {a.speaker} nói với {a.addressee}: tự xưng '{a.vi_self}', gọi '{a.vi_other}'")
+                lines.append(
+                    f"  {a.speaker} speaking to {a.addressee}: self '{a.vi_self}', other '{a.vi_other}'"
+                )
     return "\n".join(lines)
 
 
@@ -77,38 +79,76 @@ def build_system_prompt(glossary: GlossaryDoc, lang: str) -> str:
 
     Stability is deliberate: it is what lets prompt caching make a large glossary
     almost free from the second batch onward.
+
+    Written in English, and so are the JSON keys, even though the product and its
+    users are Vietnamese. Measured on qwen2.5-7b via Ollama: a Vietnamese-language
+    version of this prompt made the model copy-edit the Chinese instead of
+    translating it, on 36 of 36 segments. The same model handed an English prompt
+    translated correctly. The phrase that most likely did it was an instruction to
+    "keep short sentences short" — read as "keep the text as it is". Small models
+    follow English instructions far more reliably, so the instruction language is
+    an engineering choice, not a stylistic one.
     """
-    lang_name = LANG_NAMES[lang]
-    return f"""Bạn là dịch giả phụ đề chuyên nghiệp, dịch từ tiếng Trung sang {lang_name}.
+    lang_name = "VIETNAMESE" if lang == "vi" else "ENGLISH"
+    script_hint = (
+        "Vietnamese uses the Latin alphabet with diacritics (e.g. \"vượt ngục\")."
+        if lang == "vi"
+        else "English uses the Latin alphabet."
+    )
+    return f"""You are a professional subtitle translator. You translate Chinese into {lang_name}.
 
-Người dùng đưa một mảng JSON các câu cần dịch, cùng một ít câu phía trước và phía
-sau chỉ để bạn hiểu ngữ cảnh.
+The user message has two parts: a plain-text SCENE CONTEXT block for you to read,
+and a JSON object. Translate every entry in the JSON and nothing else. The scene
+context is background only — never translate it, never return it.
 
-QUY TẮC TUYỆT ĐỐI:
-1. Mỗi phần tử input phải có ĐÚNG MỘT phần tử output với cùng "id".
-2. KHÔNG gộp hai câu thành một. KHÔNG tách một câu thành hai. Số lượng và tập id
-   phải khớp 100%. Đây là ràng buộc cứng vì timeline phụ đề phụ thuộc vào nó.
-3. Chỉ dịch phần trong "cần dịch". Phần ngữ cảnh chỉ để đọc, KHÔNG dịch.
-4. Dịch tự nhiên, đúng nghĩa, đúng văn phong phụ đề. Không dịch máy móc từng chữ.
-5. Giữ nguyên câu ngắn là câu ngắn. Không thêm thông tin không có trong bản gốc.
-6. Không thêm dấu ngoặc kép bao quanh, không thêm chú thích.
+ABSOLUTE RULES:
+1. Output exactly ONE object per input object, carrying the SAME "id".
+   Never merge two entries into one. Never split one entry into two.
+   The id set must match 100%. Subtitle timing depends on this.
+2. The "translation" value MUST be written in {lang_name}. {script_hint}
+   NEVER copy Chinese characters into "translation". If the source is already
+   short, the translation is still {lang_name}, not the original text.
+3. Translate the meaning naturally, the way a subtitle is written. Do not
+   translate word by word, and do not add information that is not in the source.
+4. Respect each entry's "max_chars" budget. Subtitles are condensed: drop filler
+   words and redundant connectives rather than exceed it. Never drop actual
+   meaning to fit.
+5. Do not wrap the result in quotes and do not add notes or explanations.
 
 {_glossary_block(glossary, lang)}
 
-CHỈ trả về JSON, không kèm giải thích:
+Return ONLY this JSON, nothing else:
 {{"translations": [{{"id": 0, "translation": "..."}}]}}"""
 
 
 REVIEW_SUFFIX = """
 
-Đây là lượt RÀ SOÁT. Người dùng đưa bản dịch thô của chính bạn. Hãy soi và chỉnh:
-- Chỗ nào dịch cứng, dịch word-by-word, đọc lên không giống tiếng Việt tự nhiên?
-- Chỗ nào sai thuật ngữ so với danh sách bắt buộc ở trên?
-- Chỗ nào xưng hô sai hoặc không nhất quán với các câu xung quanh?
-- Chỗ nào sai nghĩa so với bản tiếng Trung?
+THIS IS THE REVIEW PASS. Each entry now also carries "draft", your own first
+attempt. Inspect it and fix:
+- stiff, word-by-word phrasing that no native speaker would write
+- terminology that contradicts the glossary above
+- pronouns or forms of address that are wrong or inconsistent with nearby lines
+- meaning that does not match the Chinese source
 
-Sửa những chỗ đó. Câu nào đã tốt thì giữ nguyên. Ràng buộc về id vẫn y nguyên:
-đúng một output cho mỗi input, cùng tập id."""
+Rewrite only what needs it; keep a good draft as it is. Every rule above still
+applies, especially: the output must be in the target language, never Chinese,
+and exactly one object per input object with the same id."""
+
+
+def char_budget(segment: Segment, cfg: Config, lang: str) -> int:
+    """How many characters this cue can actually display.
+
+    Two limits in the spec disagree and the tighter one has to win: a 7s cue allows
+    147 characters at 21 CPS, but only 84 fit in two 42-character lines. Measured on
+    a real clip, 24 of 35 Vietnamese translations overflowed because only the CPS
+    limit was being considered. Budgeting at generation time is the honest fix —
+    trimming afterwards would mean deleting meaning, and splitting the cue would
+    break the one-segment-one-cue rule.
+    """
+    limits = cfg.render.for_lang(lang)
+    by_lines = limits.max_chars_per_line * cfg.render.max_lines
+    by_rate = int((segment.end - segment.start) * limits.max_cps)
+    return max(20, min(by_lines, by_rate))
 
 
 def _build_user_message(
@@ -116,18 +156,35 @@ def _build_user_message(
     before: list[Segment],
     after: list[Segment],
     drafts: dict[int, str] | None = None,
+    budgets: dict[int, int] | None = None,
 ) -> str:
-    payload: dict = {}
-    if before:
-        payload["ngữ_cảnh_trước"] = [s.text_zh for s in before]
-    payload["cần_dịch"] = [
-        ({"id": s.id, "text": s.text_zh, "bản_dịch_thô": drafts[s.id]} if drafts else
-         {"id": s.id, "text": s.text_zh})
-        for s in batch
-    ]
-    if after:
-        payload["ngữ_cảnh_sau"] = [s.text_zh for s in after]
-    return json.dumps(payload, ensure_ascii=False, indent=1)
+    # Context is kept OUTSIDE the JSON on purpose. Measured on qwen2.5-7b: with
+    # context as sibling keys inside the same object, 14 of 20 outputs came back as
+    # untranslated Chinese — the model could not tell the read-only material from
+    # the material to translate, and echoed whichever it saw last. Moving context
+    # into a separate plain-text block above the JSON removed the confusion.
+    parts: list[str] = []
+    if before or after:
+        parts.append("SCENE CONTEXT — background only, do NOT translate, do NOT return:")
+        for s in before:
+            parts.append(f"  ... {s.text_zh}")
+        parts.append("  >>> the lines to translate belong here <<<")
+        for s in after:
+            parts.append(f"  ... {s.text_zh}")
+        parts.append("")
+
+    entries: list[dict] = []
+    for s in batch:
+        entry: dict = {"id": s.id, "text": s.text_zh}
+        if budgets:
+            entry["max_chars"] = budgets[s.id]
+        if drafts:
+            entry["draft"] = drafts[s.id]
+        entries.append(entry)
+    payload = {"to_translate": entries}
+    parts.append("TRANSLATE THIS JSON:")
+    parts.append(json.dumps(payload, ensure_ascii=False, indent=1))
+    return "\n".join(parts)
 
 
 def _parse_translations(data, expected_ids: set[int]) -> dict[int, str]:
@@ -156,6 +213,26 @@ def _parse_translations(data, expected_ids: set[int]) -> dict[int, str]:
     return out
 
 
+def cjk_ratio(text: str) -> float:
+    """Fraction of Han characters in a string."""
+    if not text:
+        return 0.0
+    return sum(1 for ch in text if "一" <= ch <= "鿿") / len(text)
+
+
+def looks_untranslated(text: str) -> bool:
+    """Whether a translation still carries Chinese it should not.
+
+    A ratio alone is too lenient: an otherwise-Vietnamese line ending in
+    "hoang诞无比" scores only 0.13 and would slip through, yet it is plainly a
+    failure. In a Vietnamese or English subtitle any run of Han characters is wrong
+    unless it came from a ``keep_source`` glossary entry, and those are short — so a
+    small absolute count catches the leaks a ratio misses.
+    """
+    han = sum(1 for ch in text if "一" <= ch <= "鿿")
+    return han >= 3 or (len(text) > 0 and han / len(text) > 0.3)
+
+
 def _translate_batch(
     provider: LLMProvider,
     system: str,
@@ -164,6 +241,7 @@ def _translate_batch(
     after: list[Segment],
     cfg: Config,
     drafts: dict[int, str] | None = None,
+    budgets: dict[int, int] | None = None,
 ) -> dict[int, str]:
     """One batch through the model, retrying then splitting on id mismatch."""
     expected = {s.id for s in batch}
@@ -171,7 +249,9 @@ def _translate_batch(
 
     for attempt in range(cfg.translate.max_retries):
         try:
-            data = provider.complete_json(system, _build_user_message(batch, before, after, drafts))
+            data = provider.complete_json(
+                system, _build_user_message(batch, before, after, drafts, budgets)
+            )
             return _parse_translations(data, expected)
         except (TranslationFailure, LLMError) as exc:
             last_error = exc
@@ -185,8 +265,12 @@ def _translate_batch(
         # and bisecting isolates it instead of failing everything around it.
         mid = len(batch) // 2
         log.warning("S4: chia đôi batch %d câu sau %d lần thất bại", len(batch), cfg.translate.max_retries)
-        left = _translate_batch(provider, system, batch[:mid], before, batch[mid:] + after, cfg, drafts)
-        right = _translate_batch(provider, system, batch[mid:], before + batch[:mid], after, cfg, drafts)
+        left = _translate_batch(
+            provider, system, batch[:mid], before, batch[mid:] + after, cfg, drafts, budgets
+        )
+        right = _translate_batch(
+            provider, system, batch[mid:], before + batch[:mid], after, cfg, drafts, budgets
+        )
         return {**left, **right}
 
     raise TranslationFailure(
@@ -233,12 +317,38 @@ def translate_segments(
         before = segments[max(0, first_index - cfg.translate.context_before) : first_index]
         after = segments[last_index + 1 : last_index + 1 + cfg.translate.context_after]
 
-        drafts = _translate_batch(provider, system, batch, before, after, cfg)
+        budgets = {s.id: char_budget(s, cfg, lang) for s in batch}
+        drafts = _translate_batch(provider, system, batch, before, after, cfg, budgets=budgets)
+
+        # A translation that is still mostly Han characters means the model echoed the
+        # source instead of translating it. Retrying just those entries is far cheaper
+        # than re-running the batch, and leaving them through would ship Chinese
+        # subtitles labelled Vietnamese.
+        leaked = [s for s in batch if looks_untranslated(drafts.get(s.id, ""))]
+        if leaked:
+            log.warning("S4[%s]: %d câu chưa được dịch, gọi lại riêng", lang, len(leaked))
+            try:
+                redone = _translate_batch(
+                    provider, system, leaked, before, after, cfg, budgets=budgets
+                )
+                drafts.update({k: v for k, v in redone.items() if not looks_untranslated(v)})
+            except (TranslationFailure, LLMError) as exc:
+                log.warning("S4[%s]: gọi lại không cứu được: %s", lang, exc)
 
         final = drafts
         if cfg.translate.review_pass:
             try:
-                final = _translate_batch(provider, review_system, batch, before, after, cfg, drafts)
+                final = _translate_batch(
+                    provider, review_system, batch, before, after, cfg, drafts, budgets
+                )
+                # The review pass can regress a good draft back into Chinese; keep
+                # whichever version actually is the target language.
+                final = {
+                    k: (drafts[k]
+                        if looks_untranslated(v) and not looks_untranslated(drafts.get(k, ""))
+                        else v)
+                    for k, v in final.items()
+                }
             except (TranslationFailure, LLMError) as exc:
                 # The draft is already valid and id-complete; losing the polish pass
                 # is far better than losing the batch.

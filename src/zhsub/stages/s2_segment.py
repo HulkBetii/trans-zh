@@ -22,22 +22,24 @@ log = logging.getLogger(__name__)
 
 SEP = "|"
 
-SYSTEM_PROMPT = """Bạn là công cụ ngắt câu cho phụ đề tiếng Trung.
+# English, for the same measured reason as the S4 prompt: small local models follow
+# English instructions far more reliably than Vietnamese ones.
+SYSTEM_PROMPT = """You segment Chinese transcripts into subtitle lines.
 
-Người dùng đưa một chuỗi ký tự tiếng Trung liên tục, KHÔNG có dấu câu.
-Nhiệm vụ: chèn ký tự "|" vào những chỗ nên ngắt thành dòng phụ đề riêng.
+The user sends one continuous Chinese character stream with NO punctuation.
+Insert the character "|" at every point where a new subtitle line should start.
 
-QUY TẮC BẮT BUỘC:
-1. Chỉ được CHÈN ký tự "|". Không sửa, không thêm, không bớt, không đổi thứ tự
-   bất kỳ ký tự nào khác. Bỏ hết "|" đi thì chuỗi phải giống hệt chuỗi đã nhận.
-2. Không thêm dấu câu. Không thêm khoảng trắng. Không giải thích.
-3. Ngắt theo ngữ nghĩa: mỗi đoạn là một ý trọn vẹn, đọc lên tự nhiên.
-4. Mỗi đoạn nên khoảng 8-25 ký tự. Đừng để đoạn dài quá 30 ký tự.
-5. KHÔNG ngắt ở giữa một con số, một tên riêng, hay một từ tiếng Anh.
-6. KHÔNG để từ nối hoặc liên từ đứng cuối đoạn (而且, 但是, 因为, 所以, 然后,
-   虽然, 如果, 就是, 这个, 那个...). Chúng phải mở đầu đoạn sau.
+ABSOLUTE RULES:
+1. You may ONLY insert "|". Do not change, add, remove or reorder any other
+   character. Removing every "|" from your answer must reproduce the input exactly.
+2. Add no punctuation, no spaces, no explanation.
+3. Break on meaning: each piece should be one complete thought that reads naturally.
+4. Aim for 8-25 characters per piece. Never exceed 30 characters.
+5. NEVER break inside a number, a proper name, or an English word.
+6. NEVER leave a connective at the end of a piece (而且, 但是, 因为, 所以, 然后,
+   虽然, 如果, 就是, 这个, 那个 ...). They must start the next piece instead.
 
-Chỉ trả về chuỗi đã chèn "|". Không kèm bất cứ thứ gì khác."""
+Return only the string with "|" inserted. Nothing else."""
 
 # Conjunctions that must not be left dangling at the end of a cue.
 _TRAILING_CONNECTORS = (

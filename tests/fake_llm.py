@@ -11,6 +11,19 @@ import json
 
 from zhsub.llm.base import LLMProvider
 
+_JSON_MARKER = "TRANSLATE THIS JSON:"
+
+
+def parse_request(user: str) -> tuple[list[dict], str]:
+    """Split a S4 user message into its items and the scene-context preamble.
+
+    The context block deliberately sits outside the JSON, so a fake provider has to
+    find the payload the same way a real model does.
+    """
+    context, _, payload = user.partition(_JSON_MARKER)
+    data = json.loads(payload if payload else user)
+    return data.get("to_translate", []), context
+
 
 class FakeProvider(LLMProvider):
     """Translates by prefixing, and can be told to misbehave on cue."""
@@ -41,9 +54,8 @@ class FakeProvider(LLMProvider):
 
             raise LLMError("lỗi giả lập")
 
-        payload = json.loads(user)
-        items = payload.get("cần_dịch", [])
-        prefix = "VI:" if "tiếng Việt" in system else "EN:"
+        items, _ = parse_request(user)
+        prefix = "VI:" if "VIETNAMESE" in system else "EN:"
 
         out = []
         for i, item in enumerate(items):
@@ -74,9 +86,9 @@ class GlossaryAwareProvider(FakeProvider):
 
     def _call(self, system: str, user: str, cache_system: bool, json_mode: bool = False) -> str:
         self.calls += 1
-        payload = json.loads(user)
+        items, _ = parse_request(user)
         out = []
-        for item in payload.get("cần_dịch", []):
+        for item in items:
             text = item["text"]
             for zh, vi in self.mapping.items():
                 text = text.replace(zh, vi)

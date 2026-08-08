@@ -265,6 +265,63 @@ def test_criterion_5_glossary_terms_are_consistent_across_batches(tmp_path: Path
         assert "扛把子" not in item.translation
 
 
+def test_scene_context_stays_outside_the_json_payload():
+    """Context inside the JSON made a 7B model echo Chinese instead of translating.
+
+    Measured on qwen2.5-7b: with context as sibling keys of "to_translate" in one
+    object, 14 of 20 outputs came back untranslated. Moving it to a plain-text block
+    above the JSON dropped that to 1 of 20. The JSON must therefore carry only the
+    lines to translate.
+    """
+    segments = _make_segments(5)
+    message = s4_translate._build_user_message(segments[2:4], segments[:2], segments[4:])
+
+    payload = json.loads(message.split("TRANSLATE THIS JSON:", 1)[1])
+    assert set(payload) == {"to_translate"}
+    assert [i["id"] for i in payload["to_translate"]] == [2, 3]
+    assert "SCENE CONTEXT" in message
+    assert segments[0].text_zh in message.split("TRANSLATE THIS JSON:", 1)[0]
+
+
+def test_char_budget_takes_the_tighter_of_the_two_limits():
+    """The spec's two limits disagree; the tighter one has to win.
+
+    A 7s cue allows 147 characters at 21 CPS but only 84 in two 42-character lines.
+    Measured on a real clip, 24 of 35 Vietnamese translations overflowed because
+    only the CPS limit was applied.
+    """
+    cfg = Config()
+    long_cue = Segment(id=0, start=0.0, end=7.0, text_zh="x", token_range=(0, 1))
+    short_cue = Segment(id=1, start=0.0, end=2.0, text_zh="x", token_range=(0, 1))
+
+    assert s4_translate.char_budget(long_cue, cfg, "vi") == 84  # line-limited
+    assert s4_translate.char_budget(short_cue, cfg, "vi") == 42  # rate-limited
+
+
+def test_budget_reaches_the_model():
+    cfg = Config()
+    segments = _make_segments(2)
+    budgets = {s.id: s4_translate.char_budget(s, cfg, "vi") for s in segments}
+    message = s4_translate._build_user_message(segments, [], [], budgets=budgets)
+
+    payload = json.loads(message.split("TRANSLATE THIS JSON:", 1)[1])
+    assert all("max_chars" in entry for entry in payload["to_translate"])
+
+
+def test_leftover_chinese_is_detected_even_when_it_is_a_minority():
+    """A ratio alone misses the common case of a trailing Chinese fragment."""
+    assert not s4_translate.looks_untranslated("Anh ta là trùm sò của giới vượt ngục")
+    assert s4_translate.looks_untranslated("他是美国越狱史上的扛把子")
+    # Observed in a real run: an otherwise-Vietnamese line ending in Chinese.
+    assert s4_translate.looks_untranslated("càng ngày càng hoang诞无比")
+
+
+def test_target_language_is_named_explicitly_in_the_prompt():
+    prompt = s4_translate.build_system_prompt(GlossaryDoc(), "vi")
+    assert "VIETNAMESE" in prompt
+    assert "NEVER copy Chinese characters" in prompt
+
+
 def test_glossary_goes_into_the_system_prompt_verbatim():
     """Identical across batches is what makes prompt caching work."""
     glossary = GlossaryDoc(terms=[
