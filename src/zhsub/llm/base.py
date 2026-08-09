@@ -99,10 +99,21 @@ def extract_json(text: str) -> str:
     if fenced:
         text = fenced.group(1).strip()
 
-    # Fall back to the outermost bracketed span.
-    for opener, closer in (("[", "]"), ("{", "}")):
-        start = text.find(opener)
-        end = text.rfind(closer)
-        if start != -1 and end > start:
-            return text[start : end + 1]
-    return text
+    # Take whichever delimiter opens FIRST, then its matching closer at the end.
+    #
+    # Trying "[" before "{" unconditionally silently truncates every object that
+    # contains an array: given {"style": {...}, "address_terms": [...]} it returns
+    # just the address_terms array and the rest is gone. That went unnoticed because
+    # the two callers whose payload is a top-level array happen to accept a bare
+    # list, so only the object-valued "style" block came back empty.
+    first_obj = text.find("{")
+    first_arr = text.find("[")
+    if first_obj == -1 and first_arr == -1:
+        return text
+    if first_arr == -1 or (first_obj != -1 and first_obj < first_arr):
+        opener, closer, start = "{", "}", first_obj
+    else:
+        opener, closer, start = "[", "]", first_arr
+
+    end = text.rfind(closer)
+    return text[start : end + 1] if end > start else text

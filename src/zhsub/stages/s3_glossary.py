@@ -20,50 +20,69 @@ log = logging.getLogger(__name__)
 
 PROMPT_VERSION = 1
 
-TERMS_SYSTEM = """Bạn là công cụ trích thuật ngữ cho việc dịch phụ đề tiếng Trung.
+TERMS_SYSTEM = """You extract a translation glossary from a Chinese transcript.
 
-Người dùng đưa một đoạn transcript tiếng Trung. Hãy trích ra:
-- Tên nhân vật (person)
-- Địa danh (place)
-- Tên tổ chức, cơ quan, công ty (org)
-- Thuật ngữ chuyên ngành (term)
-- Tên món ăn (dish)
-- Tên sản phẩm, thương hiệu (product)
+Extract only:
+- character names (person)
+- place names (place)
+- organisations, agencies, companies (org)
+- specialist terminology a general audience would not know (term)
+- dish names (dish)
+- product and brand names (product)
 
-Với mỗi mục, cho: dạng tiếng Trung, pinyin có dấu, bản dịch tiếng Việt, bản dịch
-tiếng Anh.
+For each entry give the Chinese form, pinyin with tone marks, a Vietnamese
+rendering and an English rendering.
 
-Nguyên tắc:
-- Chỉ trích thứ thực sự là tên riêng hoặc thuật ngữ. Bỏ qua từ thông thường.
-- Tên người nước ngoài phiên âm sang tiếng Trung thì phải khôi phục lại dạng gốc
-  ở bản tiếng Anh (ví dụ 弗兰克 -> Frank).
-- Tên tiếng Việt theo quy ước phổ thông của người Việt, không phiên âm máy móc.
-- keep_source: HẦU HẾT phải là false. Chỉ đặt true khi thuật ngữ BẮT BUỘC hiển thị
-  nguyên dạng chữ Hán trên phụ đề, và khi đó phải để trống cả "vi" lẫn "en".
-  Đã điền bản dịch thì keep_source PHẢI là false. Tên riêng, địa danh, tổ chức
-  gần như luôn là false.
+RULES:
+- Extract proper nouns and specialist terms ONLY. Skip ordinary vocabulary: words
+  like 监狱 (prison), 美国 (America), 警察 (police) are everyday words, not glossary
+  entries, and pinning them to one rendering makes the translation worse.
+- A foreign name transliterated into Chinese must be restored to its original form
+  in "en" (弗兰克 -> Frank, not "Fulanke"). Get real people and places right.
+- Vietnamese renderings follow normal Vietnamese usage, not mechanical
+  transliteration.
+- "keep_source" must be false for almost everything. Set it true ONLY when the
+  term has to appear on screen in Chinese characters, and then leave both "vi" and
+  "en" empty. If you provide a translation, keep_source MUST be false. Names,
+  places and organisations are essentially always false.
 
-CHỈ trả về JSON, không kèm giải thích:
+Return ONLY this JSON, no explanation:
 {"terms": [{"zh": "...", "pinyin": "...", "vi": "...", "en": "...",
             "type": "person|place|org|term|dish|product|other",
             "keep_source": false, "note": ""}]}"""
 
-STYLE_SYSTEM = """Bạn là công cụ phân tích văn phong để dịch phụ đề sang tiếng Việt.
+# English, same measured reason as the S2 and S4 prompts. The Vietnamese version of
+# this prompt returned an entirely empty style block on a 35-minute narration that
+# plainly has a register and addresses its audience directly.
+STYLE_SYSTEM = """You decide Vietnamese forms of address for subtitling a Chinese video.
 
-Người dùng đưa transcript tiếng Trung kèm danh sách nhân vật đã biết. Hãy quyết
-định cách xưng hô tiếng Việt và giữ nhất quán cho cả video.
+The user sends a Chinese transcript plus any character names already identified.
+Vietnamese has no neutral "you" or "I": every line commits to a relationship, so
+these choices must be made once and held for the whole video.
 
-Suy ra từ nội dung thoại: quan hệ giữa các nhân vật, chênh lệch tuổi tác, sắc
-thái trang trọng hay thân mật. Nếu không đủ căn cứ thì chọn phương án trung tính
-và ghi rõ lý do trong "basis".
+Decide, and answer in VIETNAMESE inside the JSON values:
 
-CHỈ trả về JSON:
-{"style": {"speech_register": "mô tả ngắn giọng điệu tổng thể",
-           "narrator_self_vi": "người kể tự xưng là gì",
-           "audience_vi": "người kể gọi khán giả là gì"},
- "address_terms": [{"speaker": "tên A", "addressee": "tên B",
-                    "vi_self": "A tự xưng", "vi_other": "A gọi B",
-                    "basis": "căn cứ"}]}"""
+1. "speech_register" — the overall tone in a few words (formal documentary,
+   casual storytelling, comedic, ...).
+2. "narrator_self_vi" — what the narrator calls themselves. Fill this in for ANY
+   video with a narrator or presenter, including documentaries. Common choices:
+   "mình", "tôi", "chúng ta", "chúng mình".
+3. "audience_vi" — how the narrator addresses the viewer. Almost every online
+   video has one. Common choices: "các bạn", "mọi người", "anh em".
+4. "address_terms" — one entry per pair of characters who speak TO EACH OTHER.
+   Leave this empty ONLY if the video is pure narration with no dialogue between
+   named people. Infer from the dialogue: relative age, closeness, formality. When
+   the evidence is thin, choose a neutral pairing and say so in "basis".
+
+Never leave "speech_register", "narrator_self_vi" or "audience_vi" empty — infer
+the most likely value from the transcript instead.
+
+Return ONLY this JSON:
+{"style": {"speech_register": "...", "narrator_self_vi": "...", "audience_vi": "..."},
+ "address_terms": [{"speaker": "A", "addressee": "B",
+                    "vi_self": "how A refers to themselves",
+                    "vi_other": "how A addresses B",
+                    "basis": "the evidence, in Vietnamese"}]}"""
 
 
 def _batches(segments, max_chars: int) -> list[str]:
