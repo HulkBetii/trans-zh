@@ -155,10 +155,27 @@ Cache dịch có `glossary_hash` trong khoá nên sửa glossary sẽ tự độ
 
 ### `batch` sau khi mất điện
 
-Chạy lại đúng lệnh cũ. Job đã `done` bị bỏ qua, job kẹt ở `running` với heartbeat
-quá hạn được thu hồi về `pending`, và stage nào đã có file JSON hợp lệ thì không
-chạy lại. Process bị giết không bao giờ chạy được cleanup, nên trạng thái phải
-suy ra từ heartbeat chứ không thể trông vào shutdown hook.
+Chạy lại đúng lệnh cũ. Chỉ job đã `done` bị bỏ qua, nên job kẹt ở `running` do bị
+giết vẫn được xử lý lại ngay, **không phải chờ hết ngưỡng heartbeat 5 phút** —
+việc thu hồi chỉ để dọn trạng thái cho sạch. Stage nào đã có file JSON hợp lệ thì
+không chạy lại, nên resume rẻ.
+
+Đã kiểm chứng: chạy `batch --concurrency 2` trên 3 clip, giết process lúc hai job
+đang ở stage `asr`, chạy lại đúng lệnh cũ → 3/3 hoàn tất, mọi job về `done`.
+
+Process bị giết không bao giờ chạy được cleanup, nên trạng thái phải suy ra từ
+heartbeat chứ không thể trông vào shutdown hook.
+
+### Giới hạn đã biết
+
+- **Hai tiến trình `batch` chạy song song sẽ giẫm chân nhau.** Việc chọn job chỉ
+  loại các job `done`, nên tiến trình thứ hai sẽ nhận luôn job mà tiến trình thứ
+  nhất đang làm. Dùng `--concurrency` trong MỘT tiến trình, đừng mở hai cửa sổ.
+- **S3 vẫn trích cả từ thông thường** vào glossary (监狱, 逃跑) dù prompt đã dặn
+  không. Vô hại vì bản dịch không bị ép theo, nhưng làm glossary dài hơn cần thiết.
+- **Cột `vi` của glossary đôi khi bị điền tiếng Anh** cho tên cơ quan dài
+  ("Florence Federal Correctional Institution"). Sửa tay trong `glossary.json` rồi
+  `resume --from translate` là xong — đây đúng là việc mà vòng lặp đó sinh ra để làm.
 
 ---
 

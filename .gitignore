@@ -8,6 +8,7 @@ build/
 # State & output của pipeline
 work/
 output/
+inbox/
 jobs.db
 jobs.db-journal
 jobs.db-wal
