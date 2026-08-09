@@ -34,6 +34,30 @@ class TranslationFailure(RuntimeError):
     """Raised when a batch cannot be translated with the id set intact."""
 
 
+def _staleness(
+    existing: TranslationsDoc,
+    segments_hash: str,
+    glossary_hash: str,
+    model: str,
+    cfg: Config,
+) -> list[str]:
+    """Name every input that changed since ``existing`` was produced.
+
+    Returning the reasons rather than a bare bool so the log says why a re-run cost
+    tokens — silence there is how a stale file goes unnoticed.
+    """
+    reasons: list[str] = []
+    if existing.segments_hash != segments_hash:
+        reasons.append("segments.json")
+    if existing.glossary_hash != glossary_hash:
+        reasons.append("glossary.json")
+    if existing.model != model:
+        reasons.append("model")
+    if existing.prompt_version != cfg.translate.prompt_version:
+        reasons.append("prompt_version")
+    return reasons
+
+
 def compute_segments_hash(segments_doc: SegmentsDoc) -> str:
     """Hash only what a translation actually depends on: the ids and their text.
 
@@ -238,6 +262,25 @@ def looks_untranslated(text: str, keep_source: tuple[str, ...] = ()) -> bool:
     return any("一" <= ch <= "鿿" for ch in text)
 
 
+def apply_glossary(text: str, glossary: GlossaryDoc, lang: str) -> str:
+    """Force any glossary term the model left in Chinese to its defined rendering.
+
+    The glossary is the authority on these strings, so substituting is not a patch
+    over a bad translation — it is the definition being applied. Observed with
+    gpt-4o-mini: the model produced good Vietnamese but copied 俄克拉荷马州 and
+    美国空军 verbatim even though both were defined right there in its own prompt.
+
+    Longest terms first, so a term containing another does not get half-replaced.
+    """
+    for term in sorted(glossary.terms, key=lambda t: len(t.zh), reverse=True):
+        if term.keep_source or not term.zh:
+            continue
+        target = term.vi if lang == "vi" else term.en
+        if target and term.zh in text:
+            text = text.replace(term.zh, target)
+    return text
+
+
 def _translate_batch(
     provider: LLMProvider,
     system: str,
@@ -385,6 +428,14 @@ def translate_segments(
     missing = set(by_id) - set(results)
     if missing:
         raise TranslationFailure(f"Thiếu bản dịch cho id: {sorted(missing)[:10]}")
+
+    # Applied here, over both fresh and cached entries, rather than inside the batch
+    # loop. The cache holds raw model output, so substituting on read means editing
+    # glossary.json changes the result without paying to call the model again — and
+    # a cache hit can no longer smuggle an untranslated term past the check.
+    for item in results.values():
+        item.translation = apply_glossary(item.translation, glossary, lang)
+
     return [results[i] for i in sorted(results)]
 
 
@@ -407,14 +458,17 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False) -> dict[st
         out_json = work_dir / f"translations.{lang}.json"
         if out_json.is_file() and not force:
             existing = read_doc(out_json, TranslationsDoc)
-            # Re-running S2 renumbers and re-splits segments, so anything translated
-            # against the old segmentation is stale. Reusing it would break the 1-1
-            # relation the timeline depends on. The text cache still absorbs the
-            # cost: only genuinely changed segments are paid for again.
-            if existing.segments_hash == segments_hash:
+            # Every input that can change a translation has to be compared, not just
+            # the segments. Checking segmentation alone meant that hand-editing
+            # glossary.json and running `resume --from translate` silently returned
+            # the old file — defeating the whole point of the glossary edit loop.
+            # The per-segment cache still absorbs the cost: only entries whose text,
+            # glossary, model or prompt actually changed are paid for again.
+            stale = _staleness(existing, segments_hash, glossary_hash, provider.model, cfg)
+            if not stale:
                 out[lang] = existing
                 continue
-            log.info("S4[%s]: segments.json đã đổi — dịch lại (cache vẫn dùng được)", lang)
+            log.info("S4[%s]: %s đã đổi — dịch lại", lang, " và ".join(stale))
 
         items = translate_segments(
             segments_doc.segments, lang, provider, glossary, cfg, cache, glossary_hash

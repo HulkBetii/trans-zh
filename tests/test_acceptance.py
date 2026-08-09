@@ -283,6 +283,29 @@ def test_scene_context_stays_outside_the_json_payload():
     assert segments[0].text_zh in message.split("TRANSLATE THIS JSON:", 1)[0]
 
 
+def test_editing_the_glossary_forces_a_retranslation(tmp_path: Path):
+    """The glossary edit loop is the main lever on translation quality.
+
+    Comparing only the segmentation meant `resume --from translate` after a hand
+    edit returned the previous file untouched — the edit appeared to do nothing.
+    """
+    from zhsub.models import TranslationsDoc
+
+    cfg = Config()
+    existing = TranslationsDoc(
+        lang="vi", model="m", prompt_version=cfg.translate.prompt_version,
+        glossary_hash="OLD", segments_hash="SEG", items=[],
+    )
+
+    assert s4_translate._staleness(existing, "SEG", "OLD", "m", cfg) == []
+    assert s4_translate._staleness(existing, "SEG", "NEW", "m", cfg) == ["glossary.json"]
+    assert s4_translate._staleness(existing, "OTHER", "OLD", "m", cfg) == ["segments.json"]
+    assert s4_translate._staleness(existing, "SEG", "OLD", "other-model", cfg) == ["model"]
+
+    cfg.translate.prompt_version += 1
+    assert s4_translate._staleness(existing, "SEG", "OLD", "m", cfg) == ["prompt_version"]
+
+
 def test_char_budget_takes_the_tighter_of_the_two_limits():
     """The spec's two limits disagree; the tighter one has to win.
 
@@ -335,6 +358,72 @@ def test_target_language_is_named_explicitly_in_the_prompt():
     prompt = s4_translate.build_system_prompt(GlossaryDoc(), "vi")
     assert "VIETNAMESE" in prompt
     assert "NEVER copy Chinese characters" in prompt
+
+
+def test_glossary_substitution_also_covers_cached_entries(tmp_path: Path):
+    """A cache hit must not be able to smuggle an untranslated term through.
+
+    The cache holds raw model output, so the substitution has to happen on read.
+    Applying it only to freshly translated batches left three Chinese place names in
+    a real run the moment those segments came back from cache.
+    """
+    glossary = GlossaryDoc(terms=[
+        GlossaryTerm(zh="美国空军", vi="Không quân Hoa Kỳ", en="US Air Force", type="org"),
+    ])
+    segments = [Segment(id=0, start=0.0, end=3.0, text_zh="加入美国空军", token_range=(0, 6))]
+    cfg = Config()
+    cfg.translate.review_pass = False
+    cache = TranslationCache(tmp_path / "cache")
+
+    # Seed the cache with output that left the term in Chinese.
+    key = cache.make_key(segments[0].text_zh, "vi", "fake-model", "gh", cfg.translate.prompt_version)
+    cache.put(key, "gia nhập 美国空军")
+
+    provider = FakeProvider()
+    items = translate_segments(segments, "vi", provider, glossary, cfg, cache, "gh")
+
+    assert provider.calls == 0, "phải là cache hit"
+    assert items[0].cache_hit
+    assert items[0].translation == "gia nhập Không quân Hoa Kỳ"
+
+
+def test_glossary_terms_left_in_chinese_are_substituted():
+    """The glossary defines these strings, so applying it is the definition winning.
+
+    Observed with gpt-4o-mini: good Vietnamese overall, but 俄克拉荷马州 and 美国空军
+    were copied verbatim despite both being defined in its own prompt.
+    """
+    glossary = GlossaryDoc(terms=[
+        GlossaryTerm(zh="俄克拉荷马州", vi="Bang Oklahoma", en="Oklahoma", type="place"),
+        GlossaryTerm(zh="美国空军", vi="Không quân Hoa Kỳ", en="US Air Force", type="org"),
+    ])
+    text = "sinh ra ở 俄克拉荷马州, sau vào 美国空军."
+
+    assert s4_translate.apply_glossary(text, glossary, "vi") == (
+        "sinh ra ở Bang Oklahoma, sau vào Không quân Hoa Kỳ."
+    )
+    assert "Oklahoma" in s4_translate.apply_glossary(text, glossary, "en")
+
+
+def test_keep_source_terms_are_left_alone_by_substitution():
+    glossary = GlossaryDoc(terms=[
+        GlossaryTerm(zh="麻婆豆腐", vi="đậu phụ Ma Bà", type="dish", keep_source=True),
+    ])
+    text = "Món 麻婆豆腐 rất ngon"
+
+    assert s4_translate.apply_glossary(text, glossary, "vi") == text
+
+
+def test_longer_glossary_terms_are_substituted_first():
+    # Substituting the shorter term first would leave a mangled fragment behind.
+    glossary = GlossaryDoc(terms=[
+        GlossaryTerm(zh="北达科他州", vi="Bang Bắc Dakota", type="place"),
+        GlossaryTerm(zh="北达科他州麦诺特空军基地", vi="Căn cứ Không quân Minot", type="place"),
+    ])
+
+    assert s4_translate.apply_glossary("ở 北达科他州麦诺特空军基地", glossary, "vi") == (
+        "ở Căn cứ Không quân Minot"
+    )
 
 
 def test_glossary_goes_into_the_system_prompt_verbatim():

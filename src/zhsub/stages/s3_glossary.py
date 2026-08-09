@@ -38,7 +38,10 @@ Nguyên tắc:
 - Tên người nước ngoài phiên âm sang tiếng Trung thì phải khôi phục lại dạng gốc
   ở bản tiếng Anh (ví dụ 弗兰克 -> Frank).
 - Tên tiếng Việt theo quy ước phổ thông của người Việt, không phiên âm máy móc.
-- keep_source = true nếu nên giữ nguyên dạng tiếng Trung, không dịch.
+- keep_source: HẦU HẾT phải là false. Chỉ đặt true khi thuật ngữ BẮT BUỘC hiển thị
+  nguyên dạng chữ Hán trên phụ đề, và khi đó phải để trống cả "vi" lẫn "en".
+  Đã điền bản dịch thì keep_source PHẢI là false. Tên riêng, địa danh, tổ chức
+  gần như luôn là false.
 
 CHỈ trả về JSON, không kèm giải thích:
 {"terms": [{"zh": "...", "pinyin": "...", "vi": "...", "en": "...",
@@ -105,11 +108,33 @@ def _merge_terms(batches: list[list[dict]]) -> list[GlossaryTerm]:
     out: list[GlossaryTerm] = []
     for data in merged.values():
         try:
-            out.append(GlossaryTerm.model_validate(data))
+            term = GlossaryTerm.model_validate(data)
         except Exception:  # noqa: BLE001 - a malformed entry must not sink the job
             log.warning("S3: bỏ qua entry hỏng: %r", data)
+            continue
+        out.append(_resolve_keep_source(term))
     out.sort(key=lambda t: (t.type, t.zh))
     return out
+
+
+def _resolve_keep_source(term: GlossaryTerm) -> GlossaryTerm:
+    """Drop ``keep_source`` when the entry also carries a real translation.
+
+    The two contradict each other, and models set the flag far too eagerly.
+    Observed with gpt-4o-mini: every extracted term came back ``keep_source: true``
+    *and* with a filled-in Vietnamese rendering. Believing the flag made S4 instruct
+    the model to leave 美国空军 in Chinese and made the substitution step skip it, so
+    correct glossary content produced Chinese fragments in a Vietnamese subtitle.
+
+    A supplied translation is the stronger signal of intent, so it wins.
+    """
+    if not term.keep_source:
+        return term
+    translated = [x for x in (term.vi, term.en) if x and x != term.zh]
+    if translated:
+        log.debug("S3: bỏ keep_source cho %r vì đã có bản dịch %r", term.zh, translated[0])
+        return term.model_copy(update={"keep_source": False})
+    return term
 
 
 def build_glossary(
