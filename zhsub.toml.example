@@ -31,7 +31,7 @@ batch_size_s = 300       # cửa sổ gộp VAD của FunASR (giây)
 # bật khi file dài hơn ngưỡng này — bọc thêm một tầng offset là tự chuốc bug.
 outer_chunk_threshold_sec = 5400   # 90 phút
 outer_chunk_sec = 1800             # 30 phút
-outer_chunk_overlap_sec = 2.0
+outer_chunk_overlap_sec = 8.0
 
 # ---------------------------------------------------------------------------
 # S2 — ngắt câu lại theo ngữ nghĩa

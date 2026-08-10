@@ -39,7 +39,13 @@ class AsrConfig(BaseModel):
     batch_size_s: int = 300
     outer_chunk_threshold_sec: float = 5400.0
     outer_chunk_sec: float = 1800.0
-    outer_chunk_overlap_sec: float = 2.0
+    # 8s, not 2s. The overlap has to be wide enough to contain a whole sentence, or
+    # an utterance straddling the cut is truncated in both chunks and its tokens are
+    # simply lost. Measured on the 35-minute clip with the threshold forced down to
+    # 10 minutes: a 2s overlap dropped 113 of 9179 tokens (1.2%) across three
+    # boundaries. Cues run 0.8-7s, so 8s covers essentially all of them; the extra
+    # duplication costs nothing because merge_outputs discards it on time.
+    outer_chunk_overlap_sec: float = 8.0
 
     def resolve_device(self) -> str:
         """``auto`` picks cuda when available. ``ZHSUB_DEVICE`` overrides everything."""

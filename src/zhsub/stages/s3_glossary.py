@@ -33,14 +33,31 @@ Extract only:
 For each entry give the Chinese form, pinyin with tone marks, a Vietnamese
 rendering and an English rendering.
 
-RULES:
-- Extract proper nouns and specialist terms ONLY. Skip ordinary vocabulary: words
-  like 监狱 (prison), 美国 (America), 警察 (police) are everyday words, not glossary
-  entries, and pinning them to one rendering makes the translation worse.
+THE INCLUSION TEST — apply it to every candidate before adding it:
+
+  "Would a competent translator, with no glossary at all, plausibly render this
+   differently from one line to the next in a way that would confuse a viewer?"
+
+  If no, LEAVE IT OUT. Only entries that pass belong in the glossary.
+
+A telling sign a word fails the test: it is listed in an ordinary dictionary and
+its translation varies with grammar. 监狱 (prison), 越狱 (to escape prison), 美国
+(America / American / the US), 警察 (police), 逃跑 (to flee) all fail — they are
+everyday vocabulary. Forcing one fixed rendering on them makes the translation
+WORSE, because the natural wording differs by sentence. A specific named prison
+passes. A generic "prison" does not.
+
+Aim for a short, high-value list. Twenty precise entries beat eighty padded ones.
+
+OTHER RULES:
 - A foreign name transliterated into Chinese must be restored to its original form
   in "en" (弗兰克 -> Frank, not "Fulanke"). Get real people and places right.
-- Vietnamese renderings follow normal Vietnamese usage, not mechanical
-  transliteration.
+- "vi" must be VIETNAMESE, not a copy of the English. Bare foreign proper nouns do
+  stay as they are (North Dakota, Richard McNair), but a descriptive name has to be
+  translated: 弗罗伦斯联邦监狱 -> "Nhà tù liên bang Florence", NOT "Florence Federal
+  Correctional Institution"; 魔鬼岛 -> "Đảo Quỷ", NOT "Devil's Island". If "vi" and
+  "en" come out identical, the entry must be a bare proper noun — otherwise you got
+  it wrong.
 - "keep_source" must be false for almost everything. Set it true ONLY when the
   term has to appear on screen in Chinese characters, and then leave both "vi" and
   "en" empty. If you provide a translation, keep_source MUST be false. Names,
@@ -85,6 +102,27 @@ Return ONLY this JSON:
                     "basis": "the evidence, in Vietnamese"}]}"""
 
 
+# Everyday words that must never become glossary entries. Pinning them to one
+# rendering makes the translation worse, because the natural wording changes with
+# grammar: 美国 is "America", "American" or "the US" depending on the sentence.
+#
+# This is a backstop for an instruction the model does not reliably follow. The
+# prompt names 监狱, 越狱, 美国, 警察 and 逃跑 as explicit examples of what to leave
+# out, and a measured run still returned all five. A deterministic filter is the
+# only thing that actually holds.
+_COMMON_WORDS = frozenset("""
+美国 中国 英国 法国 德国 日本 韩国 加拿大
+监狱 越狱 逃跑 警察 警方 法官 律师 犯人 囚犯 罪犯 案件 法院
+男人 女人 孩子 父母 家庭 朋友 老板 医生 学生 老师
+今天 明天 昨天 早上 晚上 时间 地方 东西 事情 问题 办法
+汽车 飞机 火车 电话 电脑 手机 网络 视频 照片
+""".split())
+
+
+def _is_common_word(zh: str) -> bool:
+    return zh in _COMMON_WORDS
+
+
 def _batches(segments, max_chars: int) -> list[str]:
     """Concatenate segment text into LLM-sized blocks."""
     blocks: list[str] = []
@@ -109,10 +147,14 @@ def _merge_terms(batches: list[list[dict]]) -> list[GlossaryTerm]:
     way to keep it without another LLM round trip.
     """
     merged: dict[str, dict] = {}
+    dropped: list[str] = []
     for batch in batches:
         for raw in batch:
             zh = (raw.get("zh") or "").strip()
             if not zh:
+                continue
+            if _is_common_word(zh):
+                dropped.append(zh)
                 continue
             existing = merged.setdefault(zh, {"zh": zh})
             for field in ("pinyin", "vi", "en", "note"):
@@ -123,6 +165,10 @@ def _merge_terms(batches: list[list[dict]]) -> list[GlossaryTerm]:
                 existing.setdefault("type", raw["type"])
             if raw.get("keep_source"):
                 existing["keep_source"] = True
+
+    if dropped:
+        log.info("S3: loại %d mục là từ thông thường: %s",
+                 len(set(dropped)), ", ".join(sorted(set(dropped))))
 
     out: list[GlossaryTerm] = []
     for data in merged.values():

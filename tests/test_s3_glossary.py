@@ -1,49 +1,67 @@
-"""Glossary extraction must not hand S4 a self-contradictory entry."""
+"""Glossary extraction: what belongs in it, and what must be kept out."""
 
 from __future__ import annotations
 
-from zhsub.models import GlossaryTerm
-from zhsub.stages.s3_glossary import _merge_terms, _resolve_keep_source
+from zhsub.stages.s3_glossary import _merge_terms
 
 
-def test_keep_source_is_dropped_when_a_translation_is_present():
-    """The flag and a filled-in translation contradict each other; the translation wins.
+def test_everyday_words_are_dropped():
+    """The prompt names these as examples to skip and the model returns them anyway.
 
-    Observed with gpt-4o-mini: every extracted term came back keep_source=true *and*
-    with a Vietnamese rendering. Believing the flag told S4 to leave 美国空军 in
-    Chinese, so a correct glossary produced Chinese fragments in the subtitle.
+    Measured on a 35-minute clip: 美国, 监狱, 警察, 越狱 and 逃跑 all came back despite
+    being listed verbatim in the prompt as things to leave out. Pinning them to one
+    rendering hurts the translation — 美国 is "America", "American" or "the US"
+    depending on the sentence — so the filter has to be deterministic.
     """
-    term = GlossaryTerm(zh="美国空军", vi="Không quân Hoa Kỳ", en="US Air Force",
-                        type="org", keep_source=True)
-
-    assert _resolve_keep_source(term).keep_source is False
-
-
-def test_keep_source_survives_when_there_is_no_translation():
-    term = GlossaryTerm(zh="麻婆豆腐", vi="", en="", type="dish", keep_source=True)
-
-    assert _resolve_keep_source(term).keep_source is True
+    raw = [[
+        {"zh": "美国", "vi": "Mỹ", "en": "United States", "type": "place"},
+        {"zh": "监狱", "vi": "nhà tù", "en": "prison", "type": "term"},
+        {"zh": "越狱", "vi": "vượt ngục", "en": "prison break", "type": "term"},
+        {"zh": "警察", "vi": "cảnh sát", "en": "police", "type": "term"},
+        {"zh": "逃跑", "vi": "chạy trốn", "en": "flee", "type": "term"},
+    ]]
+    assert _merge_terms(raw) == []
 
 
-def test_keep_source_survives_when_the_translation_is_just_the_source():
-    term = GlossaryTerm(zh="卡拉OK", vi="卡拉OK", en="卡拉OK", type="term", keep_source=True)
+def test_proper_nouns_survive():
+    raw = [[
+        {"zh": "理查德", "vi": "Richard", "en": "Richard", "type": "person"},
+        {"zh": "佛罗伦斯超级监狱", "vi": "Nhà tù siêu cấp Florence",
+         "en": "Florence Supermax Prison", "type": "org"},
+    ]]
+    terms = _merge_terms(raw)
 
-    assert _resolve_keep_source(term).keep_source is True
-
-
-def test_merge_prefers_the_richest_entry_across_batches():
-    merged = _merge_terms([
-        [{"zh": "越狱", "vi": "vượt ngục", "type": "term"}],
-        [{"zh": "越狱", "vi": "", "en": "prison break", "pinyin": "yuè yù"}],
-    ])
-
-    assert len(merged) == 1
-    assert merged[0].vi == "vượt ngục"
-    assert merged[0].en == "prison break"
-    assert merged[0].pinyin == "yuè yù"
+    assert {t.zh for t in terms} == {"理查德", "佛罗伦斯超级监狱"}
 
 
-def test_malformed_entry_is_skipped_not_fatal():
-    merged = _merge_terms([[{"zh": "越狱", "vi": "vượt ngục"}, {"no_zh": "rác"}]])
+def test_a_named_prison_is_kept_even_though_plain_prison_is_not():
+    """The distinction the filter has to draw: a specific name passes, the generic
+    word does not."""
+    raw = [[
+        {"zh": "监狱", "vi": "nhà tù", "en": "prison", "type": "term"},
+        {"zh": "波洛克联邦监狱", "vi": "Nhà tù liên bang Pollock",
+         "en": "Pollock Federal Prison", "type": "org"},
+    ]]
+    assert [t.zh for t in _merge_terms(raw)] == ["波洛克联邦监狱"]
 
-    assert [t.zh for t in merged] == ["越狱"]
+
+def test_duplicate_entries_merge_keeping_the_richest_fields():
+    """Different batches see the same name in different contexts; take the fullest."""
+    raw = [
+        [{"zh": "理查德", "vi": "Richard", "en": "", "pinyin": "", "type": "person"}],
+        [{"zh": "理查德", "vi": "Richard", "en": "Richard Lee McNair",
+          "pinyin": "Lǐchádé", "type": "person"}],
+    ]
+    terms = _merge_terms(raw)
+
+    assert len(terms) == 1
+    assert terms[0].en == "Richard Lee McNair"
+    assert terms[0].pinyin == "Lǐchádé"
+
+
+def test_malformed_entry_does_not_sink_the_batch():
+    raw = [[
+        {"zh": "理查德", "vi": "Richard", "en": "Richard", "type": "person"},
+        {"zh": "坏了", "type": "không-phải-loại-hợp-lệ"},
+    ]]
+    assert [t.zh for t in _merge_terms(raw)] == ["理查德"]
