@@ -173,11 +173,19 @@ provider này tồn tại.
 Luật vẫn được gửi lại ở **mọi** lượt dù thread đã chứa chúng. Đo trên clip 472 câu,
 so ba cách chạy bằng tỉ lệ dạng xưng hô trội trong toàn bộ bản dịch:
 
-| | Đồng bộ | Thời gian S4 |
+| | "Đồng bộ" | Thời gian S4 |
 |---|---:|---:|
 | Chat mới mỗi lần | 77% | 4,7 phút |
 | Thread chung, luật nói một lần | 74% | 6,2 phút |
-| **Thread chung, luật mọi lượt** | **90%** | 7,4 phút |
+| Thread chung, luật mọi lượt | 90% | 7,4 phút |
+
+**Đừng dùng cột "đồng bộ" để xếp hạng.** Nó là tỉ lệ dạng xưng hô trội trên toàn
+bộ bản dịch, mà phép đếm đó gộp chung ba thứ khác nhau: đại từ trong lời dẫn, ngôi
+hai trong lời thoại ("Anh có giấy tờ tùy thân không?" là cảnh sát hỏi cung, dùng
+"anh" mới đúng), và cả danh từ ("anh cả trong bốn anh chị em"). Nó thưởng cho bản
+dùng một dạng duy nhất ở mọi chỗ, kể cả chỗ sai. Đếm riêng `ông ta`/`hắn` — hai
+dạng không bao giờ là ngôi hai — thì thứ hạng đảo ngược: bản 90% ở trên hoá ra
+lạc ngôi nhiều nhất (7 lần), bản 77% chỉ 2 lần.
 
 Nói luật một lần rồi tin vào thread là tệ nhất: đến batch 5 rule 3 đã trôi quá xa
 phía trên và model bắt đầu lẫn `anh ta` với `ông ấy`.
@@ -196,14 +204,13 @@ transcript nằm chung một hội thoại nên model nhận ra thực thể nó
 trước và viết nhất quán, thay vì đặt tên mới mỗi khối. 47 cũng đúng bằng số thuật
 ngữ bản gpt-5 rút được.
 
-Cả hai lần chạy đều cho `0 cặp xưng hô` — lỗ hổng `address_terms` nằm ở
-`_extract_style` của S3, không liên quan tới thiết kế thread.
-
 Cần biết trước một tính chất: **thread chung không sửa lựa chọn, nó khuếch đại
 lựa chọn.** Batch 1 chọn xưng hô nào thì cả video theo nấy — kể cả khi đó là dạng
-nằm ngoài danh sách rule 3 đề xuất. Cách ghim đúng đắn là `address_terms` trong
-`glossary.json`; khi nó rỗng thì model tự do chọn, và thiết kế thread chỉ quyết
-định model có nhất quán với lựa chọn của chính nó hay không.
+nằm ngoài danh sách rule 3 đề xuất.
+
+Thứ thật sự ghim xưng hô là `style.subject_third_person_vi` trong `glossary.json`
+(xem mục dưới), **không phải** `address_terms` — trường đó chỉ áp cho lời thoại
+trực tiếp giữa hai nhân vật và bị cấm dùng trong lời dẫn.
 
 Mọi lần gọi nối đuôi nhau qua **một** cửa sổ trình duyệt, kể cả khi chạy
 `zhsub batch -j 4` — nhiều tab cùng gõ vào một tài khoản chỉ làm chạm hạn mức
@@ -260,9 +267,20 @@ chạy lại cùng một file là dùng lại kết quả cũ thay vì làm lạ
 Đây là vòng lặp quan trọng nhất để bản dịch chuẩn:
 
 1. Chạy `zhsub run` một lần.
-2. Mở `work/<job_id>/glossary.json`, sửa tên riêng và thuật ngữ cho đúng. Sửa cả
-   `address_terms` nếu xưng hô tiếng Việt chưa hợp.
+2. Mở `work/<job_id>/glossary.json`, sửa tên riêng và thuật ngữ cho đúng.
 3. `uv run zhsub resume <job_id> --from translate`
+
+Ba trường trong `style` đáng để mắt nhất, vì chúng quyết định giọng của cả video:
+
+- `subject_third_person_vi` — đại từ **lời dẫn** gọi nhân vật chính (`anh ta`,
+  `ông ấy`, `hắn`...). Không đặt thì rule 3 chỉ đưa thực đơn và mỗi batch chọn lại,
+  nên cả video lẫn lộn nhiều dạng. Một giá trị cho một video: video có hai nhân vật
+  chính cần sửa tay.
+- `narrator_self_vi` và `audience_vi` — người kể tự xưng và gọi khán giả.
+
+`address_terms` là chuyện khác: nó chỉ áp **bên trong lời thoại trực tiếp** giữa
+hai nhân vật, và bị cấm dùng trong lời dẫn — thả tự do thì model lật ngôi, 他进行了
+一番伪装 ra thành "mình đã cải trang". Sửa nó không ảnh hưởng gì tới lời dẫn.
 
 Cache dịch có `glossary_hash` trong khoá nên sửa glossary sẽ tự động dịch lại
 đúng những câu bị ảnh hưởng, không dịch lại phần còn nguyên.
