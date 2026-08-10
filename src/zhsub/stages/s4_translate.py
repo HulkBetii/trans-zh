@@ -320,8 +320,17 @@ def apply_glossary(text: str, glossary: GlossaryDoc, lang: str) -> str:
         if term.keep_source or not term.zh:
             continue
         target = term.vi if lang == "vi" else term.en
-        if target and term.zh in text:
-            text = text.replace(term.zh, target)
+        if not target or term.zh not in text:
+            continue
+        # A rendering that embeds the source form — FBI -> "Cục Điều tra Liên bang
+        # Mỹ (FBI)" — nests inside itself when the model has already applied the
+        # glossary line and this function applies it again. Seen on a real run:
+        # "Cục Điều tra Liên bang Mỹ (Cục Điều tra Liên bang Mỹ (FBI))", 102
+        # characters on a 2.3s cue whose budget was 48. Collapsing any finished
+        # rendering back to the source form first makes the substitution idempotent.
+        if term.zh in target:
+            text = text.replace(target, term.zh)
+        text = text.replace(term.zh, target)
     return text
 
 
