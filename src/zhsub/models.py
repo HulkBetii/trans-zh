@@ -210,6 +210,15 @@ class StyleDecision(BaseModel):
     speech_register: str = ""
     narrator_self_vi: str = ""
     audience_vi: str = ""
+    # How narration refers to the main subject in the third person. Without it the
+    # S4 prompt only offers a menu — "anh ta" / "cô ta" / "ông ấy" — and every batch
+    # picks again: measured on one 472-line video, the dominant form covered only
+    # 77-90% of occurrences depending on how the conversation was threaded.
+    # ``address_terms`` cannot fill this role; it is scoped to direct speech and is
+    # explicitly forbidden in narration.
+    # One value per video, not per character: a second protagonist would need its
+    # own, but the common case is a single subject and the file is user-editable.
+    subject_third_person_vi: str = ""
 
 
 class GlossaryDoc(_Doc):

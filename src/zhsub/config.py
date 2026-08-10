@@ -97,7 +97,11 @@ class TranslateConfig(BaseModel):
     #       same 4/15 over budget). The same prompt on gpt-5 gave 81.5 chars and real
     #       idiomatic renderings. The binding constraint here is the model, not the
     #       prompt — worth remembering before writing more prompt text.
-    prompt_version: int = 7
+    #   v8: the glossary block now pins one third-person form for the main subject.
+    #       Rule 3 only ever offered a menu, so each batch chose again: measured on a
+    #       472-line video, the dominant form covered 77-90% of occurrences and one
+    #       run settled on "anh", which rule 3 does not even list.
+    prompt_version: int = 8
 
 
 class LangLimits(BaseModel):

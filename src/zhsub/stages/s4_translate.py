@@ -82,7 +82,12 @@ def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
 
     if lang == "vi":
         style = glossary.style
-        if style.speech_register or style.narrator_self_vi or style.audience_vi:
+        if (
+            style.speech_register
+            or style.narrator_self_vi
+            or style.audience_vi
+            or style.subject_third_person_vi
+        ):
             lines.append("\nREGISTER AND ADDRESS:")
             if style.speech_register:
                 lines.append(f"  tone: {style.speech_register}")
@@ -90,6 +95,14 @@ def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
                 lines.append(f"  narrator refers to themselves as: {style.narrator_self_vi}")
             if style.audience_vi:
                 lines.append(f"  narrator addresses the audience as: {style.audience_vi}")
+            if style.subject_third_person_vi:
+                # Rule 3 lists several acceptable third-person forms, which leaves each
+                # batch free to pick again; naming one here is what actually holds it
+                # steady across a whole video.
+                lines.append(
+                    f"  narration calls the main subject: {style.subject_third_person_vi}"
+                    f" — use this every time, never switch to another third-person form"
+                )
         if glossary.address_terms:
             # Scope this hard. Injected as a blanket rule, the model applies it to
             # narration as well and flips the grammatical person: 他进行了一番伪装

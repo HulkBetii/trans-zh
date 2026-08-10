@@ -93,16 +93,23 @@ Decide, and answer in VIETNAMESE inside the JSON values:
    "mình", "tôi", "chúng ta", "chúng mình".
 3. "audience_vi" — how the narrator addresses the viewer. Almost every online
    video has one. Common choices: "các bạn", "mọi người", "anh em".
-4. "address_terms" — one entry per pair of characters who speak TO EACH OTHER.
+4. "subject_third_person_vi" — the ONE pronoun the narration uses for the main
+   subject when talking ABOUT them, e.g. "anh ta", "cô ta", "ông ấy", "hắn". Pick
+   the single best fit for the subject's age, gender and how the narrator regards
+   them, and never leave it empty when the video is about a person. This is the
+   narrator's word for them, not anything a character says out loud.
+5. "address_terms" — one entry per pair of characters who speak TO EACH OTHER.
    Leave this empty ONLY if the video is pure narration with no dialogue between
    named people. Infer from the dialogue: relative age, closeness, formality. When
    the evidence is thin, choose a neutral pairing and say so in "basis".
 
-Never leave "speech_register", "narrator_self_vi" or "audience_vi" empty — infer
-the most likely value from the transcript instead.
+Never leave "speech_register", "narrator_self_vi", "audience_vi" or
+"subject_third_person_vi" empty — infer the most likely value from the transcript
+instead.
 
 Return ONLY this JSON:
-{"style": {"speech_register": "...", "narrator_self_vi": "...", "audience_vi": "..."},
+{"style": {"speech_register": "...", "narrator_self_vi": "...", "audience_vi": "...",
+           "subject_third_person_vi": "..."},
  "address_terms": [{"speaker": "A", "addressee": "B",
                     "vi_self": "how A refers to themselves",
                     "vi_other": "how A addresses B",
