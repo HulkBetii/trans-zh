@@ -59,6 +59,50 @@ def test_duplicate_entries_merge_keeping_the_richest_fields():
     assert terms[0].pinyin == "Lǐchádé"
 
 
+def test_asr_spelling_variants_of_one_name_share_a_rendering():
+    """ASR mishears a name slightly differently and S3 glosses each spelling apart.
+
+    Both pairs came from a real 35-minute run: 北达科他州 / 北达克科塔州 is one state,
+    and 路易斯安那州 / 路易斯安纳州 was rendered two different ways in Vietnamese —
+    precisely the inconsistency the glossary is supposed to prevent.
+    """
+    raw = [[
+        {"zh": "路易斯安那州", "vi": "Tiểu bang Louisiana", "en": "Louisiana", "type": "place"},
+        {"zh": "路易斯安纳州", "vi": "Louisiana", "en": "Louisiana", "type": "place"},
+    ]]
+    terms = _merge_terms(raw)
+
+    # Both spellings survive — each has to stay matchable against the transcript.
+    assert {t.zh for t in terms} == {"路易斯安那州", "路易斯安纳州"}
+    # ...but they now agree, taking the fuller rendering.
+    assert {t.vi for t in terms} == {"Tiểu bang Louisiana"}
+
+
+def test_different_names_sharing_a_suffix_stay_apart():
+    """The guard against over-merging: two prisons share 联邦监狱 but are not the same."""
+    raw = [[
+        {"zh": "弗罗伦斯联邦监狱", "vi": "Nhà tù liên bang Florence",
+         "en": "Florence Federal Prison", "type": "org"},
+        {"zh": "波洛克联邦监狱", "vi": "Nhà tù liên bang Pollock",
+         "en": "Pollock Federal Prison", "type": "org"},
+    ]]
+    terms = _merge_terms(raw)
+
+    assert len(terms) == 2
+    assert {t.vi for t in terms} == {"Nhà tù liên bang Florence", "Nhà tù liên bang Pollock"}
+
+
+def test_similar_spellings_with_different_meanings_are_not_merged():
+    """Similarity alone is not enough — the English gloss has to agree too."""
+    raw = [[
+        {"zh": "北达科他州", "vi": "North Dakota", "en": "North Dakota", "type": "place"},
+        {"zh": "南达科他州", "vi": "South Dakota", "en": "South Dakota", "type": "place"},
+    ]]
+    terms = _merge_terms(raw)
+
+    assert {t.vi for t in terms} == {"North Dakota", "South Dakota"}
+
+
 def test_malformed_entry_does_not_sink_the_batch():
     raw = [[
         {"zh": "理查德", "vi": "Richard", "en": "Richard", "type": "person"},

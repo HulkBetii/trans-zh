@@ -178,7 +178,58 @@ def _merge_terms(batches: list[list[dict]]) -> list[GlossaryTerm]:
             log.warning("S3: bỏ qua entry hỏng: %r", data)
             continue
         out.append(_resolve_keep_source(term))
+
+    out = _unify_asr_variants(out)
     out.sort(key=lambda t: (t.type, t.zh))
+    return out
+
+
+# Two Chinese forms this similar, glossing to the same thing, are the same name.
+# Below it they are genuinely different (弗罗伦斯联邦监狱 vs 波洛克联邦监狱 share
+# 联邦监狱 and score ~0.53 — different prisons that must stay apart).
+_VARIANT_SIMILARITY = 0.6
+
+
+def _unify_asr_variants(terms: list[GlossaryTerm]) -> list[GlossaryTerm]:
+    """Give ASR spelling variants of one name a single rendering.
+
+    ASR mishears a proper noun slightly differently across a long video, S3 then
+    creates an entry per spelling, and the model translates each independently. Seen
+    on a 35-minute clip: 北达科他州 and 北达克科塔州 (the same state) as two entries,
+    and 路易斯安那州 / 路易斯安纳州 glossed as "Tiểu bang Louisiana" and "Louisiana" —
+    the exact inconsistency a glossary exists to prevent.
+
+    The safe signal is agreement, not spelling alone: only fold two entries together
+    when their Chinese forms are close AND they already gloss to the same English.
+    Every variant then keeps its own ``zh`` (each spelling has to stay matchable
+    against the transcript) but shares one ``vi`` and ``en``.
+    """
+    from ..text.align import similarity
+
+    groups: list[list[GlossaryTerm]] = []
+    for term in terms:
+        for group in groups:
+            head = group[0]
+            same_en = term.en and head.en and term.en.strip().lower() == head.en.strip().lower()
+            if same_en and similarity(term.zh, head.zh) >= _VARIANT_SIMILARITY:
+                group.append(term)
+                break
+        else:
+            groups.append([term])
+
+    out: list[GlossaryTerm] = []
+    for group in groups:
+        if len(group) == 1:
+            out.append(group[0])
+            continue
+        # Prefer the fullest rendering so "Tiểu bang Louisiana" wins over "Louisiana".
+        best_vi = max((t.vi for t in group), key=len)
+        best_pinyin = max((t.pinyin for t in group), key=len)
+        log.info(
+            "S3: gộp %d biến thể ASR của cùng một tên (%s) -> vi=%r",
+            len(group), " / ".join(t.zh for t in group), best_vi,
+        )
+        out.extend(t.model_copy(update={"vi": best_vi, "pinyin": best_pinyin}) for t in group)
     return out
 
 
