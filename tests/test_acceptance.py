@@ -354,6 +354,25 @@ def test_keep_source_terms_are_not_flagged_as_untranslated():
     )
 
 
+def test_address_terms_are_scoped_to_direct_speech():
+    """As a blanket rule they rewrite narration into the first person.
+
+    Measured: 他进行了一番伪装 ("he disguised himself") came back as "mình đã cải
+    trang" ("I disguised myself"), and 警方 ("the police") became "các anh" ("you"),
+    because the model read the address table as applying everywhere.
+    """
+    from zhsub.models import AddressTerm
+
+    glossary = GlossaryDoc(address_terms=[
+        AddressTerm(speaker="理查德", addressee="弟弟", vi_self="anh", vi_other="em")
+    ])
+    prompt = s4_translate.build_system_prompt(glossary, "vi")
+
+    assert "ONLY inside direct speech" in prompt
+    assert "NEVER use these in narration" in prompt
+    assert "third person" in prompt
+
+
 def test_target_language_is_named_explicitly_in_the_prompt():
     prompt = s4_translate.build_system_prompt(GlossaryDoc(), "vi")
     assert "VIETNAMESE" in prompt

@@ -90,11 +90,25 @@ def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
             if style.audience_vi:
                 lines.append(f"  narrator addresses the audience as: {style.audience_vi}")
         if glossary.address_terms:
-            lines.append("\nADDRESS TERMS BETWEEN CHARACTERS (keep consistent for the whole video):")
+            # Scope this hard. Injected as a blanket rule, the model applies it to
+            # narration as well and flips the grammatical person: 他进行了一番伪装
+            # ("he disguised himself") came back as "mình đã cải trang" ("I disguised
+            # myself"), and 警方 ("the police") became "các anh" ("you"). That is
+            # worse than having no address terms at all.
+            lines.append(
+                "\nADDRESS TERMS — apply ONLY inside direct speech between these two"
+                " characters, and keep them consistent for the whole video:"
+            )
             for a in glossary.address_terms:
                 lines.append(
-                    f"  {a.speaker} speaking to {a.addressee}: self '{a.vi_self}', other '{a.vi_other}'"
+                    f"  when {a.speaker} speaks TO {a.addressee}: {a.speaker} says"
+                    f" '{a.vi_self}' for themselves and '{a.vi_other}' for {a.addressee}"
                 )
+            lines.append(
+                "  NEVER use these in narration. Narration about a character stays in"
+                " the third person: 他 is 'anh ta' / 'ông ta', never 'mình' or 'tôi'."
+                " Keep the grammatical person of the Chinese source exactly."
+            )
     return "\n".join(lines)
 
 
@@ -132,12 +146,17 @@ ABSOLUTE RULES:
 2. The "translation" value MUST be written in {lang_name}. {script_hint}
    NEVER copy Chinese characters into "translation". If the source is already
    short, the translation is still {lang_name}, not the original text.
-3. Translate the meaning naturally, the way a subtitle is written. Do not
+3. Preserve the grammatical PERSON of the source exactly. Narration about someone
+   stays third person: 他/她 is "anh ta" / "cô ta" / "ông ấy", NEVER "mình" or
+   "tôi". Only render first person where the Chinese itself is first person
+   (我/我们). Getting this wrong turns a documentary into a confession, so check it
+   on every line.
+4. Translate the meaning naturally, the way a subtitle is written. Do not
    translate word by word, and do not add information that is not in the source.
-4. Respect each entry's "max_chars" budget. Subtitles are condensed: drop filler
+5. Respect each entry's "max_chars" budget. Subtitles are condensed: drop filler
    words and redundant connectives rather than exceed it. Never drop actual
    meaning to fit.
-5. Do not wrap the result in quotes and do not add notes or explanations.
+6. Do not wrap the result in quotes and do not add notes or explanations.
 
 {_glossary_block(glossary, lang)}
 

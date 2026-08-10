@@ -87,7 +87,12 @@ class TranslateConfig(BaseModel):
     #       the JSON payload, after both were measured to break translation on
     #       small local models.
     #   v3: per-entry "max_chars" budget added to the prompt.
-    prompt_version: int = 3
+    #   v4: max_lines 2 -> 3 changed every "max_chars" value.
+    #   v5: address terms scoped to direct speech only — as a blanket rule they
+    #       flipped narration into the first person.
+    #   v6: preserving grammatical person promoted to a top-level rule; inside the
+    #       address-terms block it only applied when a glossary happened to have one.
+    prompt_version: int = 6
 
 
 class LangLimits(BaseModel):
