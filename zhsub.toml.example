@@ -81,7 +81,7 @@ max_cps = 9.0
 # LLM. Model dùng để ngắt câu và model dùng để dịch cấu hình riêng: S2 là việc
 # cơ học (chèn dấu ngắt) nên dùng model rẻ, S4 mới cần model mạnh.
 #
-# provider: "openai" (mọi endpoint OpenAI-compatible) | "anthropic"
+# provider: "openai" (mọi endpoint OpenAI-compatible) | "anthropic" | "chatgpt_web"
 # api_key_env: tên BIẾN MÔI TRƯỜNG chứa key, không phải key.
 #              Để "" nếu endpoint chạy local và không cần xác thực.
 # ---------------------------------------------------------------------------
@@ -127,3 +127,31 @@ timeout_sec = 180
 # api_key_env = "ANTHROPIC_API_KEY"
 # model = "SET_ME"
 # temperature = 0.3
+
+# --- ChatGPT web qua Playwright (không tốn tiền API) -----------------------
+# Lái thẳng giao diện chatgpt.com bằng trình duyệt đã đăng nhập. Không cần API
+# key, đổi lại: selector hỏng bất cứ lúc nào OpenAI đổi UI, chậm hơn API nhiều,
+# và tự động hoá web UI là trái ToS của OpenAI.
+#
+# Cài: uv sync --extra chatgpt-web && playwright install chromium
+# Đăng nhập một lần: zhsub chatgpt-login
+#
+# [llm.translate]
+# provider = "chatgpt_web"
+# model = "chatgpt-web"     # chỉ là nhãn cho khoá cache, không phải model thật
+# max_retries = 3
+# timeout_sec = 300         # UI chậm hơn API; batch 40 câu dễ vượt 180s
+#
+# [llm.chatgpt_web]
+# profile_dir = "data/chrome_profile"
+# account_file = "data/chatgpt_account.json"   # không có file cũng chạy được
+# manual_login_timeout_sec = 300
+#
+# account_file (tuỳ chọn) — chỉ tạo nếu muốn tự đăng nhập lại khi hết phiên.
+# Mật khẩu nằm plaintext trên đĩa, nên cách khuyến nghị là bỏ hẳn file này và
+# đăng nhập tay một lần bằng `zhsub chatgpt-login`.
+#   {
+#     "email": "...",
+#     "password": "...",
+#     "totp_secret": "..."      // chỉ khi tài khoản bật MFA
+#   }

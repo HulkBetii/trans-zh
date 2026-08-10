@@ -112,6 +112,47 @@ Rồi trỏ `base_url = "http://localhost:11434/v1"` và `api_key_env = ""`.
 **Đặt `OLLAMA_MODELS` ra ngoài ổ hệ thống trước khi pull.** Mặc định Ollama lưu
 vào `%USERPROFILE%\.ollama`, và một model 7B chiếm ~5GB.
 
+### ChatGPT web qua Playwright
+
+`provider = "chatgpt_web"` lái thẳng giao diện chatgpt.com bằng một trình duyệt đã
+đăng nhập, thay vì gọi API. Không cần API key, chất lượng bằng đúng model bạn đang
+trả tiền thuê bao — đổi lại thì:
+
+- Selector là của giao diện web, OpenAI đổi UI lúc nào là hỏng lúc đó.
+- Chậm hơn API nhiều, và mỗi lần gọi phải mở một chat mới.
+- Tự động hoá web UI là **trái ToS của OpenAI**. Tự cân nhắc.
+
+```bash
+uv sync --extra chatgpt-web
+uv run playwright install chromium
+uv run zhsub chatgpt-login      # đăng nhập tay một lần, profile nhớ phiên
+```
+
+Rồi trong `zhsub.toml`:
+
+```toml
+[llm.translate]
+provider = "chatgpt_web"
+model = "chatgpt-web"     # chỉ là nhãn cho khoá cache, không phải model thật
+timeout_sec = 300
+
+[llm.chatgpt_web]
+profile_dir = "data/chrome_profile"
+```
+
+Chạy `zhsub chatgpt-login` trước khi dịch. Bỏ qua bước này thì pipeline vẫn tự mở
+trình duyệt, nhưng là ở giữa chừng — sau khi ASR đã chạy xong — rồi đứng chờ bạn
+đăng nhập.
+
+Cửa sổ trình duyệt phải hiện (headless không qua được Cloudflare), và `[llm.segment]`
+với `[llm.translate]` dùng chung một profile: Chromium không mở cùng một thư mục
+user-data hai lần.
+
+Muốn tự đăng nhập lại khi hết phiên thì tạo `data/chatgpt_account.json` với
+`email` / `password` / `totp_secret` — nhưng mật khẩu sẽ nằm plaintext trên đĩa, và
+gặp captcha hay xác minh thiết bị thì vẫn phải làm tay. Không có file này là cấu
+hình khuyến nghị.
+
 ## Dùng
 
 ```bash

@@ -220,6 +220,24 @@ def cmd_batch(
         raise typer.Exit(code=1)
 
 
+@app.command("chatgpt-login")
+def cmd_chatgpt_login(
+    config: Path | None = typer.Option(None, "--config", "-c"),
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+) -> None:
+    """Đăng nhập ChatGPT một lần cho provider `chatgpt_web`.
+
+    Chạy trước khi dịch: nếu để `zhsub run` tự mở, pipeline sẽ đứng chờ đăng nhập
+    ở giữa chừng, sau khi ASR đã chạy xong.
+    """
+    _setup_logging(verbose)
+    from .llm.chatgpt_web.session import get_session
+
+    cfg = Config.load(config)
+    get_session(cfg.llm.chatgpt_web)
+    typer.echo(f"Đã đăng nhập. Profile: {Path(cfg.llm.chatgpt_web.profile_dir).resolve()}")
+
+
 @app.command("jobs")
 def cmd_jobs(
     config: Path | None = typer.Option(None, "--config", "-c"),

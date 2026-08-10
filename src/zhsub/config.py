@@ -122,7 +122,7 @@ class RenderConfig(BaseModel):
 
 
 class LLMProfile(BaseModel):
-    provider: Literal["openai", "anthropic"] = "openai"
+    provider: Literal["openai", "anthropic", "chatgpt_web"] = "openai"
     base_url: str = "https://api.openai.com/v1"
     api_key_env: str = "OPENAI_API_KEY"
     model: str = _PLACEHOLDER
@@ -155,11 +155,27 @@ class LLMProfile(BaseModel):
         return self.model
 
 
+class ChatGPTWebConfig(BaseModel):
+    """Browser settings for ``provider = "chatgpt_web"``.
+
+    One block for the whole file rather than one per profile: Chromium refuses to
+    open the same user-data directory twice, so segment and translate share a
+    browser whether or not the config pretends otherwise.
+    """
+
+    profile_dir: str = "data/chrome_profile"
+    # Optional. Absent — the recommended setup — login happens by hand once and the
+    # profile remembers it, which keeps the ChatGPT password off disk entirely.
+    account_file: str = "data/chatgpt_account.json"
+    manual_login_timeout_sec: float = 300.0
+
+
 class LLMConfig(BaseModel):
     segment: LLMProfile = Field(default_factory=LLMProfile)
     translate: LLMProfile = Field(
         default_factory=lambda: LLMProfile(temperature=0.3, timeout_sec=180.0)
     )
+    chatgpt_web: ChatGPTWebConfig = Field(default_factory=ChatGPTWebConfig)
 
 
 class Config(BaseModel):

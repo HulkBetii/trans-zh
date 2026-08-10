@@ -301,7 +301,7 @@ def run(work_dir, cfg: Config, force: bool = False,
     try:
         from ..llm.factory import build_provider
 
-        provider = build_provider(cfg.llm.segment, "segment")
+        provider = build_provider(cfg.llm, "segment")
     except Exception as exc:
         log.warning("S2: không dựng được LLM (%s) — dùng ngắt theo rule", exc)
 

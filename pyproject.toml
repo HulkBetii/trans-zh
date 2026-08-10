@@ -26,6 +26,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Provider chatgpt_web. Sau khi cài còn phải `playwright install chromium`.
+# pyotp chỉ cần khi tài khoản bật MFA.
+chatgpt-web = [
+    "playwright>=1.40",
+    "pyotp>=2.9",
+]
 bench = [
     "faster-whisper>=1.2.1",
     "jiwer>=4.0",

@@ -342,7 +342,7 @@ def run(work_dir, cfg: Config, force: bool = False,
     try:
         from ..llm.factory import build_provider
 
-        provider = build_provider(cfg.llm.translate, "translate")
+        provider = build_provider(cfg.llm, "translate")
     except Exception as exc:
         log.warning("S3: không dựng được LLM (%s)", exc)
 

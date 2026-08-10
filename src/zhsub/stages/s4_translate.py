@@ -487,7 +487,7 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False,
 
     from ..llm.factory import build_provider
 
-    provider = build_provider(cfg.llm.translate, "translate")
+    provider = build_provider(cfg.llm, "translate")
     cache = TranslationCache(cfg.paths.cache_dir)
 
     out: dict[str, TranslationsDoc] = {}

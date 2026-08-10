@@ -15,6 +15,9 @@ jobs.db-wal
 .cache/
 zhsub.toml
 
+# Profile Chrome và credential của provider chatgpt_web
+data/
+
 # Dữ liệu benchmark (media lớn; ref.srt được commit riêng nếu muốn)
 bench/data/*
 !bench/data/.gitkeep
