@@ -21,6 +21,7 @@ from ..jsonio import read_doc, sha256_json_canonical, write_doc
 from ..llm.base import LLMError, LLMProvider
 from ..llm.cache import TranslationCache
 from ..models import GlossaryDoc, Segment, SegmentsDoc, TranslationItem, TranslationsDoc
+from ..progress import RunContext, ensure_context
 
 log = logging.getLogger(__name__)
 
@@ -354,7 +355,9 @@ def translate_segments(
     cfg: Config,
     cache: TranslationCache | None = None,
     glossary_hash: str = "",
+    ctx: RunContext | None = None,
 ) -> list[TranslationItem]:
+    ctx = ensure_context(ctx)
     system = build_system_prompt(glossary, lang)
     review_system = system + REVIEW_SUFFIX
     keep_source = tuple(t.zh for t in glossary.terms if t.keep_source)
@@ -379,6 +382,9 @@ def translate_segments(
 
     size = cfg.translate.batch_size
     for start in range(0, len(pending), size):
+        # Between batches: safe to stop. Everything already translated is in the
+        # cache, so cancelling here costs nothing already paid for.
+        ctx.report(len(results) / max(len(segments), 1), f"{lang}: {len(results)}/{len(segments)} câu")
         batch = pending[start : start + size]
         first_index = segments.index(batch[0])
         last_index = segments.index(batch[-1])
@@ -458,7 +464,8 @@ def translate_segments(
     return [results[i] for i in sorted(results)]
 
 
-def run(work_dir, cfg: Config, langs: list[str], force: bool = False) -> dict[str, TranslationsDoc]:
+def run(work_dir, cfg: Config, langs: list[str], force: bool = False,
+        ctx: RunContext | None = None) -> dict[str, TranslationsDoc]:
     work_dir = Path(work_dir)
     segments_doc = read_doc(work_dir / "segments.json", SegmentsDoc)
     glossary_path = work_dir / "glossary.json"
@@ -490,7 +497,7 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False) -> dict[st
             log.info("S4[%s]: %s đã đổi — dịch lại", lang, " và ".join(stale))
 
         items = translate_segments(
-            segments_doc.segments, lang, provider, glossary, cfg, cache, glossary_hash
+            segments_doc.segments, lang, provider, glossary, cfg, cache, glossary_hash, ctx=ctx
         )
         doc = TranslationsDoc(
             lang=lang,

@@ -223,7 +223,7 @@ def test_criterion_4_merging_two_segments_is_never_accepted(tmp_path: Path):
     assert all(i.translation.strip() for i in items)
     # No translation may carry a second segment's text glued onto it.
     for item, seg in zip(items, segments):
-        assert item.translation == f"VI:{seg.text_zh}"
+        assert item.translation == f"VI:seg{seg.id}"
     assert provider.calls > len(segments) / cfg.translate.batch_size, "phải có retry và chia batch"
 
 

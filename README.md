@@ -166,6 +166,57 @@ không chạy lại, nên resume rẻ.
 Process bị giết không bao giờ chạy được cleanup, nên trạng thái phải suy ra từ
 heartbeat chứ không thể trông vào shutdown hook.
 
+## Dùng như thư viện (nhúng vào app desktop)
+
+CLI chỉ là một cách gọi. Một app desktop cần ba thứ CLI không có: API gọn, báo
+tiến độ, và huỷ được giữa chừng.
+
+```python
+import threading
+from zhsub import Progress, translate_video
+
+cancel = threading.Event()          # bấm Cancel thì cancel.set()
+
+def on_progress(p: Progress) -> None:
+    bar.value = p.fraction          # 0..1 cho CẢ job, không phải từng stage
+    label.text = f"{p.stage_label} — {p.message}"
+
+result = translate_video(
+    "video.mp4",
+    targets=["vi", "en"],
+    out_dir="./output",
+    on_progress=on_progress,
+    cancel=cancel,
+)
+print(result.outputs)               # các file .srt/.ass đã ghi
+print(result.glossary_path)         # file để người dùng sửa tay
+```
+
+**Huỷ giữa chừng an toàn.** Cancel được kiểm ở ranh giới stage và bên trong các
+vòng lặp dài, không bao giờ giữa lúc ghi file. Mỗi stage ghi JSON một lần duy
+nhất và ghi nguyên tử, nên job bị huỷ chỉ mất đúng stage đang chạy dở. Riêng khâu
+dịch, cache flush sau từng batch nên phần đã trả tiền không mất — gọi lại là chạy
+tiếp, không dịch lại.
+
+Báo tiến độ và kiểm huỷ cố ý là **cùng một lời gọi**: mọi chỗ đáng báo tiến độ
+đều là chỗ an toàn để dừng, nên nối được thanh progress là tự động có nút Cancel
+phản hồi nhanh.
+
+**Vòng lặp sửa glossary từ trong app:**
+
+```python
+from zhsub.api import load_glossary, save_glossary, translate_video
+
+gl = load_glossary(result.work_dir)
+gl.terms[3].vi = "Nhà tù liên bang Florence"   # người dùng sửa trong UI
+save_glossary(result.work_dir, gl)
+
+translate_video("video.mp4", from_stage="translate", ...)   # dịch lại
+```
+
+S4 phát hiện glossary đổi và dịch lại, còn cache giữ chi phí ở mức những câu
+thực sự bị ảnh hưởng.
+
 ### Giới hạn đã biết
 
 - **Hai tiến trình `batch` chạy song song sẽ giẫm chân nhau.** Việc chọn job chỉ

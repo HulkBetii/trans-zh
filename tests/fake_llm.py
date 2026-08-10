@@ -8,6 +8,7 @@ id, merging two segments, wrapping JSON in prose.
 from __future__ import annotations
 
 import json
+import re
 
 from zhsub.llm.base import LLMProvider
 
@@ -55,7 +56,7 @@ class FakeProvider(LLMProvider):
             raise LLMError("lỗi giả lập")
 
         items, _ = parse_request(user)
-        prefix = "VI:" if "VIETNAMESE" in system else "EN:"
+        prefix = "VI" if "VIETNAMESE" in system else "EN"
 
         out = []
         for i, item in enumerate(items):
@@ -63,12 +64,16 @@ class FakeProvider(LLMProvider):
             if ident in self.drop_ids and not (self.drop_once and self._dropped):
                 self._dropped = True
                 continue
+            # Output carries NO Han characters, because a real translation does not.
+            # Echoing the Chinese back made looks_untranslated fire on every line and
+            # sent the pipeline down its leak-retry path, doubling the call count and
+            # masking what the test was actually measuring.
             if self.merge_first_two and i == 0 and len(items) > 1:
-                out.append({"id": ident, "translation": f"{prefix}{item['text']} {items[1]['text']}"})
+                out.append({"id": ident, "translation": f"{prefix}:seg{ident} seg{items[1]['id']}"})
                 continue
             if self.merge_first_two and i == 1:
                 continue
-            out.append({"id": ident, "translation": f"{prefix}{item['text']}"})
+            out.append({"id": ident, "translation": f"{prefix}:seg{ident}"})
             self.translated_ids.append(ident)
 
         body = json.dumps({"translations": out}, ensure_ascii=False)
@@ -92,6 +97,10 @@ class GlossaryAwareProvider(FakeProvider):
             text = item["text"]
             for zh, vi in self.mapping.items():
                 text = text.replace(zh, vi)
+            # Whatever the mapping did not cover would still be Han; stand it in with
+            # Latin so the fake looks like a finished translation rather than a
+            # half-done one that trips the leak detector.
+            text = re.sub(r"[一-鿿]", "x", text)
             out.append({"id": int(item["id"]), "translation": text})
         return json.dumps({"translations": out}, ensure_ascii=False)
 

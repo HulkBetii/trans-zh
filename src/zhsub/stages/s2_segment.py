@@ -15,6 +15,7 @@ from ..config import Config
 from ..jsonio import read_doc, sha256_file, write_doc
 from ..llm.base import LLMError, LLMProvider
 from ..models import AsrDoc, Segment, SegmentsDoc
+from ..progress import RunContext, ensure_context
 from ..text.align import recover_breaks
 from ..timing import Span, apply_min_duration, merge_adjacent
 
@@ -235,15 +236,18 @@ def _segment_chunk(
     return _rule_based_breaks(doc, lo, hi, cfg), "rule_fallback"
 
 
-def build_segments(doc: AsrDoc, provider: LLMProvider | None, cfg: Config) -> SegmentsDoc:
+def build_segments(doc: AsrDoc, provider: LLMProvider | None, cfg: Config,
+                   ctx: RunContext | None = None) -> SegmentsDoc:
     """Re-segment ``doc`` and produce ``segments.json``. Times come only from tokens."""
+    ctx = ensure_context(ctx)
     chunks = _chunk_at_silences(
         doc, cfg.segment.chunk_at_silence_sec, cfg.segment.max_chars_per_llm_call
     )
 
     all_breaks: list[int] = []
     methods: set[str] = set()
-    for lo, hi in chunks:
+    for idx, (lo, hi) in enumerate(chunks):
+        ctx.report(idx / max(len(chunks), 1), f"đoạn {idx + 1}/{len(chunks)}")
         breaks, method = _segment_chunk(doc, lo, hi, provider, cfg)
         methods.add(method)
         all_breaks.extend(_fix_break_positions(doc, breaks, lo, hi))
@@ -281,7 +285,8 @@ def build_segments(doc: AsrDoc, provider: LLMProvider | None, cfg: Config) -> Se
     return SegmentsDoc(source_asr_sha256="", method=method, segments=segments)
 
 
-def run(work_dir, cfg: Config, force: bool = False) -> SegmentsDoc:
+def run(work_dir, cfg: Config, force: bool = False,
+        ctx: RunContext | None = None) -> SegmentsDoc:
     from pathlib import Path
 
     work_dir = Path(work_dir)
@@ -300,7 +305,7 @@ def run(work_dir, cfg: Config, force: bool = False) -> SegmentsDoc:
     except Exception as exc:
         log.warning("S2: không dựng được LLM (%s) — dùng ngắt theo rule", exc)
 
-    result = build_segments(doc, provider, cfg)
+    result = build_segments(doc, provider, cfg, ctx=ctx)
     result.source_asr_sha256 = sha256_file(asr_path)
     write_doc(out_json, result)
 

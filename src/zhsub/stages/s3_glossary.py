@@ -15,6 +15,7 @@ from ..config import Config
 from ..jsonio import read_doc, write_doc
 from ..llm.base import LLMError, LLMProvider
 from ..models import AddressTerm, GlossaryDoc, GlossaryTerm, SegmentsDoc, StyleDecision
+from ..progress import RunContext, ensure_context
 
 log = logging.getLogger(__name__)
 
@@ -254,8 +255,10 @@ def _resolve_keep_source(term: GlossaryTerm) -> GlossaryTerm:
 
 
 def build_glossary(
-    segments_doc: SegmentsDoc, provider: LLMProvider | None, max_chars: int = 3000
+    segments_doc: SegmentsDoc, provider: LLMProvider | None, max_chars: int = 3000,
+    ctx: RunContext | None = None,
 ) -> GlossaryDoc:
+    ctx = ensure_context(ctx)
     if provider is None:
         log.warning("S3: không có LLM — sinh glossary rỗng, người dùng tự điền")
         return GlossaryDoc()
@@ -265,6 +268,7 @@ def build_glossary(
 
     collected: list[list[dict]] = []
     for i, block in enumerate(blocks):
+        ctx.report(i / max(len(blocks), 1), f"đoạn {i + 1}/{len(blocks)}")
         try:
             data = provider.complete_json(TERMS_SYSTEM, block)
         except LLMError as exc:
@@ -316,7 +320,8 @@ def _extract_style(
     return style, address
 
 
-def run(work_dir, cfg: Config, force: bool = False) -> GlossaryDoc:
+def run(work_dir, cfg: Config, force: bool = False,
+        ctx: RunContext | None = None) -> GlossaryDoc:
     work_dir = Path(work_dir)
     out_json = work_dir / "glossary.json"
     # Never overwrite without being asked: this file is the user's edit surface, and
@@ -335,7 +340,7 @@ def run(work_dir, cfg: Config, force: bool = False) -> GlossaryDoc:
     except Exception as exc:
         log.warning("S3: không dựng được LLM (%s)", exc)
 
-    doc = build_glossary(segments_doc, provider)
+    doc = build_glossary(segments_doc, provider, ctx=ctx)
     write_doc(out_json, doc)
     log.info("S3 xong: %d thuật ngữ, %d cặp xưng hô", len(doc.terms), len(doc.address_terms))
     return doc

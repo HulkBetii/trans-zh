@@ -17,6 +17,7 @@ from ..config import Config
 from ..jsonio import read_doc, write_doc
 from ..media import slice_wav
 from ..models import AsrDoc, EngineInfo, IngestDoc, RawSegment, Token
+from ..progress import RunContext, ensure_context
 
 log = logging.getLogger(__name__)
 
@@ -114,8 +115,10 @@ def transcribe_file(
     engine: ASREngine,
     cfg: Config,
     scratch_dir: Path | None = None,
+    ctx: RunContext | None = None,
 ) -> AsrOutput:
     """Transcribe a whole file, chunking when needed. Timestamps are always absolute."""
+    ctx = ensure_context(ctx)
     windows = plan_chunks(
         duration_sec,
         cfg.asr.outer_chunk_threshold_sec,
@@ -134,6 +137,7 @@ def transcribe_file(
             piece = scratch / f"chunk_{idx:04d}.wav"
             slice_wav(wav_path, piece, start, end - start)
             log.info("  chunk %d/%d  [%.1fs .. %.1fs]", idx + 1, len(windows), start, end)
+            ctx.report(idx / len(windows), f"chunk {idx + 1}/{len(windows)}")
             parts.append((start, engine.transcribe(piece)))
             piece.unlink(missing_ok=True)
     finally:
@@ -142,7 +146,8 @@ def transcribe_file(
     return merge_outputs(parts)
 
 
-def run(work_dir: Path, cfg: Config, force: bool = False) -> AsrDoc:
+def run(work_dir: Path, cfg: Config, force: bool = False,
+        ctx: RunContext | None = None) -> AsrDoc:
     out_json = work_dir / "asr.json"
     if out_json.is_file() and not force:
         return read_doc(out_json, AsrDoc)
@@ -151,7 +156,7 @@ def run(work_dir: Path, cfg: Config, force: bool = False) -> AsrDoc:
     wav_path = work_dir / ingest.media.wav_path
 
     engine = build_engine(cfg)
-    out = transcribe_file(wav_path, ingest.media.duration_sec, engine, cfg)
+    out = transcribe_file(wav_path, ingest.media.duration_sec, engine, cfg, ctx=ctx)
     doc = build_asr_doc(out, engine, ingest.media.duration_sec)
     write_doc(out_json, doc)
     log.info("S1 xong: %d token, %d câu thô", len(doc.tokens), len(doc.raw_segments))
