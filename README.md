@@ -154,8 +154,8 @@ lần gọi của S4.
 
 Đo trên clip 35 phút (452 câu, dịch cả `vi` lẫn `en`): 60 lần gọi với
 `batch_size = 40` + `review_pass = true`, xuống 28 lần với `batch_size = 60` +
-`review_pass = false`. Chạy thật với `--target vi`: 19 lần gọi, 8,4 phút
-(S2 17,9s/lần, S3 14,3s/lần, S4 35,1s/lần).
+`review_pass = false`. Chạy thật với `--target vi`: 19 lần gọi, khoảng 12 phút
+(S2 24,7s/lần, S3 23,4s/lần, S4 55,5s/lần).
 
 ### Một stage, một hội thoại
 
@@ -177,6 +177,23 @@ so ba cách chạy bằng tỉ lệ dạng xưng hô trội trong toàn bộ b�
 
 Nói luật một lần rồi tin vào thread là tệ nhất: đến batch 5 rule 3 đã trôi quá xa
 phía trên và model bắt đầu lẫn `anh ta` với `ông ấy`.
+
+Hai stage kia, cùng `asr.json`, chat mới mỗi lần so với thread chung:
+
+| | Chat mới | Thread chung |
+|---|---|---|
+| S2 | `method = llm`, 472 câu, 17,9s/lần | `method = llm`, 468 câu, 24,7s/lần |
+| S3 | 39 thuật ngữ, 14,3s/lần | **47 thuật ngữ**, 23,4s/lần |
+
+S2 không đổi chất lượng — vẫn chép nguyên văn chính xác, chỉ chậm hơn. S3 thì tốt
+lên rõ: rút được 47 thuật ngữ thay vì 39, và gộp được nhiều biến thể ASR hơn (bắt
+được cả nhóm ba dạng 波洛克监狱/布洛克联邦监狱/布洛克监狱). Lý do hợp lý: bốn khối
+transcript nằm chung một hội thoại nên model nhận ra thực thể nó đã rút ở khối
+trước và viết nhất quán, thay vì đặt tên mới mỗi khối. 47 cũng đúng bằng số thuật
+ngữ bản gpt-5 rút được.
+
+Cả hai lần chạy đều cho `0 cặp xưng hô` — lỗ hổng `address_terms` nằm ở
+`_extract_style` của S3, không liên quan tới thiết kế thread.
 
 Cần biết trước một tính chất: **thread chung không sửa lựa chọn, nó khuếch đại
 lựa chọn.** Batch 1 chọn xưng hô nào thì cả video theo nấy — kể cả khi đó là dạng
