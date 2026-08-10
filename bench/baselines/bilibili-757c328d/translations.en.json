@@ -1,0 +1,3626 @@
+{
+  "schema": 1,
+  "lang": "en",
+  "model": "gpt-4o-mini",
+  "prompt_version": 6,
+  "glossary_hash": "06c2c9e747528bd847a69634572d5c9441de89b85f202e9c9de85e81fd895ca6",
+  "segments_hash": "46aaa593981ecbad903b0c19d736a681eec5b1387b9cc6b558fb03cb90dc40b1",
+  "items": [
+    {
+      "id": 0,
+      "text_zh": "他是美国越狱史上的扛把子，被称为美国最会逃的男人。他的人生信条很简单，",
+      "draft": "He is a legend in American prison break history, known as the best escape artist in the country. His life motto is simple,",
+      "translation": "He is a legend in American prison break history, known as the best escape artist in the country. His life motto is simple,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 1,
+      "text_zh": "要么越狱，要么死",
+      "draft": "either escape or die.",
+      "translation": "either escape or die.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 2,
+      "text_zh": "普通人越狱一次就足以写进纪录片。而他呢硬生生来了三次",
+      "draft": "For ordinary people, escaping once is enough to make it into a documentary. But he managed to do it three times.",
+      "translation": "For ordinary people, escaping once is enough to make it into a documentary. But he managed to escape three times.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 3,
+      "text_zh": "三次震惊全美，且一次比一次离谱。",
+      "draft": "Three times that shocked the entire nation, each one more outrageous than the last.",
+      "translation": "Three times that shocked the entire nation, each one more outrageous than the last.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 4,
+      "text_zh": "最后一次更是脑洞大开，将自己游出监狱，成为越狱史上的传奇。",
+      "draft": "The last time was particularly creative, as he swam out of prison, becoming a legend in escape history.",
+      "translation": "The last time was particularly creative, as he swam out of prison, becoming a legend in escape history.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 5,
+      "text_zh": "你以为这已经够离谱了，还没完呢？明明刚逃出来就被警方拦住，",
+      "draft": "You think that's outrageous enough? It’s not over yet. He was stopped by the police right after escaping,",
+      "translation": "You think that's outrageous enough? It’s not over yet. He was stopped by the police right after escaping,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 6,
+      "text_zh": "但他却凭借极度的自信，",
+      "draft": "but with extreme confidence,",
+      "translation": "but with extreme confidence,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 7,
+      "text_zh": "冷静到变态的头脑，堪称影帝般的应对表演，把警察忽悠的心服口服。",
+      "draft": "a calm yet twisted mind, and a performance worthy of an Oscar, he convinced the police.",
+      "translation": "a calm yet twisted mind, and a performance worthy of an Oscar, he convinced the police.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 8,
+      "text_zh": "这个名场面被全网疯传，超四千万人观看恐论。",
+      "draft": "This iconic scene went viral online, with over forty million views.",
+      "translation": "This iconic scene went viral online, with over forty million views.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 9,
+      "text_zh": "你看多少遍，每次都会忍不住为他捏一把冷汗。",
+      "draft": "No matter how many times you watch it, you can't help but break a cold sweat for him.",
+      "translation": "No matter how many times you watch it, you can't help but break a cold sweat for him.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 10,
+      "text_zh": "他的表现连真正的奥斯卡影帝见了，恐怕也要自叹不如吧。",
+      "draft": "Even a real Oscar-winning actor would probably feel inferior after seeing his performance.",
+      "translation": "Even a real Oscar-winning actor would probably feel inferior after seeing his performance.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 11,
+      "text_zh": "大家好，这里是奇幻观察室，我是长峰。那么，这位越狱天才的故事究竟有多精彩，就让我们先穿越回。",
+      "draft": "Hello everyone, this is the Fantasy Observation Room, I’m Chang Feng. Now, let's travel back to see just how amazing this escape genius's story is.",
+      "translation": "Hello everyone, this is the Fantasy Observation Room, I’m Chang Feng. Now, let's travel back to see just how amazing this escape genius's story is.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 12,
+      "text_zh": "一九五八年听一听这位美国最会淘的男人的故事，",
+      "draft": "In 1958, let's listen to the story of the best escape artist in America,",
+      "translation": "In 1958, let's listen to the story of the best escape artist in America,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 13,
+      "text_zh": "理查德里麦克奈尔。",
+      "draft": "Richard McNair.",
+      "translation": "Richard McNair.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 14,
+      "text_zh": "一九五八年十二月十九日，出生于俄克拉荷马州的一个普通家庭，是家里四个孩子中的老大，",
+      "draft": "Born on December 19, 1958, in an ordinary family in Oklahoma, he was the eldest of four children,",
+      "translation": "Born on December 19, 1958, in an ordinary family in Oklahoma, he was the eldest of four children,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 15,
+      "text_zh": "父亲是一名预备役警察，父母恩爱，家庭和睦，是一个标准的美国家庭，",
+      "draft": "with a father who was a reserve police officer. His parents were loving, and the family was harmonious, a typical American family.",
+      "translation": "with a father who was a reserve police officer. His parents were loving, and the family was harmonious, a typical American family.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 16,
+      "text_zh": "从小理查德就表现的聪明伶俐，头脑灵活，是身边人公认的小机灵鬼。",
+      "draft": "From a young age, Richard was smart and quick-witted, recognized as a little genius by those around him.",
+      "translation": "From a young age, Richard was smart and quick-witted, recognized as a little genius by those around him.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 17,
+      "text_zh": "用他弟弟的话来说啊，哥哥是我见过最聪明的人，一直以来都是我的学习榜样。",
+      "draft": "In his brother's words, \"My brother is the smartest person I’ve ever met, always my role model for learning.\"",
+      "translation": "In his brother's words, \"My brother is the smartest person I’ve ever met, always my role model for learning.\"",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 18,
+      "text_zh": "少年时期的理查德酷爱运动，品学兼优，以父亲为楷模，",
+      "draft": "In his youth, Richard loved sports and excelled academically, looking up to his father as a role model,",
+      "translation": "In his youth, Richard loved sports and excelled academically, looking up to his father as a role model,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 19,
+      "text_zh": "把从军当做人生目标，最终顺利成为美国空军的一员。",
+      "draft": "and aimed to serve in the military, eventually becoming a member of the U.S. Air Force.",
+      "translation": "and aimed to serve in the military, eventually becoming a member of the U.S. Air Force.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 20,
+      "text_zh": "在部队里，他依旧表现出色，不仅是一位合格的士兵，",
+      "draft": "In the military, he continued to excel, not only as a qualified soldier,",
+      "translation": "In the military, he continued to excel, not only as a qualified soldier,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 21,
+      "text_zh": "还是当地警方的信任，帮助警方破获了数起违禁品案件。",
+      "draft": "but also earning the trust of local police, helping them solve several cases of illegal goods.",
+      "translation": "but also earning the trust of local police, helping them solve several cases of illegal goods.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 22,
+      "text_zh": "那时的他没有不良嗜好，看上去前途无量。",
+      "draft": "At that time, he had no bad habits and seemed to have a bright future.",
+      "translation": "At that time, he had no bad habits and seemed to have a bright future.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 23,
+      "text_zh": "如果非要挑个毛病，那就是花钱大手大脚的没个储蓄意识，",
+      "draft": "If one had to pick a flaw, it would be his reckless spending without any savings,",
+      "translation": "If one had to pick a flaw, it would be his reckless spending without any savings,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 24,
+      "text_zh": "而这一点也将成为其人生悲剧的导火索。",
+      "draft": "and this would become the catalyst for his tragic life.",
+      "translation": "and this would become the catalyst for his tragic life.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 25,
+      "text_zh": "转折点发生在一九八七年十一月十七日，",
+      "draft": "The turning point occurred on November 17, 1987,",
+      "translation": "The turning point occurred on November 17, 1987,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 26,
+      "text_zh": "这一天正驻扎在北达科他州麦诺特空军基地的理查德。",
+      "draft": "when Richard was stationed at Minot Air Force Base in North Dakota.",
+      "translation": "when Richard was stationed at Minot Air Force Base in North Dakota.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 27,
+      "text_zh": "突然脑袋一热，想搞点钱花一花。他知道啊，基地附近有一个谷仓，晚上几乎没人上班。",
+      "draft": "On that day, he suddenly got a wild idea to make some quick cash. He knew there was a barn nearby where hardly anyone worked at night.",
+      "translation": "On that day, he suddenly got a wild idea to make some quick cash. He knew there was a barn nearby where hardly anyone worked at night.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 28,
+      "text_zh": "他想着神不知鬼不觉的偷点值钱的东西，应该不会被人发现了，",
+      "draft": "He thought that stealing something valuable without being noticed should be fine,",
+      "translation": "He thought that stealing something valuable without being noticed should be fine,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 29,
+      "text_zh": "可天不随人愿。他刚趁着夜色偷偷潜入谷仓，就撞进了值班经理基斯曼。",
+      "draft": "but things didn't go as planned. Just as he stealthily entered the barn under the cover of night, he ran into the duty manager, Gitzman.",
+      "translation": "but things didn't go as planned. Just as he stealthily entered the barn under the cover of night, he ran into the duty manager, Gitzman.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 30,
+      "text_zh": "按理说啊，他完全可以转身跑开，一点事都没有。",
+      "draft": "Logically, he could have just turned and run away without any trouble.",
+      "translation": "Logically, he could have just turned and run away without any trouble.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 31,
+      "text_zh": "可也不知道是军人的本能警觉，还是太过心虚紧张，他想都没想，",
+      "draft": "But whether it was military instinct or sheer nervousness, without thinking,",
+      "translation": "But whether it was military instinct or sheer nervousness, without thinking,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 32,
+      "text_zh": "就掏出身上的配枪，对着吉茨曼连开四枪，看着对方倒地，鲜血横流。",
+      "draft": "he pulled out his service weapon and shot Gitzman four times, watching him fall to the ground, bleeding.",
+      "translation": "he pulled out his service weapon and shot Gitzman four times, watching him fall to the ground, bleeding.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 33,
+      "text_zh": "他一时也顾不上偷东西，转身逃跑了。",
+      "draft": "He couldn't even think about stealing anything and turned to run away.",
+      "translation": "He couldn't even think about stealing anything and turned to run away.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 34,
+      "text_zh": "可刚跑到门口，又看到一名卡车司机坐在驾驶室",
+      "draft": "But just as he reached the door, he saw a truck driver sitting in the cab.",
+      "translation": "But just as he reached the door, he saw a truck driver sitting in the cab.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 35,
+      "text_zh": "杀红眼的理查德，二话不说，对着司机又是连开数枪，随后消失在了夜色当中。",
+      "draft": "In a blind rage, Richard shot at the driver without a second thought, then disappeared into the night.",
+      "translation": "In a blind rage, Richard shot at the driver without a second thought, then disappeared into the night.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 36,
+      "text_zh": "接下来的几周里，尽管警方没有找上门，但他始终心神不宁，",
+      "draft": "In the following weeks, although the police didn't come looking for him, he remained restless,",
+      "translation": "In the following weeks, although the police didn't come looking for him, he remained restless,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 37,
+      "text_zh": "担心现场没有处理干净，会留下什么线索。",
+      "draft": "worried that he hadn't cleaned up the scene properly and might leave some clues.",
+      "translation": "worried that he hadn't cleaned up the scene properly and might leave some clues.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 38,
+      "text_zh": "果不其然，他的担心成真了。实际上，当前身中四枪的基茨曼并未去世。",
+      "draft": "Sure enough, his worries came true. In fact, Gitzman, who had been shot four times, did not die.",
+      "translation": "Sure enough, his worries came true. In fact, Gitzman, who had been shot four times, did not die.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 39,
+      "text_zh": "中枪后，他强忍剧痛，一动不动的躺在地上装死。",
+      "draft": "After being shot, he endured the pain and lay still on the ground, pretending to be dead.",
+      "translation": "After being shot, he endured the pain and lay still on the ground, pretending to be dead.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 40,
+      "text_zh": "理查德离开后，他第一时间就报了警，",
+      "draft": "After Richard left, he immediately reported to the police.",
+      "translation": "After Richard left, he immediately called the police.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 41,
+      "text_zh": "警方根据他的口供，以及在谷仓找到了十枚弹壳。",
+      "draft": "The police found ten shell casings in the barn based on his testimony.",
+      "translation": "The police found ten shell casings in the barn based on his statement.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 42,
+      "text_zh": "经过几周的调查，锁定了理查德后查验气枪支，确定匹配现场所遗留的弹壳，",
+      "draft": "After weeks of investigation, they identified Richard and matched the air gun to the shell casings left at the scene.",
+      "translation": "After weeks of investigation, they identified Richard and matched the air gun to the shell casings found at the scene.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 43,
+      "text_zh": "这一下证据确凿，直接将其给逮捕了。",
+      "draft": "With this solid evidence, he was directly arrested.",
+      "translation": "With this solid evidence, he was arrested.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 44,
+      "text_zh": "面对一死一重伤的指控，",
+      "draft": "Faced with charges of one death and one serious injury,",
+      "translation": "Faced with charges of one death and one serious injury,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 45,
+      "text_zh": "作为军人的他很清楚自己的结局，终身监禁是没跑了，",
+      "draft": "as a soldier, he knew his fate was sealed; life imprisonment was inevitable.",
+      "translation": "as a soldier, he understood his fate was sealed; life imprisonment was unavoidable.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 46,
+      "text_zh": "可他不甘心呢，他认为自己平时兢兢业业，只是一时犯浑才酿下惨剧。",
+      "draft": "But he was unwilling; he believed he had always been diligent and that it was just a moment of folly that led to the tragedy.",
+      "translation": "But he was unwilling to accept it; he believed he had always been diligent and that it was just a moment of folly that led to the tragedy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 47,
+      "text_zh": "他不想一辈子被关在监狱里，怎么办呢？",
+      "draft": "He didn't want to spend his life in prison, so what could he do?",
+      "translation": "He didn't want to spend his life in prison, so what could he do?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 48,
+      "text_zh": "一个疯狂的念头开始在脑海里盘旋那一刻，这个念头在他脑海里扎了根。",
+      "draft": "At that moment, a crazy thought began to swirl in his mind, taking root.",
+      "translation": "At that moment, a crazy thought began to swirl in his mind, taking root.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 49,
+      "text_zh": "一九八八年二月，在一次常规审讯中，",
+      "draft": "In February 1988, during a routine interrogation,",
+      "translation": "In February 1988, during a routine interrogation,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 50,
+      "text_zh": "三位警探将其靠在明医托市警局审讯中的椅子上问话。",
+      "draft": "three detectives leaned him against a chair in the Minot Police Department to question him.",
+      "translation": "three detectives leaned him against a chair in the Minot Police Department to question him.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 51,
+      "text_zh": "中途呢三个人因为接电话短暂离开独留李超的一人，他意识到此时不跑，",
+      "draft": "Halfway through, the three left briefly to answer a phone call, leaving Li Chao alone.",
+      "translation": "Halfway through, the three left briefly to answer a phone call, leaving him alone.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 52,
+      "text_zh": "更待何时啊。巧的是，",
+      "draft": "He realized that if he didn't run now,",
+      "translation": "He realized that if he didn't run now,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 53,
+      "text_zh": "当时他口袋里有一只润唇膏，于是果断取出，涂在了手腕处，然后忍着剧烈的疼痛，",
+      "draft": "what was he waiting for? Coincidentally,",
+      "translation": "coincidentally, he had a lip balm in his pocket, so he decisively took it out and applied it to his wrist, enduring the intense pain,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 54,
+      "text_zh": "硬生生的将双手从手铐中挣脱，",
+      "draft": "he had a lip balm in his pocket, so he decisively took it out and applied it to his wrist, enduring the intense pain,",
+      "translation": "and forcibly pulled his hands free from the handcuffs.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 55,
+      "text_zh": "接着毫不犹豫的冲出审讯室，跑出警局警员，很快就发现情况并展开追捕。",
+      "draft": "and forcibly pulled his hands free from the handcuffs.",
+      "translation": "Then, without hesitation, he rushed out of the interrogation room, ran out of the police station, and was soon discovered by officers who began a chase.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 56,
+      "text_zh": "最终，他被逼到一栋公寓楼的三楼屋顶，无路可逃的他打算借助一根树枝翻下去，",
+      "draft": "Then, without hesitation, he rushed out of the interrogation room, ran out of the police station, and was soon discovered by officers who began a chase.",
+      "translation": "Ultimately, he was cornered on the rooftop of a three-story apartment building, and with no way out, he planned to use a branch to climb down.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 57,
+      "text_zh": "没想到树枝腐朽，他直接从八点五米高的地方重重摔落腰椎，当场骨折，",
+      "draft": "Ultimately, he was cornered on the rooftop of a three-story apartment building, and with no way out, he planned to use a branch to climb down.",
+      "translation": "Unexpectedly, the branch was rotten, and he fell heavily from a height of 8.5 meters, fracturing his spine on the spot.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 58,
+      "text_zh": "逃跑失败。",
+      "draft": "Unexpectedly, the branch was rotten, and he fell heavily from a height of 8.5 meters, fracturing his spine on the spot.",
+      "translation": "His escape failed.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 59,
+      "text_zh": "这是他的第一次越狱。",
+      "draft": "His escape failed.",
+      "translation": "This was his first prison break.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 60,
+      "text_zh": "虽说只持续了几个小时，但已然为他接下来的传奇拉开了序幕啊。",
+      "draft": "This was his first prison break.",
+      "translation": "Although it lasted only a few hours, it had already set the stage for his upcoming legend.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 61,
+      "text_zh": "经过治疗后，他被送进沃德县监狱后，因谋杀和谋杀未遂被判处两个终身监禁，",
+      "draft": "Although it lasted only a few hours, it had already set the stage for his upcoming legend.",
+      "translation": "After treatment, he was sent to Ward County Jail and sentenced to two life imprisonments for murder and attempted murder,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 62,
+      "text_zh": "外加入室盗窃三十年监禁，接着被转移至戒备森严的北达科他州州夜监狱。",
+      "draft": "After treatment, he was sent to Ward County Jail and sentenced to two life imprisonments for murder and attempted murder,",
+      "translation": "plus thirty years for burglary, and then transferred to the highly secure North Dakota State Prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 63,
+      "text_zh": "然而，就在其被转移走后，沃德县监狱狱警在检查其牢房时，惊讶的发现，",
+      "draft": "plus thirty years for burglary, and then transferred to the highly secure North Dakota State Prison.",
+      "translation": "However, just after he was transferred, the prison guards at Ward County Jail were surprised to find,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 64,
+      "text_zh": "牢房里有两块墙砖，几乎被凿穿，里面还藏着床单等逃生物品。",
+      "draft": "However, just after he was transferred, the prison guards at Ward County Jail were surprised to find,",
+      "translation": "two bricks in his cell were nearly chiseled through, hiding sheets and other escape items inside.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 65,
+      "text_zh": "很显然，他正计划着越狱，幸好转移监狱，打断了他的施法，不然后果不堪设想。",
+      "draft": "two bricks in his cell were nearly chiseled through, hiding sheets and other escape items inside.",
+      "translation": "Clearly, he was planning an escape, and fortunately, the transfer interrupted his scheme; otherwise, the consequences would have been unimaginable.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 66,
+      "text_zh": "而这一次，他被送进了北达科他州戒备最森严的监狱，",
+      "draft": "Clearly, he was planning an escape, and fortunately, the transfer interrupted his scheme; otherwise, the consequences would have been unimaginable.",
+      "translation": "This time, he was sent to the most secure prison in North Dakota,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 67,
+      "text_zh": "这个地方主要用于关押长期服刑的重刑犯。",
+      "draft": "This time, he was sent to the most secure prison in North Dakota,",
+      "translation": "a place primarily used to hold long-term felons.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 68,
+      "text_zh": "对于许多囚犯而言，这里或许就是人生的尽头，",
+      "draft": "a place primarily used to hold long-term felons.",
+      "translation": "For many inmates, this might be the end of their lives,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 69,
+      "text_zh": "而理查德却认为这只不过是他越狱传奇的开端。",
+      "draft": "For many inmates, this might be the end of their lives,",
+      "translation": "but Richard believed it was just the beginning of his prison break legend.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 70,
+      "text_zh": "因为他前脚刚迈进牢房，后脚就已经在为下一次越狱做着全面的准备了。",
+      "draft": "but Richard believed it was just the beginning of his prison break legend.",
+      "translation": "As soon as he stepped into the cell, he was already making comprehensive preparations for his next escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 71,
+      "text_zh": "北达克他州州立监狱考虑到理查德之前的越狱前科，狱警们对其特别关照，严加看管，",
+      "draft": "As soon as he stepped into the cell, he was already making comprehensive preparations for his next escape.",
+      "translation": "Considering Richard's previous escape record, the guards paid special attention to him and kept a close watch,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 72,
+      "text_zh": "加上这里本来就戒备森严，所以狱防自信满满的，认为没有人能够逃得出去。",
+      "draft": "Considering Richard's previous escape record, the guards paid special attention to him and kept a close watch,",
+      "translation": "and since this place was already heavily guarded, the prison staff were confident that no one could escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 73,
+      "text_zh": "可理查德偏偏不信邪，",
+      "draft": "and since this place was already heavily guarded, the prison staff were confident that no one could escape.",
+      "translation": "But Richard was determined to prove them wrong.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 74,
+      "text_zh": "他把上一次逃跑失败，归结于太过冲动，毛躁，毫无计划。",
+      "draft": "But Richard was determined to prove them wrong.",
+      "translation": "He attributed his last escape failure to being too impulsive, reckless, and unplanned.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 75,
+      "text_zh": "因此，这一次他制定了一个详细的越狱方案，",
+      "draft": "He attributed his last escape failure to being too impulsive, reckless, and unplanned.",
+      "translation": "Therefore, this time he devised a detailed escape plan,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 76,
+      "text_zh": "第一步自然是洗白自己，",
+      "draft": "Therefore, this time he devised a detailed escape plan,",
+      "translation": "The first step was to clear his name,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 77,
+      "text_zh": "他不再惹是生非，不掺和打架斗殴，",
+      "draft": "The first step was to clear his name,",
+      "translation": "He stopped causing trouble and avoided fights,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 78,
+      "text_zh": "平时话也不多，总是独来独往、抽烟、喝酒、打孔纹身",
+      "draft": "He stopped causing trouble and avoided fights,",
+      "translation": "and generally kept to himself, smoking, drinking, and getting tattoos.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 79,
+      "text_zh": "这些典型的囚犯表签，他是一样不沾。对于狱警言听计从，",
+      "draft": "and generally kept to himself, smoking, drinking, and getting tattoos.",
+      "translation": "He avoided all typical prisoner behaviors and complied with the guards.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 80,
+      "text_zh": "发展到后来，连狱警都觉得他不像是个重刑犯，倒像是哪个图书馆走错门的学生。",
+      "draft": "As time went on, even the prison guards thought he didn't look like a felon, but rather like a student who had wandered into the wrong library.",
+      "translation": "As time went on, even the prison guards thought he looked less like a felon and more like a student who had wandered into the wrong library.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 81,
+      "text_zh": "其次就是勤家锻炼，越狱逃跑得有一个好的训练。",
+      "draft": "Next, he needed to train hard; a good workout was essential for escaping.",
+      "translation": "Next, he needed to train hard; a good workout was essential for the escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 82,
+      "text_zh": "因此，他每日风雨无阻的健身锻炼放风，就跑步，在牢房就俯卧撑等力量训练。",
+      "draft": "Therefore, he exercised diligently every day, running and doing push-ups in his cell.",
+      "translation": "Therefore, he exercised diligently every day, running and doing push-ups in his cell.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 83,
+      "text_zh": "最后就是用知识武装自己，他认为越狱光莽撞不行，",
+      "draft": "Finally, he armed himself with knowledge, believing that a reckless escape wouldn't work.",
+      "translation": "Finally, he armed himself with knowledge, believing that a reckless escape wouldn't succeed.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 84,
+      "text_zh": "得会各种求生技巧和相关的知识。",
+      "draft": "He needed to learn various survival skills and related knowledge.",
+      "translation": "He needed to learn various survival skills and related knowledge.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 85,
+      "text_zh": "只有这样，才能将任何物品变成工具。",
+      "draft": "Only then could he turn any item into a tool.",
+      "translation": "Only then could he turn any item into a tool.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 86,
+      "text_zh": "因此，他超级爱去监狱的图书馆，而且一呆就是数个小时，埋头钻研各类书籍，杂志，",
+      "draft": "Thus, he loved going to the prison library, spending hours immersed in various books and magazines,",
+      "translation": "Thus, he loved going to the prison library, spending hours immersed in various books and magazines,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 87,
+      "text_zh": "主要是野外生存技能之类的，为最终计划做着准备。",
+      "draft": "mainly focusing on wilderness survival skills to prepare for his ultimate plan.",
+      "translation": "mainly focusing on wilderness survival skills to prepare for his ultimate plan.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 88,
+      "text_zh": "他这一准备就是近三年时间。到了一九九一年初，理查德终于发现了一个逃生通道，",
+      "draft": "He prepared for nearly three years. By early 1991, Richard finally discovered an escape route,",
+      "translation": "He prepared for nearly three years. By early 1991, Richard finally discovered an escape route,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 89,
+      "text_zh": "那就是通风口。",
+      "draft": "which was the vent.",
+      "translation": "which was the vent.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 90,
+      "text_zh": "当时监狱内厂区顶楼都配有通风口，",
+      "draft": "At that time, the prison's factory building had vents on the top floor,",
+      "translation": "At that time, the prison's factory building had vents on the top floor,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 91,
+      "text_zh": "只要穿过了通风口，就离外面的自由世界不远了。",
+      "draft": "and once he passed through the vent, he would be close to the free world outside.",
+      "translation": "and once he passed through the vent, he would be close to the free world outside.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 92,
+      "text_zh": "可想要穿过这扇自由之门并不容易。",
+      "draft": "But getting through this door to freedom was not easy.",
+      "translation": "But getting through this door to freedom was not easy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 93,
+      "text_zh": "塔楼警卫一旦发现就会开枪射击，且通风口内安装了大量的金属防护网，",
+      "draft": "If the tower guard spotted him, they would open fire, and the vent was equipped with a lot of metal protective nets,",
+      "translation": "If the tower guard spotted him, they would open fire, and the vent was equipped with many metal protective nets,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 94,
+      "text_zh": "正常情况下根本就钻不进去。但理查德并不着急，",
+      "draft": "which normally made it impossible to crawl through. But Richard was not in a hurry,",
+      "translation": "which normally made it impossible to crawl through. But Richard was not in a hurry,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 95,
+      "text_zh": "他联合了一名狱友，花费数周时间，利用做空的机会一点一点的拆除了，这些防护装置",
+      "draft": "He teamed up with a fellow inmate, spending weeks carefully dismantling these protective devices.",
+      "translation": "He teamed up with a fellow inmate, spending weeks carefully dismantling these protective devices.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 96,
+      "text_zh": "逃生通道被打通了。",
+      "draft": "The escape route was cleared.",
+      "translation": "The escape route was cleared.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 97,
+      "text_zh": "结果万万没想到，就在他们准备行动的前一晚，被其他狱友给举报",
+      "draft": "Unexpectedly, just the night before they were set to act, they were reported by other inmates.",
+      "translation": "Unexpectedly, just the night before they were set to act, they were reported by other inmates.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 98,
+      "text_zh": "了。一九九一年四月二十一日，监狱安保主管根据举报对通风口进行检查，",
+      "draft": "On April 21, 1991, the prison security chief inspected the vent based on the report,",
+      "translation": "On April 21, 1991, the prison security chief inspected the vent based on the report,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 99,
+      "text_zh": "果然发现了大部分安全装置，都已被拆除，",
+      "draft": "and indeed found that most of the security devices had been removed.",
+      "translation": "and indeed found that most of the security devices had been removed.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 100,
+      "text_zh": "狱警迅速将理查德和另一名囚犯逮捕，最终理查德被判处三年监禁。",
+      "draft": "The guards quickly arrested Richard and another inmate, and Richard was ultimately sentenced to three more years.",
+      "translation": "The guards quickly arrested Richard and another inmate, and Richard was ultimately sentenced to three more years.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 101,
+      "text_zh": "不过这对于已经终身监禁的他来说啊，无所谓。",
+      "draft": "However, this meant nothing to him, as he was already serving a life sentence.",
+      "translation": "However, this meant nothing to him, as he was already serving a life sentence.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 102,
+      "text_zh": "此次越狱计划虽然被打断，但理查德并未灰心，反而越战越勇。",
+      "draft": "Although this escape plan was interrupted, Richard did not lose heart; instead, he became more determined.",
+      "translation": "Although this escape plan was interrupted, Richard did not lose heart; instead, he became more determined.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 103,
+      "text_zh": "在接下来的两年里，他故技重施，",
+      "draft": "In the following two years, he used the same tactics,",
+      "translation": "In the following two years, he used the same tactics,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 104,
+      "text_zh": "一边伪造老好人的形象，一边继续寻找逃生通道。",
+      "draft": "pretending to be a nice guy while continuing to search for an escape route.",
+      "translation": "pretending to be a nice guy while continuing to search for an escape route.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 105,
+      "text_zh": "找来找去还是瞄上了通风口。尽管狱方已经做了全面防范，",
+      "draft": "After searching around, he still focused on the vent. Although the prison had taken comprehensive precautions,",
+      "translation": "After searching around, he still focused on the vent. Although the prison had taken comprehensive precautions,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 106,
+      "text_zh": "但理查德反向推理认为最危险的地方反而最安全，",
+      "draft": "Richard reasoned that the most dangerous places were actually the safest.",
+      "translation": "Richard reasoned that the most dangerous places were actually the safest.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 107,
+      "text_zh": "这就是所谓的灯下黑。",
+      "draft": "This is what is known as darkness under the lamp.",
+      "translation": "This is what is known as darkness under the lamp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 108,
+      "text_zh": "看过越狱和肖申克救赎的朋友肯定明白，想要越狱仅靠一个人是不现实的。",
+      "draft": "Friends who have seen Prison Break and The Shawshank Redemption surely understand that escaping prison alone is unrealistic.",
+      "translation": "Friends who have seen Prison Break and The Shawshank Redemption surely understand that escaping prison alone is unrealistic.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 109,
+      "text_zh": "因此，他找了两名志同道合的狱友，",
+      "draft": "Therefore, he found two like-minded inmates,",
+      "translation": "Therefore, he found two like-minded inmates,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 110,
+      "text_zh": "三个人默契配合，首先摸清了狱警交接班规律、巡视盲点等等，",
+      "draft": "and the three of them coordinated well, first figuring out the guards' shift patterns and blind spots,",
+      "translation": "and the three of them coordinated well, first figuring out the guards' shift patterns and blind spots,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 111,
+      "text_zh": "然后相互掩护，一步步拆除牢房天花板的石膏板与金属网，",
+      "draft": "then covering for each other as they gradually dismantled the ceiling's drywall and metal mesh.",
+      "translation": "then covering for each other as they gradually dismantled the ceiling's drywall and metal mesh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 112,
+      "text_zh": "并精确测量了从房顶通风管进入主通风道，在绕行至监狱外墙屋顶的路线。",
+      "draft": "They accurately measured the route from the roof's vent into the main ventilation duct, leading to the prison's outer wall roof.",
+      "translation": "They accurately measured the route from the roof's vent into the main ventilation duct, leading to the prison's outer wall roof.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 113,
+      "text_zh": "为了顺利从高墙下到地面，他们还准备了很多布条，拼接成的绳子，",
+      "draft": "To safely descend from the high wall to the ground, they also prepared many strips of cloth to make a rope.",
+      "translation": "To safely descend from the high wall to the ground, they also prepared many strips of cloth to make a rope.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 114,
+      "text_zh": "一切都准备的明明白白。",
+      "draft": "Everything was prepared clearly.",
+      "translation": "Everything was prepared clearly.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 115,
+      "text_zh": "一九九二年十月九日上午，三个人觉得时机成熟，",
+      "draft": "On the morning of October 9, 1992, the three felt the time was right,",
+      "translation": "On the morning of October 9, 1992, the three felt the time was right,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 116,
+      "text_zh": "趁着监狱交育室为大家播放电影时，偷偷爬进天花板，",
+      "draft": "and while the prison's education room was showing a movie, they secretly climbed into the ceiling,",
+      "translation": "and while the prison's education room was showing a movie, they secretly climbed into the ceiling,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 117,
+      "text_zh": "钻入早已探明的主通风管道。他们爬行穿越了三十多米长的铁管，",
+      "draft": "crawling into the main vent they had already explored. They crawled through over thirty meters of iron pipe,",
+      "translation": "crawling into the main vent they had already explored. They crawled through over thirty meters of iron pipe,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 118,
+      "text_zh": "然后顺着通风管滑行到监狱，外墙内侧的平台上，",
+      "draft": "then slid down the vent to the platform inside the prison's outer wall,",
+      "translation": "then slid down the vent to the platform inside the prison's outer wall,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 119,
+      "text_zh": "再靠自制的布条绳索翻越高墙，分头逃跑。",
+      "draft": "and used their homemade cloth rope to climb over the high wall, escaping in different directions.",
+      "translation": "and used their homemade cloth rope to climb over the high wall, escaping in different directions.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 120,
+      "text_zh": "监狱方面直到两个小时后才反应过来，随即展开了追捕行动。",
+      "draft": "The prison did not react until two hours later, and then launched a pursuit.",
+      "translation": "The prison did not respond until two hours later, then launched a pursuit.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 121,
+      "text_zh": "他的两位狱友可能是不够精明，很快就被缉拿归案了。",
+      "draft": "His two cellmates may not have been clever enough and were soon captured.",
+      "translation": "His two cellmates may not have been sharp enough and were quickly captured.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 122,
+      "text_zh": "而理查德凭借极强的反侦察意识，彻底消失在了警方的眼皮子底下。",
+      "draft": "But Richard, with a strong counter-surveillance awareness, completely disappeared from the police's sight.",
+      "translation": "But Richard, with a keen sense of counter-surveillance, completely vanished from the police's view.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 123,
+      "text_zh": "为了逃避警方的追捕，他进行了一番伪装，",
+      "draft": "To evade the police pursuit, he disguised himself,",
+      "translation": "To evade the police pursuit, he disguised himself,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 124,
+      "text_zh": "把头发留长，并染成了黄毛，戴上眼镜。乍一看很有书生气质，",
+      "draft": "growing his hair long, dyeing it blonde, and wearing glasses. At first glance, he looked scholarly,",
+      "translation": "growing his hair long, dyeing it blonde, and wearing glasses. At first glance, he looked scholarly,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 125,
+      "text_zh": "开着偷来的车在美国到处流浪，每隔一段时间就会换一个造型换一辆车，",
+      "draft": "drifting around the U.S. in a stolen car, changing his look and vehicle every so often,",
+      "translation": "drifting around the U.S. in a stolen car, changing his appearance and vehicle frequently,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 126,
+      "text_zh": "并且不会在同一个地方停留太久。",
+      "draft": "and not staying in one place too long.",
+      "translation": "and not staying in one place for too long.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 127,
+      "text_zh": "就这样，理查德在外面自由自在的旅游了整整十个月。",
+      "draft": "In this way, Richard traveled freely for a full ten months.",
+      "translation": "In this way, Richard traveled freely for a full ten months.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 128,
+      "text_zh": "直到一九九三年七月五日，他才在警方的一次围捕中落网。",
+      "draft": "Until July 5, 1993, he was caught in a police sweep.",
+      "translation": "Until July 5, 1993, when he was caught in a police sweep.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 129,
+      "text_zh": "他的第二次越狱也宣告失败。",
+      "draft": "His second escape also ended in failure.",
+      "translation": "His second escape also ended in failure.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 130,
+      "text_zh": "这一次逮捕理查德北达克科塔州监狱明白了一件事儿，理查德不是个普通囚犯，",
+      "draft": "This arrest made the North Dakota State Prison realize one thing: Richard was not an ordinary inmate,",
+      "translation": "This arrest made North Dakota State Prison realize one thing: Richard was not an ordinary inmate,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 131,
+      "text_zh": "这个能在几十分钟内从手铐中滑脱，能从通风管爬出监狱的男人是个雷呀。",
+      "draft": "the man who could slip out of handcuffs in minutes and crawl out of the ventilation duct was a force to be reckoned with.",
+      "translation": "the man who could slip out of handcuffs in minutes and crawl out of the ventilation duct was a force to be reckoned with.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 132,
+      "text_zh": "而他们的解决方案也很直接",
+      "draft": "Their solution was straightforward,",
+      "translation": "Their solution was straightforward,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 133,
+      "text_zh": "送走，越远越好。随即，根据洲际协议，",
+      "draft": "send him away, the further the better. Thus, according to interstate agreements,",
+      "translation": "send him away, the further the better. Thus, according to interstate agreements,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 134,
+      "text_zh": "理查德被送到了橡树公园高地成教所。",
+      "draft": "Richard was sent to the Oak Park Heights Correctional Facility.",
+      "translation": "Richard was sent to the Oak Park Heights Correctional Facility.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 135,
+      "text_zh": "该监狱是明尼苏达州安全级别最高的监狱，",
+      "draft": "This prison is the highest security prison in Minnesota,",
+      "translation": "This prison is the highest security prison in Minnesota,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 136,
+      "text_zh": "监管森严，历史上从未有囚犯从中逃脱。",
+      "draft": "with strict supervision and no inmate has ever escaped from it.",
+      "translation": "with strict supervision and no inmate has ever escaped from it.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 137,
+      "text_zh": "尽管理查德自视自己不是一般人认为没有什么监狱能够关得住他。可几年过去了，",
+      "draft": "Despite Richard believing he was not an ordinary person and that no prison could hold him, years passed,",
+      "translation": "Despite Richard believing he was not an ordinary person and that no prison could hold him, years passed,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 138,
+      "text_zh": "他逐渐意识到，我逃不出这所监狱了。",
+      "draft": "and he gradually realized that he could not escape this prison.",
+      "translation": "and he gradually realized that he could not escape this prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 139,
+      "text_zh": "面对铜墙铁壁般的监狱，他想到了另一条方案，",
+      "draft": "Faced with the prison's impenetrable walls, he thought of another plan,",
+      "translation": "Faced with the prison's impenetrable walls, he thought of another plan,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 140,
+      "text_zh": "换个监狱试一试。",
+      "draft": "to try a different prison.",
+      "translation": "to try a different prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 141,
+      "text_zh": "为此，他联合其他狱友发起了一场静坐罢工，",
+      "draft": "To this end, he organized a sit-in strike with other inmates,",
+      "translation": "To this end, he organized a sit-in strike with other inmates,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 142,
+      "text_zh": "不吃饭也不工作，拒绝和狱芳的一切交流。",
+      "draft": "refusing to eat or work, and rejecting all communication with the guards.",
+      "translation": "refusing to eat or work, and rejecting all communication with the guards.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 143,
+      "text_zh": "监狱一看，这也不是个事儿啊，死我手里算咋回事呢？",
+      "draft": "The prison saw this as a problem; how could they let him die on their watch?",
+      "translation": "The prison saw this as a problem; how could they let him die on their watch?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 144,
+      "text_zh": "于是将其遣返回了北达科他州，可该州门卿啊一看灾星回来，头都大了，",
+      "draft": "So they sent him back to North Dakota, but the officials there were overwhelmed to see this troublemaker return,",
+      "translation": "So they sent him back to North Dakota, but the officials there were overwhelmed to see this troublemaker return,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 145,
+      "text_zh": "赶紧再次把他送走了。",
+      "draft": "and quickly sent him away again.",
+      "translation": "and quickly sent him away again.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 146,
+      "text_zh": "这一次呢是一座监管更加严格的地方，科罗拉多州弗罗伦斯联邦监狱，",
+      "draft": "This time it was to a place with even stricter supervision, the Florence Federal Correctional Institution, Colorado,",
+      "translation": "This time it was to a place with even stricter supervision, the Florence Federal Correctional Institution, Colorado,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 147,
+      "text_zh": "该监狱也是铜墙铁壁般的存在。这让理查德再次崩溃，",
+      "draft": "which was also a fortress-like prison. This made Richard feel hopeless again,",
+      "translation": "which was also a fortress-like prison. This made Richard feel hopeless again,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 148,
+      "text_zh": "几乎找不到逃出去的希望啊，于是他秉着此地不行，我再换一个地方的原则，",
+      "draft": "as he could hardly see any hope of escaping, so he adhered to the principle of moving to another place,",
+      "translation": "as he could hardly see any hope of escaping, so he adhered to the principle of moving to another place,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 149,
+      "text_zh": "以我想离家人居住的俄克拉荷马州近一些为由，",
+      "draft": "claiming he wanted to be closer to his family in Oklahoma.",
+      "translation": "claiming he wanted to be closer to his family in Oklahoma.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 150,
+      "text_zh": "申请调往路易斯安纳州的波洛克联邦监狱",
+      "draft": "He applied to be transferred to Pollock Federal Correctional Institution in Louisiana,",
+      "translation": "He applied to be transferred to Pollock Federal Correctional Institution in Louisiana,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 151,
+      "text_zh": "改监狱，同样监管森严，关押的都是联邦重刑犯。",
+      "draft": "which also had strict supervision and housed federal felons.",
+      "translation": "which also had strict supervision and housed federal felons.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 152,
+      "text_zh": "狱方觉得他转到这里也讨不到便宜，且申请呢也算合理，于是就同意了。",
+      "draft": "The prison thought he wouldn't gain any advantage by moving here, and his request seemed reasonable, so they agreed.",
+      "translation": "The prison thought he wouldn't gain any advantage by moving here, and his request seemed reasonable, so they agreed.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 153,
+      "text_zh": "和布洛克联邦监狱怎么也不会想到，",
+      "draft": "Little did they know that Pollock Federal Correctional Institution,",
+      "translation": "Little did they know that Pollock Federal Correctional Institution,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 154,
+      "text_zh": "一场轰动全美的越狱行动，",
+      "draft": "would soon be the site of a sensational escape,",
+      "translation": "would soon be the site of a sensational escape,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 155,
+      "text_zh": "让这座默默无闻名不见经传的监狱登上了全球新闻头条，",
+      "draft": "bringing this obscure prison into the global news headlines,",
+      "translation": "bringing this obscure prison into the global news headlines,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 156,
+      "text_zh": "变得人尽皆知。",
+      "draft": "and making it widely known.",
+      "translation": "and making it widely known.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 157,
+      "text_zh": "我是理查德，自从一九八八年被抓以来，我从未放弃过越狱，",
+      "draft": "I am Richard. Since I was arrested in 1988, I have never given up on escaping,",
+      "translation": "I am Richard. Since I was arrested in 1988, I have never given up on escaping,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 158,
+      "text_zh": "并时刻准备着，我知道必须要逃出去，也一定能逃出去。",
+      "draft": "and I am always prepared. I know I must escape and I will.",
+      "translation": "and I am always prepared. I know I must escape and I will.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 159,
+      "text_zh": "二零零五年九月，我被正式转到了布洛克联邦监狱。",
+      "draft": "In September 2005, I was officially transferred to Block Federal Correctional Institution.",
+      "translation": "In September 2005, I was officially transferred to Block Federal Correctional Institution.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 160,
+      "text_zh": "根据之前的经验，我明白机会要慢慢的等。",
+      "draft": "Based on previous experience, I understand that opportunities must be waited for slowly.",
+      "translation": "From previous experience, I understand that opportunities must be waited for patiently.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 161,
+      "text_zh": "本以为这一等至少需要数年时间，可出人意料的是，",
+      "draft": "I thought this wait would take at least several years, but unexpectedly,",
+      "translation": "I thought this wait would take at least several years, but unexpectedly,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 162,
+      "text_zh": "仅仅三个月我就闻到了一丝腥味儿。布洛克监狱虽然外部监管森严，",
+      "draft": "in just three months, I caught a whiff of something. Although Block Prison is heavily monitored externally,",
+      "translation": "in just three months, I caught a whiff of something. Although Block Prison is heavily monitored externally,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 163,
+      "text_zh": "有数层围栏、电网与监控哨塔，但内部有多个供囚犯工作的厂房车间。",
+      "draft": "with several layers of fences, electric wires, and watchtowers, there are multiple workshops for inmates inside.",
+      "translation": "with several layers of fences, electric wires, and watchtowers, there are multiple workshops for inmates inside.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 164,
+      "text_zh": "白天狱友们都要上班。",
+      "draft": "During the day, inmates have to work.",
+      "translation": "During the day, inmates have to work.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 165,
+      "text_zh": "承担预防外接的一些工作，主要有木工、金属加工、油包、分拣、修补等等。",
+      "draft": "They handle some preventive work against external connections, mainly carpentry, metal processing, oil bags, sorting, repairs, etc.",
+      "translation": "They handle some preventive work against external connections, mainly carpentry, metal processing, oil bags, sorting, and repairs.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 166,
+      "text_zh": "刚进监狱三个月的我就被安排修补这些邮包",
+      "draft": "Just three months into my prison term, I was assigned to repair these mail packages.",
+      "translation": "Just three months into my prison term, I was assigned to repair these mail packages.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 167,
+      "text_zh": "多年的服役生涯交给了伟象秘诀，那就是行动保密准则。",
+      "draft": "Years of service taught me a great secret: the principle of keeping actions confidential.",
+      "translation": "Years of service taught me a valuable secret: the principle of keeping actions confidential.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 168,
+      "text_zh": "他要求从各种渠道收集零碎情报，当信息足够多时，",
+      "draft": "He required collecting fragmented intelligence from various sources, and when enough information was gathered,",
+      "translation": "He required collecting fragmented intelligence from various sources, and when enough information was gathered,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 169,
+      "text_zh": "即便不能拼出全貌，至少能勾勒出大致情况。",
+      "draft": "even if the whole picture couldn't be pieced together, at least a rough outline could be sketched.",
+      "translation": "even if the whole picture couldn't be pieced together, at least a rough outline could be sketched.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 170,
+      "text_zh": "我从修补邮包的工作中意识到，这些邮包最终都要运出监狱，",
+      "draft": "I realized from repairing mail packages that these packages would eventually be shipped out of the prison,",
+      "translation": "I realized from repairing mail packages that these packages would eventually be shipped out of the prison,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 171,
+      "text_zh": "储存在附近的一个仓库，虽然中途要经过检查，但这其中暗藏身门。",
+      "draft": "stored in a nearby warehouse. Although they would be checked along the way, there were hidden exits.",
+      "translation": "stored in a nearby warehouse. Although they would be checked along the way, there were hidden exits.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 172,
+      "text_zh": "我研究了各种越狱方法，大体归结为挖洞、挖地道、爬管子、翻墙撬锁等等。",
+      "draft": "I studied various escape methods, which can be broadly categorized into digging holes, tunnels, climbing pipes, and scaling walls.",
+      "translation": "I studied various escape methods, which can be broadly categorized into digging holes, tunnels, climbing pipes, and scaling walls.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 173,
+      "text_zh": "但这些在这一所监狱全部行不通。",
+      "draft": "But none of these would work in this prison.",
+      "translation": "But none of these would work in this prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 174,
+      "text_zh": "我苦思冥想，一个大胆疯狂，足以载入跃跃始寸的念头在我脑中成型了，",
+      "draft": "I pondered deeply, and a bold and crazy idea that could make history took shape in my mind,",
+      "translation": "I pondered deeply, and a bold and crazy idea that could make history took shape in my mind,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 175,
+      "text_zh": "把自己打包邮寄出去。",
+      "draft": "to package myself and mail myself out.",
+      "translation": "to package myself and mail myself out.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 176,
+      "text_zh": "有了这个想法，我每天最高兴的事儿就是上班了。",
+      "draft": "With this idea, the happiest part of my day became going to work.",
+      "translation": "With this idea, the happiest part of my day became going to work.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 177,
+      "text_zh": "修补邮包期间，我会伪装成无比听话的老好人，任劳任怨，",
+      "draft": "During the mail package repairs, I pretended to be an extremely obedient nice guy, working hard without complaint,",
+      "translation": "During the mail package repairs, I pretended to be an extremely obedient nice guy, working hard without complaint,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 178,
+      "text_zh": "从不嫌弃活多活重活脏，以此换取狱警们的信任。",
+      "draft": "never complaining about heavy or dirty work, in order to gain the trust of the guards.",
+      "translation": "never complaining about heavy or dirty work, in order to gain the trust of the guards.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 179,
+      "text_zh": "其实，暗中我一直密切留意邮包的行走路线，",
+      "draft": "In fact, I was secretly keeping a close eye on the routes of the mail packages,",
+      "translation": "In fact, I was secretly keeping a close eye on the routes of the mail packages,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 180,
+      "text_zh": "什么时候邮包会被叉车转运，哪些邮包会被送进监狱外的中转仓？",
+      "draft": "when the packages would be transported by forklift, which ones would be sent to the transfer warehouse outside the prison?",
+      "translation": "when the packages would be transported by forklift, which ones would be sent to the transfer warehouse outside the prison?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 181,
+      "text_zh": "中途要经过哪些检查等等，这些都是我计划中不可或缺的一环。",
+      "draft": "What checks they would go through, etc., all of these were essential parts of my plan.",
+      "translation": "What checks they would go through, etc., all of these were essential parts of my plan.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 182,
+      "text_zh": "可怎么才能将一个活人混在邮包中被人打包运走呢？",
+      "draft": "But how could I mix a living person in with the mail packages to be shipped out?",
+      "translation": "But how could I mix a living person in with the mail packages to be shipped out?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 183,
+      "text_zh": "这个难题一直困扰着我，邮包不够大，根本就无法装人。",
+      "draft": "This dilemma troubled me; the packages weren't big enough to fit a person.",
+      "translation": "This dilemma troubled me; the packages weren't big enough to fit a person.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 184,
+      "text_zh": "即使能装人，那也太明显，根本就行不通。",
+      "draft": "Even if they could fit a person, it would be too obvious and wouldn't work.",
+      "translation": "Even if they could fit a person, it would be too obvious and wouldn't work.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 185,
+      "text_zh": "几个月以来，我一直没有想到好的办法，最终把目光瞄向了油带下方的托架。",
+      "draft": "For months, I couldn't come up with a good solution, and finally, I set my sights on the support frame below the oil bag.",
+      "translation": "For months, I couldn't come up with a good solution, and finally, I set my sights on the support frame below the oil bag.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 186,
+      "text_zh": "虽然托架高度有限，藏不住东西，但却是一个很好的承重装置。",
+      "draft": "Although the support frame was limited in height and couldn't hide anything, it was a good load-bearing device.",
+      "translation": "Although the support frame was limited in height and couldn't hide anything, it was a good load-bearing device.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 187,
+      "text_zh": "巧的是我从车间领班那里偷听到了一个消息说，",
+      "draft": "Coincidentally, I overheard a piece of news from the workshop foreman,",
+      "translation": "Coincidentally, I overheard a piece of news from the workshop foreman,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 188,
+      "text_zh": "那些破旧的未分类的友邦会在接下来一周运到监狱外的中转仓存储。",
+      "draft": "that those old, uncategorized packages would be shipped to the transfer warehouse outside the prison next week.",
+      "translation": "that those old, uncategorized packages would be shipped to the transfer warehouse outside the prison next week.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 189,
+      "text_zh": "我知道机会来了，于是开始建造我的逃生舱。",
+      "draft": "I knew the opportunity had come, so I started building my escape pod.",
+      "translation": "I knew the opportunity had come, so I started building my escape pod.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 190,
+      "text_zh": "基于任劳任怨的老好人风格，",
+      "draft": "Based on my style of being a hardworking nice guy,",
+      "translation": "Based on my style of being a hardworking nice guy,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 191,
+      "text_zh": "我的工位被安排在工厂隐藏的小角落里，整天和发霉的破油带打交道，",
+      "draft": "my workstation was arranged in a hidden corner of the factory, dealing all day with moldy old oil bags,",
+      "translation": "my workstation was arranged in a hidden corner of the factory, dealing all day with moldy old oil bags,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 192,
+      "text_zh": "而这恰好给了我更大的操作空间。",
+      "draft": "which just happened to give me more operational space.",
+      "translation": "which just happened to give me more operational space.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 193,
+      "text_zh": "我运气不错，当时别的狱友都被调走，干奖金更高的分拣工作，只留我一个人在这里收尾。",
+      "draft": "I was lucky; at that time, other inmates were reassigned to sorting jobs with higher bonuses, leaving me alone to finish up here.",
+      "translation": "I was lucky; at that time, other inmates were reassigned to sorting jobs with higher bonuses, leaving me alone to finish up here.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 194,
+      "text_zh": "我将大量废弃的邮包用胶布打包成捆掏空中心。",
+      "draft": "I bundled a large number of discarded mail packages with tape, hollowing out the center.",
+      "translation": "I bundled a large number of discarded mail packages with tape, hollowing out the center.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 195,
+      "text_zh": "用塑料板、废弃金属等一些有支撑性的东西撑起了一个小空间，",
+      "draft": "I used plastic boards, discarded metal, and other supportive materials to create a small space,",
+      "translation": "I used plastic boards, discarded metal, and other supportive materials to create a small space,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 196,
+      "text_zh": "并用拉链绑好，固定到托架上。最后在底部开了一个小的入口，可以从中钻进去。",
+      "draft": "and secured it with a zipper to the support frame. Finally, I made a small entrance at the bottom to crawl in.",
+      "translation": "and secured it with a zipper to the support frame. Finally, I made a small entrance at the bottom to crawl in.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 197,
+      "text_zh": "虽然这个计划很冒险，很可能会被狱警发现。",
+      "draft": "Although this plan was risky and could easily be discovered by the guards,",
+      "translation": "Although this plan was risky and could easily be discovered by the guards,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 198,
+      "text_zh": "我还可能会窒息其中，但我的人生信条是要不自由，要不死。",
+      "draft": "I might even suffocate inside, but my life motto is to either be free or die.",
+      "translation": "I might even suffocate inside, but my life motto is to either be free or die.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 199,
+      "text_zh": "可第一个逃生舱，其内部空间太小，根本就钻不进去。于是我又制作了头身舱，二号",
+      "draft": "But the first escape pod was too small inside; I couldn't crawl in at all. So I made a head and body pod, Pod Two.",
+      "translation": "But the first escape pod was too small inside; I couldn't crawl in at all. So I made a head and body pod, Pod Two.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 200,
+      "text_zh": "空间依旧狭小，但不能再扩大了，不然目标就太过明显。",
+      "draft": "The space is still small, but it can't be expanded further, or the target will be too obvious.",
+      "translation": "The space is still cramped, but it can't be expanded further, or the target will be too obvious.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 201,
+      "text_zh": "造好逃生舱，我开始准备逃生，要准备的各种物品，",
+      "draft": "After making the escape pod, I began preparing for the escape, gathering various items,",
+      "translation": "After building the escape pod, I began preparing for the escape, gathering various items,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 202,
+      "text_zh": "用于呼吸的管子、食物、水、小刀等等。",
+      "draft": "such as a breathing tube, food, water, a small knife, and so on.",
+      "translation": "such as a breathing tube, food, water, a small knife, and more.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 203,
+      "text_zh": "这一些还只是我越狱第一阶段所需，",
+      "draft": "These are just what I need for the first phase of my escape,",
+      "translation": "These are just what I need for the first phase of my escape,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 204,
+      "text_zh": "一旦逃离监狱，狱方肯定要展开大规模搜捕，",
+      "draft": "Once I escape from prison, the authorities will definitely launch a massive manhunt,",
+      "translation": "Once I escape from prison, the authorities will definitely launch a massive manhunt,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 205,
+      "text_zh": "想要逃出包围圈，还需要准备更多东西。",
+      "draft": "and I need to prepare more items to break out of the encirclement.",
+      "translation": "and I need to prepare more items to break out of the encirclement.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 206,
+      "text_zh": "一身普通的运动服，一件背心，一双阿迪的运动鞋以及一张地图，",
+      "draft": "A regular tracksuit, a tank top, a pair of Adidas sneakers, and a map,",
+      "translation": "A regular tracksuit, a tank top, a pair of Adidas sneakers, and a map,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 207,
+      "text_zh": "这些是我逃亡第二阶段，必要的装备。",
+      "draft": "these are the necessary gear for the second phase of my escape.",
+      "translation": "these are the necessary gear for the second phase of my escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 208,
+      "text_zh": "我原计划是在四月一日行动，",
+      "draft": "I originally planned to act on April 1st,",
+      "translation": "I originally planned to act on April 1st,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 209,
+      "text_zh": "因为那天是愚人节。",
+      "draft": "because that day is April Fool's Day.",
+      "translation": "because that day is April Fool's Day.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 210,
+      "text_zh": "我心想，也许警方在初期接到报警时会误以为是恶作剧，",
+      "draft": "I thought maybe the police would mistakenly think it was a prank when they received the initial report,",
+      "translation": "I thought maybe the police would mistakenly think it was a prank when they received the initial report,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 211,
+      "text_zh": "所以说这种可能性微乎其微，但哪怕增加万分之一的胜算，我也要考虑进去。",
+      "draft": "so the likelihood of that happening is very low, but even if it increases my odds by one in ten thousand, I have to consider it.",
+      "translation": "so the likelihood of that happening is very low, but even if it increases my odds by one in ten thousand, I have to consider it.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 212,
+      "text_zh": "然而，计划赶不上变化，那天是周六，厂区没有安排工作计划，只能延迟。",
+      "draft": "However, plans can't keep up with changes; that day was Saturday, and there was no work schedule at the factory, so I had to delay.",
+      "translation": "However, plans can't keep up with changes; that day was Saturday, and there was no work schedule at the factory, so I had to delay.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 213,
+      "text_zh": "四月五日早上六点，我兴奋的起床吃过早饭，于七点二十分准时抵达我的工作区。",
+      "draft": "On April 5th at six in the morning, I excitedly got up, had breakfast, and arrived at my work area at seven twenty.",
+      "translation": "On April 5th at six in the morning, I excitedly got up, had breakfast, and arrived at my work area at seven twenty.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 214,
+      "text_zh": "偷偷藏好食物和那身逃跑用的运动服。",
+      "draft": "I secretly hid food and the tracksuit I would use for the escape.",
+      "translation": "I secretly hid food and the tracksuit I would use for the escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 215,
+      "text_zh": "虽然被值班经理发现了，但关键时刻老好人的形象发挥了作用。他没有深究。",
+      "draft": "Although the duty manager found out, my good-natured image played a role at a critical moment. He didn't investigate further.",
+      "translation": "Although the duty manager found out, my good-natured image played a role at a critical moment. He didn't investigate further.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 216,
+      "text_zh": "七点五十分，我用小车拉这个托架来到我的工位，",
+      "draft": "At seven fifty, I used a cart to bring the rack to my workstation,",
+      "translation": "At seven fifty, I used a cart to bring the rack to my workstation,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 217,
+      "text_zh": "这一幕也成为监控，拍下我最后的画面。",
+      "draft": "and this scene became part of the surveillance footage, capturing my last moments.",
+      "translation": "and this scene became part of the surveillance footage, capturing my last moments.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 218,
+      "text_zh": "为确保有人能把托架运到装卸区，我特意和主管和几位狱友打了招呼，",
+      "draft": "To ensure someone could transport the rack to the unloading area, I specifically informed the supervisor and a few fellow inmates,",
+      "translation": "To ensure someone could transport the rack to the unloading area, I specifically informed the supervisor and a few fellow inmates,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 219,
+      "text_zh": "谎称我要去医务室检查，还补充了一句，",
+      "draft": "lying that I needed to go to the medical room for a check-up, and added,",
+      "translation": "lying that I needed to go to the medical room for a check-up, and added,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 220,
+      "text_zh": "监狱长，交代过这一批货架，必须随下一个班车一并运出。",
+      "draft": "the warden had instructed that this batch of racks must be shipped out with the next shift.",
+      "translation": "the warden had instructed that this batch of racks must be shipped out with the next shift.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 221,
+      "text_zh": "接着，我玩起了消失术，换上背心，",
+      "draft": "Then, I performed a disappearing act, changed into the tank top,",
+      "translation": "Then, I performed a disappearing act, changed into the tank top,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 222,
+      "text_zh": "艰难的爬进了逃生舱，并将所有工具都绑在身上。",
+      "draft": "and struggled to crawl into the escape pod, tying all the tools to myself.",
+      "translation": "and struggled to crawl into the escape pod, tying all the tools to myself.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 223,
+      "text_zh": "考虑到数百条邮包加上我的重量，可能会引起怀疑，",
+      "draft": "Considering the hundreds of mail packages plus my weight, it might raise suspicion,",
+      "translation": "Considering the hundreds of mail packages plus my weight, it might raise suspicion,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 224,
+      "text_zh": "我特意在邮包外贴了一张标签，FBI重要证据，不要触碰。",
+      "draft": "I deliberately stuck a label on the outside of the mail package saying, 'FBI Important Evidence, Do Not Touch.'",
+      "translation": "I deliberately stuck a label on the outside of the mail package saying, 'FBI Important Evidence, Do Not Touch.'",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 225,
+      "text_zh": "做完这些，我已是尽其所能，后面的一切只能听天由命了。",
+      "draft": "Having done all this, I had done everything I could; everything else was left to fate.",
+      "translation": "Having done all this, I had done everything I could; everything else was left to fate.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 226,
+      "text_zh": "我蜷缩在逃生舱当中，膝盖贴着额头，",
+      "draft": "I curled up inside the escape pod, my knees against my forehead,",
+      "translation": "I curled up inside the escape pod, my knees against my forehead,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 227,
+      "text_zh": "嘴里咬着通向下方托架的小管子，用来呼吸几乎密封的空间。",
+      "draft": "biting the small tube leading to the lower rack for breathing in the nearly sealed space.",
+      "translation": "biting the small tube leading to the lower rack for breathing in the nearly sealed space.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 228,
+      "text_zh": "我感觉每分每一秒都是煎熬。",
+      "draft": "I felt every minute and second was torture.",
+      "translation": "I felt every minute and second was torture.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 229,
+      "text_zh": "八点三十五分，我突然感觉到整个托架被叉车叉起，然后运来运去。",
+      "draft": "At eight thirty-five, I suddenly felt the entire rack being lifted by a forklift and moved around.",
+      "translation": "At eight thirty-five, I suddenly felt the entire rack being lifted by a forklift and moved around.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 230,
+      "text_zh": "那一刻，我几乎抑制不住内心的狂喜。要不是怕发出声音暴露，我真想大声欢呼。",
+      "draft": "At that moment, I could hardly contain my inner joy. If I weren't afraid of making noise and exposing myself, I would have wanted to cheer loudly.",
+      "translation": "At that moment, I could hardly contain my inner joy. If I weren't afraid of making noise and exposing myself, I would have wanted to cheer loudly.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 231,
+      "text_zh": "但兴奋过后是痛苦。我转运到装卸平台后，整整半个小时，没有动静，",
+      "draft": "But after the excitement came the pain. After being transferred to the unloading platform, there was no movement for a full half hour,",
+      "translation": "But after the excitement came the pain. After being transferred to the unloading platform, there was no movement for a full half hour,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 232,
+      "text_zh": "阳光暴晒，下舱内温度骤升，我感觉到无法呼气，每一次呼吸都是一场挣扎，",
+      "draft": "the sun blazed down, the temperature inside the pod rose sharply, and I felt unable to exhale; each breath was a struggle,",
+      "translation": "the sun blazed down, the temperature inside the pod rose sharply, and I felt unable to exhale; each breath was a struggle,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 233,
+      "text_zh": "甚至随时会晕倒死在其中。",
+      "draft": "and I felt like I could faint and die in there at any moment.",
+      "translation": "and I felt like I could faint and die in there at any moment.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 234,
+      "text_zh": "但直觉告诉我，这是黎明前的黑暗，我必须要坚持住。",
+      "draft": "But my intuition told me this was the darkness before dawn, and I had to hold on.",
+      "translation": "But my intuition told me this was the darkness before dawn, and I had to hold on.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 235,
+      "text_zh": "终于在九点多托架被顺利转运走，穿过了一道道铁门。最终抵达监狱外的中转舱，",
+      "draft": "Finally, around nine o'clock, the rack was successfully transported through several iron gates, reaching the transfer pod outside the prison.",
+      "translation": "Finally, around nine o'clock, the rack was successfully transported through several iron gates, reaching the transfer pod outside the prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 236,
+      "text_zh": "可惜舱惑工人一直在边上工作谈话，我不敢有任何行动，",
+      "draft": "Unfortunately, the workers were still talking and working nearby, and I dared not make any moves,",
+      "translation": "Unfortunately, the workers were still talking and working nearby, and I dared not make any moves,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 237,
+      "text_zh": "直到十一点左右，工人们都去吃饭了。我知道这是个好机会。",
+      "draft": "until around eleven o'clock when the workers went to lunch. I knew this was a good opportunity.",
+      "translation": "until around eleven o'clock when the workers went to lunch. I knew this was a good opportunity.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 238,
+      "text_zh": "考虑到监狱是下午四点钟例行点名，",
+      "draft": "Considering that the prison conducts roll call at four in the afternoon,",
+      "translation": "Considering that the prison conducts roll call at four in the afternoon,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 239,
+      "text_zh": "所以我必须要抓紧时间用小刀割开束缚艰难的爬出逃生舱。",
+      "draft": "I had to hurry and use the small knife to cut the bindings and crawl out of the escape pod.",
+      "translation": "I had to hurry and use the small knife to cut the bindings and crawl out of the escape pod.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 240,
+      "text_zh": "当适应了外面的光线之后，思绪飞快运转。肾上腺素激增的是如此强烈，",
+      "draft": "Once I adapted to the light outside, my thoughts raced. The surge of adrenaline was so intense,",
+      "translation": "Once I adapted to the light outside, my thoughts raced. The surge of adrenaline was so intense,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 241,
+      "text_zh": "让我的嗅觉、听觉、行觉借入前所未有的敏锐状态。",
+      "draft": "that my sense of smell, hearing, and touch became extraordinarily sharp.",
+      "translation": "that my sense of smell, hearing, and touch became extraordinarily sharp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 242,
+      "text_zh": "借着树丛掩护，穿过了建筑群，却被一片正在施工的新区域截断了去路。",
+      "draft": "Using the bushes for cover, I crossed the buildings, but my path was blocked by a new construction area.",
+      "translation": "Using the bushes for cover, I crossed the buildings, but my path was blocked by a new construction area.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 243,
+      "text_zh": "考虑到目标太明显，我在这里被困了一个小时，最终决定冒险向西行进，",
+      "draft": "Considering the target was too obvious, I was trapped here for an hour and ultimately decided to risk moving west,",
+      "translation": "Considering the target was too obvious, I was trapped here for an hour and ultimately decided to risk moving west,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 244,
+      "text_zh": "穿过横贯监狱建筑群的狭窄柏油路，潜入一片林地。",
+      "draft": "crossing the narrow asphalt road that runs through the prison complex and slipping into a wooded area.",
+      "translation": "crossing the narrow asphalt road that runs through the prison complex and slipping into a wooded area.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 245,
+      "text_zh": "为了迷惑警犬，我跪伏在地，以交错迂回的方式绕圈爬行，",
+      "draft": "To confuse the police dogs, I knelt down and crawled in a zigzag pattern,",
+      "translation": "To confuse the police dogs, I knelt down and crawled in a zigzag pattern,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 246,
+      "text_zh": "布下一条气味，迷踪在附近又发现了一个小池塘。",
+      "draft": "leaving a scent trail and soon discovered a small pond nearby.",
+      "translation": "leaving a scent trail and soon discovered a small pond nearby.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 247,
+      "text_zh": "为了进一步迷惑警犬，我又绕着小池塘绕了数圈，最后来到监狱南侧的空军基地路。",
+      "draft": "To further confuse the police dogs, I circled the pond several times, finally reaching the Air Force base road on the south side of the prison.",
+      "translation": "To further confuse the police dogs, I circled the pond several times, finally reaching the Air Force base road on the south side of the prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 248,
+      "text_zh": "这里有一道一点五米高的铁丝围栏。",
+      "draft": "There was a barbed wire fence about 1.5 meters high.",
+      "translation": "There was a barbed wire fence about 1.5 meters high.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 249,
+      "text_zh": "就在我翻阅之时，一名女子驾车刚好经过并看到了我。",
+      "draft": "Just as I was climbing over, a woman drove by and saw me.",
+      "translation": "Just as I was climbing over, a woman drove by and saw me.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 250,
+      "text_zh": "我知道这是一个致命漏洞，但我无计可施，只能尽快逃离。",
+      "draft": "I knew this was a fatal flaw, but I had no choice but to escape quickly.",
+      "translation": "I knew this was a fatal flaw, but I had no choice but to escape quickly.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 251,
+      "text_zh": "沿着监狱外侧的铁路向南狂奔。",
+      "draft": "I ran south along the railway outside the prison.",
+      "translation": "I ran south along the railway outside the prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 252,
+      "text_zh": "我之前研究过路线，想先逃亡到路易斯安那州的亚历山大市，",
+      "draft": "I had previously studied the route and planned to escape to Alexandria, Louisiana,",
+      "translation": "I had previously studied the route and planned to escape to Alexandria, Louisiana,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 253,
+      "text_zh": "那里人多车多，我计划在那里，头辆车换装逃亡。",
+      "draft": "where there were many people and cars; I planned to switch vehicles there.",
+      "translation": "where there were many people and cars; I planned to switch vehicles there.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 254,
+      "text_zh": "按照我的计划，鉴于在上午四点才会发现我的行踪，",
+      "draft": "According to my plan, since my movements would only be discovered at four in the morning,",
+      "translation": "According to my plan, since my movements would only be discovered at four in the morning,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 255,
+      "text_zh": "那时我早已跑远了让人出乎意料的是预防提前发生异场，",
+      "draft": "I would have already run far away, which would be unexpected for the authorities.",
+      "translation": "I would have already run far away, which would be unexpected for the authorities.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 256,
+      "text_zh": "并立即发出越狱警报。",
+      "draft": "And immediately issue a prison break alert.",
+      "translation": "And immediately issue a prison break alert.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 257,
+      "text_zh": "而那个目击我翻越铁丝网的女子，在看到新闻之后，也立即报了警。",
+      "draft": "The woman who witnessed me climbing over the fence also reported to the police after seeing the news.",
+      "translation": "The woman who witnessed me climbing over the fence also reported to the police after seeing the news.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 258,
+      "text_zh": "所以，当我好不容易沿着铁轨跑到路易斯安那州鲍尔镇附近，",
+      "draft": "So, when I finally ran along the tracks near Ball, Louisiana,",
+      "translation": "So, when I finally ran along the tracks near Ball, Louisiana,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 259,
+      "text_zh": "预方已经开始了全面搜索铁轨附近有巡逻的警察。",
+      "draft": "the authorities had already begun a full search, with police patrolling near the tracks.",
+      "translation": "the authorities had already begun a full search, with police patrolling near the tracks.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 260,
+      "text_zh": "四点左右，我沿着铁轨奔跑时，突然前面出现了一名警察，",
+      "draft": "Around four o'clock, as I was running along the tracks, a police officer suddenly appeared ahead,",
+      "translation": "Around four o'clock, as I was running along the tracks, a police officer suddenly appeared ahead,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 261,
+      "text_zh": "我知道那是抓我的，但对方可能已经看到了，我我不能跑，只能硬着头皮继续前进。",
+      "draft": "I knew they were after me, but they might have already seen me, so I couldn't run and had to keep moving forward.",
+      "translation": "I knew they were after me, but they might have already seen me, so I couldn't run and had to keep moving forward.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 262,
+      "text_zh": "此时，我的大脑飞速运转，思考各种应变方式。",
+      "draft": "At that moment, my brain was racing, considering various contingency plans.",
+      "translation": "At that moment, my brain was racing, considering various contingency plans.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 263,
+      "text_zh": "如果对方直接上来就扣我，那我只能反抗逃脱。",
+      "draft": "If they came directly to arrest me, I would have to resist and escape.",
+      "translation": "If they came directly to arrest me, I would have to resist and escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 264,
+      "text_zh": "如果对方只是询问，那或许还有一线生机。",
+      "draft": "If they were just asking questions, there might still be a glimmer of hope.",
+      "translation": "If they were just asking questions, there might still be a glimmer of hope.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 265,
+      "text_zh": "幸运呢是对方是询问，接下来就是我和警方周旋的十分钟名场面，请大家欣赏。",
+      "draft": "Fortunately, they were just asking questions, leading to a ten-minute standoff with the police; please enjoy.",
+      "translation": "Fortunately, they were just asking questions, leading to a ten-minute standoff with the police; please enjoy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 266,
+      "text_zh": "Isheit?你你能不让天帮弄我赢了呗，这样的肉包呀。",
+      "draft": "Is it? Can you not let fate help me win, like this meat bun.",
+      "translation": "Is it? Can you not let fate help me win, like this meat bun.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 267,
+      "text_zh": "黄彦彪爬步啊哈。",
+      "draft": "Huang Yanbiao crawled.",
+      "translation": "Huang Yanbiao crawled.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 268,
+      "text_zh": "Ok,doyouhavevingformdevcationonknow,watchname,robberones,",
+      "draft": "Ok, do you have any information about the robbery, know the name, robber Jones?",
+      "translation": "Ok, do you have any information about the robbery, know the name, robber Jones?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 269,
+      "text_zh": "robberjones,h.Hi,i'mnicetofumethetrick.No,that'snottheproblemrightnow.Whatwhatyouaddress?",
+      "draft": "Robber Jones, hi, I'm nice to meet you. No, that's not the problem right now. What is your address?",
+      "translation": "Robber Jones, hi, I'm nice to meet you. No, that's not the problem right now. What is your address?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 270,
+      "text_zh": "Idon'thaveabreatimelikeahotel.We'reworkingona还要出是小巴该讹回哦。",
+      "draft": "I don't have a break time like a hotel. We're working on a little bus that should be out.",
+      "translation": "I don't have a break time like a hotel. We're working on a little bus that should be out.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 271,
+      "text_zh": "Whatisregartherescaping?哦，",
+      "draft": "What is regarding the escape? Oh,",
+      "translation": "What is regarding the escape? Oh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 272,
+      "text_zh": "是嗯哼哼",
+      "draft": "yes.",
+      "translation": "yes.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 273,
+      "text_zh": "prisonprisonhere.Yeah,takeyougloball",
+      "draft": "Prison, prison here. Yeah, take you globally.",
+      "translation": "Prison, prison here. Yeah, take you globally.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 274,
+      "text_zh": "ittttousesureanythingliftover.No,no,no,",
+      "draft": "It uses sure anything lift over. No, no, no,",
+      "translation": "It uses sure anything lift over. No, no, no,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 275,
+      "text_zh": "that'sjustnow.It'splayingusual.Hello,didyouguysyou",
+      "draft": "that's just now. It's playing as usual. Hello, did you guys you.",
+      "translation": "that's just now. It's playing as usual. Hello, did you guys you.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 276,
+      "text_zh": "haveyoutypointitsix,我在在不在",
+      "draft": "Have you typed point six, am I here?",
+      "translation": "Have you typed point six, am I here?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 277,
+      "text_zh": "嗯，我等会，我",
+      "draft": "Um, I'll wait, I.",
+      "translation": "Um, I'll wait, I.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 278,
+      "text_zh": "right.Letletmeletmejustverify.Hesayshisbrotherstainedatthemoteile.Letmeverifythatifsoaswascuttingttinglose,",
+      "draft": "Right. Let me just verify. He says his brother stayed at the motel. Let me verify that if so as was cutting.",
+      "translation": "Right. Let me just verify. He says his brother stayed at the motel. Let me verify that if so as was cutting.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 279,
+      "text_zh": "ithanks,",
+      "draft": "Thanks.",
+      "translation": "Thanks.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 280,
+      "text_zh": "你倒子bad,don'tmatchupwin.Yeah.嗯，",
+      "draft": "You're bad, don't match up well. Yeah. Hmm,",
+      "translation": "You're bad, don't match up well. Yeah. Hmm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 281,
+      "text_zh": "我一生呢thatatidespeillortidesinging,他的声音不有的话，",
+      "draft": "I've spent my life singing, his voice is not there,",
+      "translation": "I've spent my life singing, his voice is not there,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 282,
+      "text_zh": "我也没有whatisthat的？",
+      "draft": "What is that?",
+      "translation": "What is that?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 283,
+      "text_zh": "Noletters.Wejustgetindetailonaboutaweekago.嗯，鸡爪没有",
+      "draft": "No letters. We just got into detail about a week ago. Hmm, no chicken feet.",
+      "translation": "No letters. We just got into detail about a week ago. Hmm, no chicken feet.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 284,
+      "text_zh": "然后我需要个个wellouthtodayworkingjobPFMaphirommanrollbya这是什么？要去隆珑的飞，",
+      "draft": "Then I need a well-out today working job. What is this? Going to Longlong's flight,",
+      "translation": "Then I need a well-out today working job. What is this? Going to Longlong's flight,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 285,
+      "text_zh": "加油啊，你嘉宾啊，你好你好，",
+      "draft": "Come on, you're the guest, hello.",
+      "translation": "Come on, you're the guest, hello.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 286,
+      "text_zh": "you'llbebacktocleareaboutaboutabproblem.Two,manytes,threethreeminuteswithyourworkkar,itis属于接出来，",
+      "draft": "You'll be back to clear about a problem. Two, many tests, three minutes with your work car, it belongs to be taken out.",
+      "translation": "You'll be back to clear about a problem. Two, many tests, three minutes with your work car, it belongs to be taken out.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 287,
+      "text_zh": "andiwhat'snamedthecompanyfeelsbroken.Ok嗯，六六五，你这个队友不爱拍，就说",
+      "draft": "And what's the name of the company feels broken. Ok, hmm, six six five, your teammate doesn't like to shoot, just say.",
+      "translation": "And what's the name of the company feels broken. Ok, hmm, six six five, your teammate doesn't like to shoot, just say.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 288,
+      "text_zh": "我也不是alwayswroteinshots",
+      "draft": "I'm not always writing in shots.",
+      "translation": "I'm not always writing in shots.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 289,
+      "text_zh": "干妈的呃，scratchedphone.是的，",
+      "draft": "Damn, scratched phone. Yes,",
+      "translation": "Damn, scratched phone. Yes,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 290,
+      "text_zh": "我要不要拍下去啊，要我拍下去，",
+      "draft": "Should I keep filming? Should I keep filming?",
+      "translation": "Should I keep filming? Should I keep filming?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 291,
+      "text_zh": "我toohigh,不要去去IIroveyoulikeyoulove行。",
+      "draft": "I'm too high, don't go, I love you like you love.",
+      "translation": "I'm too high, don't go, I love you like you love.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 292,
+      "text_zh": "嗯，",
+      "draft": "Hmm,",
+      "translation": "Hmm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 293,
+      "text_zh": "whereyoufrom啊，不是areason两些机识。",
+      "draft": "Where are you from? It's not a reason for some machines.",
+      "translation": "Where are you from? It's not a reason for some machines.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 294,
+      "text_zh": "Thewatchnameagain玉米丘，",
+      "draft": "The watch name again, Corn Hill,",
+      "translation": "The watch name again, Corn Hill,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 295,
+      "text_zh": "哎，whichselfffmyposition,你要不能不能？",
+      "draft": "Hey, which self my position, can you or can't you?",
+      "translation": "Hey, which self my position, can you or can't you?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 296,
+      "text_zh": "Iknowi'mnoti'mnot阿妈，等会就给说干预杯",
+      "draft": "I know I'm not, I'm not mom, wait a moment to say intervene.",
+      "translation": "I know I'm not, I'm not mom, wait a moment to say intervene.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 297,
+      "text_zh": "he'werebelievewiththemgysdo",
+      "draft": "He believes with them guys do.",
+      "translation": "He believes with them guys do.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 298,
+      "text_zh": "没得敢也是也是这敢把他都跟我对稳。",
+      "draft": "There's nothing to dare, but I can stabilize him.",
+      "translation": "There's nothing to dare, but I can stabilize him.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 299,
+      "text_zh": "Nowch,whaticsssstricks,andi'llsawyou",
+      "draft": "Now, what is this? Tricks, and I'll see you.",
+      "translation": "Now, what is this? Tricks, and I'll see you.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 300,
+      "text_zh": "whatdidisay?Well,",
+      "draft": "What did I say? Well,",
+      "translation": "What did I say? Well,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 301,
+      "text_zh": "还lucky垫了背，",
+      "draft": "Still lucky to have a cushion,",
+      "translation": "Still lucky to have a cushion,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 302,
+      "text_zh": "nono,no,no,butiknowprisonescapeme.呃，伊朗的委员",
+      "draft": "No, no, no, but I know prison escape me. Uh, Iranian committee.",
+      "translation": "No, no, no, but I know prison escape me. Uh, Iranian committee.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 303,
+      "text_zh": "不啥买包noti'lltopaboutyoudon'tknowwhereyouaddisforce",
+      "draft": "Not buying anything, I'll talk about you don't know where you add is force.",
+      "translation": "Not buying anything, I'll talk about you don't know where you add is force.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 304,
+      "text_zh": "wereapplewhereyouarefrompalmer.Well,wouldtakeaplaymous.哦，",
+      "draft": "Where are you from, Palmer? Well, would take a play mouse. Oh,",
+      "translation": "Where are you from, Palmer? Well, would take a play mouse. Oh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 305,
+      "text_zh": "itelltheycouldyougoing我headoutit",
+      "draft": "I tell they could you going, I head out.",
+      "translation": "I tell they could you going, I head out.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 306,
+      "text_zh": "哦，",
+      "draft": "Oh,",
+      "translation": "Oh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 307,
+      "text_zh": "有",
+      "draft": "Have,",
+      "translation": "Have,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 308,
+      "text_zh": "watchgame按钮来听。",
+      "draft": "Watch game button to listen.",
+      "translation": "Watch game button to listen.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 309,
+      "text_zh": "Youcanberightthere.Apropagamo",
+      "draft": "You can be right there. A propaganda.",
+      "translation": "You can be right there. A propaganda.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 310,
+      "text_zh": "forway.Theoragehaswasmotelandokonlythinganditloolikelikesaying,",
+      "draft": "For way. The rage has was motel and ok only thing and it looks like saying,",
+      "translation": "For way. The rage has was motel and ok only thing and it looks like saying,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 311,
+      "text_zh": "呃，又要为dress,okay,warmerthreattergorightwalmart,嗯，",
+      "draft": "Uh, again for dress, okay, warmer threat to go right to Walmart, hmm,",
+      "translation": "Uh, again for dress, okay, warmer threat to go right to Walmart, hmm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 312,
+      "text_zh": "就是不low.",
+      "draft": "It's just not low.",
+      "translation": "It's just not low.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 313,
+      "text_zh": "对，也是oneCP八，",
+      "draft": "Right, also one CP eight,",
+      "translation": "Right, also one CP eight,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 314,
+      "text_zh": "right,onesixtyfive.Itgoessalound,andwe'reabouttwoblocks.我",
+      "draft": "Right, one sixty-five. It goes around, and we're about two blocks. I",
+      "translation": "Right, one sixty-five. It goes around, and we're about two blocks. I",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 315,
+      "text_zh": "哦",
+      "draft": "Oh,",
+      "translation": "Oh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 316,
+      "text_zh": "ipromiseyouamnotthethingoninthiscase,youdon'trun,butnow",
+      "draft": "I promise you I'm not the thing on in this case, you don't run, but now.",
+      "translation": "I promise you I'm not the thing on in this case, you don't run, but now.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 317,
+      "text_zh": "你know的GCL",
+      "draft": "You know GCL,",
+      "translation": "You know GCL,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 318,
+      "text_zh": "一直这样说，把那样，",
+      "draft": "Always say that, like that,",
+      "translation": "Always say that, like that,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 319,
+      "text_zh": "我今天也没人发，没要逼。Didyouseeanybodyanything?There'ssomekidsofyourplin?Isawyousawyeah,",
+      "draft": "I also didn't send anyone today, no pressure. Did you see anybody? Is there some kids of your plane? I saw you saw, yeah,",
+      "translation": "I also didn't send anyone today, no pressure. Did you see anybody? Is there some kids of your plane? I saw you saw, yeah,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 320,
+      "text_zh": "hello,right?Downdownuphphonenumbercellphonenumbers.Icanworkrecording,justcall.Yougotacellphonewithyou",
+      "draft": "hello, right? Down down up phone number cell phone numbers. I can work recording, just call. You got a cell phone with you",
+      "translation": "hello, right? Down down up phone number cell phone numbers. I can work recording, just call. You got a cell phone with you",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 321,
+      "text_zh": "callalljustcallanyoneonsohowyougottodothethey'regnahopetous.哦，那上了可以穿",
+      "draft": "call all just call anyone on so how you got to do the they're gonna hope to us. Oh, that can be worn",
+      "translation": "call all just call anyone on so how you got to do the they're gonna hope to us. Oh, that can be worn",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 322,
+      "text_zh": "那个makeeverybody.",
+      "draft": "make everybody.",
+      "translation": "make everybody.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 323,
+      "text_zh": "哎，",
+      "draft": "Hey,",
+      "translation": "Hey,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 324,
+      "text_zh": "看完视频，不知道各位对我的表现打多少分呢？",
+      "draft": "After watching the video, I wonder how everyone would rate my performance?",
+      "translation": "After watching the video, I wonder how everyone would rate my performance?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 325,
+      "text_zh": "反正我对自己的表现还算满意，可以打个九分。",
+      "draft": "Anyway, I'm quite satisfied with my performance, I would give it a nine.",
+      "translation": "Anyway, I'm quite satisfied with my performance, I would give it a nine.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 326,
+      "text_zh": "我用提前准备好的地形知识应对盘问，假装自己是父亲的慢跑者，",
+      "draft": "I used the terrain knowledge I prepared in advance to handle the questioning, pretending to be my father's jogger,",
+      "translation": "I used the terrain knowledge I prepared in advance to handle the questioning, pretending to be my father's jogger,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 327,
+      "text_zh": "还完美解释了膝盖上的伤，说是屋顶做工所致，",
+      "draft": "and perfectly explained the injury on my knee, saying it was caused by roof work,",
+      "translation": "and perfectly explained the injury on my knee, saying it was caused by roof work,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 328,
+      "text_zh": "整个过程冷静随和，",
+      "draft": "The whole process was calm and friendly,",
+      "translation": "The whole process was calm and friendly,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 329,
+      "text_zh": "甚至独自开玩笑。",
+      "draft": "even joking alone.",
+      "translation": "even joking alone.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 330,
+      "text_zh": "实际上大家可能也发现了，我犯了一些致命的错误。一开始呢，自己编了一个名字，",
+      "draft": "In fact, everyone might have noticed that I made some fatal mistakes. At first, I made up a name,",
+      "translation": "In fact, everyone might have noticed that I made some fatal mistakes. At first, I made up a name,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 331,
+      "text_zh": "叫做罗伯特琼斯，但聊着聊着居然给忘了，",
+      "draft": "called Robert Jones, but while chatting I actually forgot,",
+      "translation": "called Robert Jones, but while chatting I actually forgot,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 332,
+      "text_zh": "又说自己叫吉米琼斯。但那名警员或许也是跟我聊了太久，竟然也忘了这一点，",
+      "draft": "and said my name was Jimmy Jones. But that officer might have chatted with me for too long and also forgot this,",
+      "translation": "and said my name was Jimmy Jones. But that officer might have chatted with me for too long and also forgot this,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 333,
+      "text_zh": "这才蒙混过关。",
+      "draft": "and that's how I got through.",
+      "translation": "and that's how I got through.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 334,
+      "text_zh": "再有就是预方发给警方的黑白照片，分辨率极低，太过模糊，",
+      "draft": "Also, the black and white photo sent to the police was of extremely low resolution, too blurry,",
+      "translation": "Also, the black and white photo sent to the police was of extremely low resolution, too blurry,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 335,
+      "text_zh": "且是六个月之前拍摄的，让对方无法看清细节。",
+      "draft": "and was taken six months ago, making it impossible for them to see the details.",
+      "translation": "and was taken six months ago, making it impossible for them to see the details.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 336,
+      "text_zh": "因此，警员无法确定越狱者的样貌，",
+      "draft": "Therefore, the officer couldn't determine the appearance of the escapee,",
+      "translation": "Therefore, the officer couldn't determine the appearance of the escapee,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 337,
+      "text_zh": "就这样，凭借我临危不乱的表演和多年对心理细节的研究，",
+      "draft": "Thus, relying on my calm performance and years of research on psychological details,",
+      "translation": "Thus, relying on my calm performance and years of research on psychological details,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 338,
+      "text_zh": "竟然成功忽悠了这名警察，堂而皇之的走出了包围圈，",
+      "draft": "I successfully deceived this officer and walked out of the encirclement,",
+      "translation": "I successfully deceived this officer and walked out of the encirclement,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 339,
+      "text_zh": "最终在警方的眼皮子底下成功消失，重获自由。",
+      "draft": "eventually disappearing right under the police's nose and regaining freedom.",
+      "translation": "eventually disappearing right under the police's nose and regaining freedom.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 340,
+      "text_zh": "二零零六年四月八日，越狱三天后，全美通缉令节目紧急播出了理查德的越狱专题，",
+      "draft": "On April 8, 2006, three days after the escape, the most wanted program urgently aired a special on Richard's escape,",
+      "translation": "On April 8, 2006, three days after the escape, the most wanted program urgently aired a special on Richard's escape,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 341,
+      "text_zh": "并呼吁全国民众积极提供线索，将这位狡猾之徒缉拿归案。",
+      "draft": "and called on the public to actively provide clues to capture this cunning criminal.",
+      "translation": "and called on the public to actively provide clues to capture this cunning criminal.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 342,
+      "text_zh": "五天之后，美国法警局正式将理查德列入十五名头号通缉犯名单，",
+      "draft": "Five days later, the U.S. Marshals Service officially placed Richard on the list of fifteen most wanted fugitives,",
+      "translation": "Five days later, the U.S. Marshals Service officially placed Richard on the list of fifteen most wanted fugitives,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 343,
+      "text_zh": "并悬赏两万五千美金。",
+      "draft": "offering a reward of twenty-five thousand dollars.",
+      "translation": "offering a reward of twenty-five thousand dollars.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 344,
+      "text_zh": "同时指出，他是自一九九一年以来第一位从联邦监狱越狱的囚犯，",
+      "draft": "It also pointed out that he was the first prisoner to escape from a federal prison since 1991,",
+      "translation": "It also pointed out that he was the first prisoner to escape from a federal prison since 1991,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 345,
+      "text_zh": "全美警力迅速介入，追查，各州布下了天罗地网，",
+      "draft": "Law enforcement across the country quickly intervened, tracking him down, with states laying traps,",
+      "translation": "Law enforcement across the country quickly intervened, tracking him down, with states laying traps,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 346,
+      "text_zh": "眼看形势越来越严峻。",
+      "draft": "as the situation became increasingly severe.",
+      "translation": "as the situation became increasingly severe.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 347,
+      "text_zh": "两周之后，理查德从华盛顿州逃到了加拿大的不列颠哥伦比亚省在",
+      "draft": "Two weeks later, Richard escaped from Washington State to British Columbia in Canada,",
+      "translation": "Two weeks later, Richard escaped from Washington State to British Columbia in Canada,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 348,
+      "text_zh": "这里，他决定故技重施，偷车，然后到处流浪。",
+      "draft": "Here, he decided to use the same trick again, stealing a car and then wandering around.",
+      "translation": "Here, he decided to use the same trick again, stealing a car and then wandering around.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 349,
+      "text_zh": "可没想到，在异国他乡的第一次屠车就被警方给盯上了。",
+      "draft": "Unexpectedly, during his first car theft in a foreign country, he was spotted by the police.",
+      "translation": "Unexpectedly, during his first car theft in a foreign country, he was spotted by the police.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 350,
+      "text_zh": "尽管他成功逃走，但两天之后，加拿大警方凭借全美通缉令的报道，",
+      "draft": "Although he successfully escaped, two days later, Canadian police, based on the most wanted program's report,",
+      "translation": "Although he successfully escaped, two days later, Canadian police, based on the most wanted program's report,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 351,
+      "text_zh": "确定美国来的偷车贼正是通缉榜上的理查德。",
+      "draft": "confirmed that the car thief from the U.S. was indeed Richard on the wanted list.",
+      "translation": "confirmed that the car thief from the U.S. was indeed Richard on the wanted list.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 352,
+      "text_zh": "此后，加拿大警方重点关注他的动向，",
+      "draft": "After that, Canadian police closely monitored his movements,",
+      "translation": "After that, Canadian police closely monitored his movements,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 353,
+      "text_zh": "美国方面也派出警力跨境协助。眼看搜捕越来越紧，",
+      "draft": "and the U.S. also sent law enforcement across the border to assist. As the manhunt intensified,",
+      "translation": "and the U.S. also sent law enforcement across the border to assist. As the manhunt intensified,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 354,
+      "text_zh": "理查德觉得加拿大的日子也不好过，于是就玩起了声东击西。",
+      "draft": "Richard felt that life in Canada was also difficult, so he played the feint to the east and attacked in the west.",
+      "translation": "Richard felt that life in Canada was also difficult, so he played the feint to the east and attacked in the west.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 355,
+      "text_zh": "反向操作又偷偷潜回了美国继续执行灯下黑的策略。",
+      "draft": "He reversed course and secretly returned to the U.S. to continue executing the darkness under the lamp strategy.",
+      "translation": "He reversed course and secretly returned to the U.S. to continue executing the darkness under the lamp strategy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 356,
+      "text_zh": "这还没完在美国各州留下数个线索之后，又溜回了加拿大。",
+      "draft": "This wasn't over; after leaving several clues in various states in the U.S., he slipped back to Canada.",
+      "translation": "This wasn't over; after leaving several clues in various states in the U.S., he slipped back to Canada.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 357,
+      "text_zh": "不得不说，这一招确实妙到了极点，",
+      "draft": "I have to say, this move was indeed brilliant,",
+      "translation": "I have to say, this move was indeed brilliant,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 358,
+      "text_zh": "可美方是铁了心要将其缉拿归案，",
+      "draft": "but the U.S. was determined to capture him,",
+      "translation": "but the U.S. was determined to capture him,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 359,
+      "text_zh": "不管你在哪里，",
+      "draft": "no matter where you are,",
+      "translation": "no matter where you are.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 360,
+      "text_zh": "全美通缉令以及各大广播新闻媒体反复报道此案深度追踪，",
+      "draft": "The nationwide wanted notice and major news outlets repeatedly reported on the case.",
+      "translation": "The nationwide wanted notice and major news outlets extensively covered the case.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 361,
+      "text_zh": "这让理查德根本就不敢在一个地方长久的停留。",
+      "draft": "This made Richard afraid to stay in one place for long.",
+      "translation": "This made Richard afraid to linger in one place.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 362,
+      "text_zh": "每当新一期节目播出时，他就会提前采购食物，并将油箱加满，",
+      "draft": "Whenever a new episode aired, he would stock up on food and fill up the gas tank.",
+      "translation": "Whenever a new episode aired, he would stock up on food and fill the gas tank.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 363,
+      "text_zh": "随时准备跑路。",
+      "draft": "He was always ready to run.",
+      "translation": "He was always ready to flee.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 364,
+      "text_zh": "他自己也表示，如果节目报道了我的案子，",
+      "draft": "He stated that if the show reported on my case,",
+      "translation": "He stated that if the show reported on his case,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 365,
+      "text_zh": "接下来几天就会极度的低调。",
+      "draft": "he would keep a low profile for the next few days.",
+      "translation": "he would keep a low profile for the next few days.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 366,
+      "text_zh": "尽管他偷车技术了得。早年做过汽车销售的，他知道汽车经销商存放现金和钥匙的位置，",
+      "draft": "Despite his exceptional car theft skills, having worked in car sales, he knew where dealers kept cash and keys.",
+      "translation": "Despite his exceptional car theft skills, having worked in car sales, he knew where dealers kept cash and keys.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 367,
+      "text_zh": "因此他只投伪装GPS定位的新车，且颜色是满大街的摆色，",
+      "draft": "So he only targeted new cars with disguised GPS, and their colors were common on the streets.",
+      "translation": "So he only targeted new cars with disguised GPS, and their colors were common on the streets.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 368,
+      "text_zh": "他还善于伪装自己制作假证件。",
+      "draft": "He was also skilled at disguising himself and making fake documents.",
+      "translation": "He was also skilled at disguising himself and creating fake documents.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 369,
+      "text_zh": "但步行的流浪总归不是个事儿啊，他也想过用假身份。",
+      "draft": "But walking around as a drifter wasn't ideal; he considered using a fake identity.",
+      "translation": "But wandering around as a drifter wasn't ideal; he considered using a fake identity.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 370,
+      "text_zh": "在布列颠哥伦比亚省的威利斯顿湖附近买一处偏僻的土地定居，",
+      "draft": "He thought about buying a remote piece of land near Williston Lake in British Columbia.",
+      "translation": "He thought about buying a remote piece of land near Williston Lake in British Columbia.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 371,
+      "text_zh": "但该地进出只有一条路，且比较干旱。还有甲虫侵扰，",
+      "draft": "However, there was only one way in and out, and it was quite arid, with beetle infestations.",
+      "translation": "However, there was only one way in and out, and it was quite arid, with beetle infestations.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 372,
+      "text_zh": "加上重重搜查之下，他不敢冒险，只能继续流浪。",
+      "draft": "With heavy searches ongoing, he didn't dare take the risk and continued to drift.",
+      "translation": "With heavy searches ongoing, he didn't dare take the risk and continued to drift.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 373,
+      "text_zh": "最终，他开着偷来的车从加拿大西部横穿至东部，一路换车，横跨五千公里，",
+      "draft": "Ultimately, he drove a stolen car from western Canada to the east, changing cars along the way, covering five thousand kilometers.",
+      "translation": "Ultimately, he drove a stolen car from western Canada to the east, changing cars along the way and covering five thousand kilometers.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 374,
+      "text_zh": "最终来到了新布伦瑞克省。",
+      "draft": "He finally arrived in New Brunswick.",
+      "translation": "He finally arrived in New Brunswick.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 375,
+      "text_zh": "或许是跑累了他在这里休息了两个月，这次他没有住酒店，",
+      "draft": "Perhaps tired from running, he rested here for two months, and this time he didn't stay in a hotel.",
+      "translation": "Perhaps tired from running, he rested here for two months, and this time he didn't stay in a hotel.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 376,
+      "text_zh": "而是偷了一辆比较新的白色厢式火车，平时呢就住在车里，有空就骑骑自行车。",
+      "draft": "Instead, he stole a relatively new white cargo van and lived in it, riding his bike when he had free time.",
+      "translation": "Instead, he stole a relatively new white cargo van and lived in it, riding his bike when he had free time.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 377,
+      "text_zh": "他本以为这样更加隐蔽安全，",
+      "draft": "He thought this would be more discreet and safe.",
+      "translation": "He thought this would be more discreet and safe.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 378,
+      "text_zh": "可没想到这辆车却成为了他的噩梦。",
+      "draft": "But unexpectedly, this vehicle became his nightmare.",
+      "translation": "But unexpectedly, this vehicle became his nightmare.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 379,
+      "text_zh": "转眼时间来到二零零七年十月二十四日，在新布伦瑞克省纳什克里克地区休班奇景。",
+      "draft": "Fast forward to October 24, 2007, in the Nash Creek area of New Brunswick.",
+      "translation": "Fast forward to October 24, 2007, in the Nash Creek area of New Brunswick.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 380,
+      "text_zh": "单柳鱼岛路边停着一辆高档的白色箱式货车，",
+      "draft": "A high-end white box truck was parked by Single Willow Fish Island Road.",
+      "translation": "A high-end white box truck was parked by Single Willow Fish Island Road.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 381,
+      "text_zh": "后窗胡乱贴着劣质的遮光膜。",
+      "draft": "The rear window was haphazardly covered with cheap tint.",
+      "translation": "The rear window was haphazardly covered with cheap tint.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 382,
+      "text_zh": "这让他心生疑惑，怀疑车辆是偷的，且是用来走私酒精或者香烟，",
+      "draft": "This raised his suspicions that the vehicle was stolen and used for smuggling alcohol or cigarettes.",
+      "translation": "This raised his suspicions that the vehicle was stolen and used for smuggling alcohol or cigarettes.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 383,
+      "text_zh": "所以记下车牌号，并提醒其他骑警。",
+      "draft": "So he noted the license plate number and alerted other mounted police.",
+      "translation": "So he noted the license plate number and alerted other mounted police.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 384,
+      "text_zh": "第二天，行人骑警斯蒂芬在坎布尔顿市中心留意到了这辆车。",
+      "draft": "The next day, pedestrian officer Stephen noticed the vehicle in downtown Campbellton.",
+      "translation": "The next day, pedestrian officer Stephen noticed the vehicle in downtown Campbellton.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 385,
+      "text_zh": "初生牛犊不怕苦的他立马展开了追捕，最终在其他警力的帮助下，成功逼停车辆，",
+      "draft": "Fearless and determined, he immediately pursued it, eventually stopping the vehicle with help from other officers.",
+      "translation": "Fearless and determined, he immediately pursued it, eventually stopping the vehicle with help from other officers.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 386,
+      "text_zh": "顺利逮捕了理查德。",
+      "draft": "Richard was successfully arrested.",
+      "translation": "Richard was successfully arrested.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 387,
+      "text_zh": "值得一提的是，他被抓时没有负隅顽抗，心态还不错，只觉得是自己运气不好，",
+      "draft": "It's worth mentioning that he did not resist arrest; he maintained a good attitude, feeling it was just bad luck.",
+      "translation": "It's worth mentioning that he did not resist arrest; he maintained a good attitude, feeling it was just bad luck.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 388,
+      "text_zh": "甚至夸奖发现他的警察工作认真，眼光毒辣，到此潜逃，",
+      "draft": "He even praised the police officer who found him for being diligent and sharp-eyed.",
+      "translation": "He even praised the police officer who found him for being diligent and sharp-eyed.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 389,
+      "text_zh": "一年半的理查德终于落网。美国方面在得知消息后，",
+      "draft": "After a year and a half, Richard was finally caught. The U.S. was thrilled to hear the news.",
+      "translation": "After a year and a half, Richard was finally caught. The U.S. was thrilled to hear the news.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 390,
+      "text_zh": "那是激动万分的，",
+      "draft": "They were extremely excited.",
+      "translation": "They were extremely excited.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 391,
+      "text_zh": "立马和加拿大方面沟通引渡事宜。",
+      "draft": "They immediately communicated with Canada regarding extradition.",
+      "translation": "They immediately communicated with Canada regarding extradition.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 392,
+      "text_zh": "由于理查德在加拿大最多时偷偷车偷偷东西并没有犯什么命啊。",
+      "draft": "Since Richard hadn't committed any serious crimes while in Canada, just stealing cars and items.",
+      "translation": "Since Richard hadn't committed any serious crimes while in Canada, just stealing cars and items.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 393,
+      "text_zh": "因此，加拿大方面以最快的速度将其引渡到了美国，",
+      "draft": "Thus, Canada quickly extradited him to the U.S.",
+      "translation": "Thus, Canada quickly extradited him to the U.S.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 394,
+      "text_zh": "理查德本身就",
+      "draft": "Richard himself,",
+      "translation": "Richard himself,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 395,
+      "text_zh": "已经背负了两个终身监禁，外加三次越狱的战机刑期在他身上也没有太大意义。",
+      "draft": "was already facing two life sentences, and the additional years for three escape attempts didn't hold much significance.",
+      "translation": "was already facing two life sentences, and the additional years for three escape attempts didn't hold much significance.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 396,
+      "text_zh": "这一次被抓后，也只是象征性的加了几年。",
+      "draft": "After this arrest, he only received a few extra years symbolically.",
+      "translation": "After this arrest, he only received a few extra years symbolically.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 397,
+      "text_zh": "二零零八年四月十八日，他被转移至佛罗伦斯超级监狱。",
+      "draft": "On April 18, 2008, he was transferred to Florence Supermax Prison.",
+      "translation": "On April 18, 2008, he was transferred to Florence Supermax Prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 398,
+      "text_zh": "这一座被称为超级监狱洛基山脉恶魔岛的设施，",
+      "draft": "This facility, known as the Devil's Island of the Rocky Mountains, is one of the highest security prisons in the U.S.",
+      "translation": "This facility, known as the Devil's Island of the Rocky Mountains, is one of the highest security prisons in the U.S.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 399,
+      "text_zh": "是全美安全级别最高的监狱之一，",
+      "draft": "It is among the most secure prisons in the country.",
+      "translation": "It is among the most secure prisons in the country.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 400,
+      "text_zh": "专门关押着一些最不可控、最危险的罪犯。至今从未有人成功从这里逃脱。",
+      "draft": "It is specifically designed to hold the most uncontrollable and dangerous criminals. No one has ever successfully escaped from here.",
+      "translation": "It is specifically designed to hold the most uncontrollable and dangerous criminals. No one has ever successfully escaped from here.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 401,
+      "text_zh": "考虑到理查德的越狱前科，",
+      "draft": "Considering Richard's history of prison breaks,",
+      "translation": "Considering Richard's history of prison breaks,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 402,
+      "text_zh": "狱方对他格外关照，将其关押在一个极其高端的单人牢房。",
+      "draft": "the prison authorities took special care of him, placing him in an extremely high-end single cell.",
+      "translation": "the prison authorities took special care of him, placing him in an extremely high-end single cell.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 403,
+      "text_zh": "该牢房的窗户只有一个十厘米宽的狭缝，",
+      "draft": "The window of this cell has only a ten-centimeter wide slit,",
+      "translation": "The window of this cell has only a ten-centimeter wide slit,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 404,
+      "text_zh": "即使是大晴天，一天也只能有几分钟的阳光照射进来。",
+      "draft": "so even on sunny days, only a few minutes of sunlight can come in each day.",
+      "translation": "so even on sunny days, only a few minutes of sunlight can come in each day.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 405,
+      "text_zh": "每天他只有一个小时的放风时间，",
+      "draft": "He only has one hour of outdoor time each day,",
+      "translation": "He only has one hour of outdoor time each day,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 406,
+      "text_zh": "其余二十三个小时全部被严格锁在单独牢房里，",
+      "draft": "and the remaining twenty-three hours are strictly locked in solitary confinement,",
+      "translation": "and the remaining twenty-three hours are strictly locked in solitary confinement,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 407,
+      "text_zh": "连三餐都是由狱警送到门口径止，和其他囚犯交流，也彻底杜绝了一切越狱",
+      "draft": "with all three meals delivered by prison guards, completely cutting off communication with other inmates.",
+      "translation": "with all three meals delivered by prison guards, completely cutting off communication with other inmates.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 408,
+      "text_zh": "监狱。",
+      "draft": "Prison.",
+      "translation": "Prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 409,
+      "text_zh": "或许理查德还有越狱的想法，但面对地狱级别的难度，估计他也无可奈何吧。",
+      "draft": "Perhaps Richard still has thoughts of escaping, but facing the hellish difficulty, he probably feels helpless.",
+      "translation": "Perhaps Richard still has thoughts of escaping, but facing the hellish difficulty, he probably feels helpless.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 410,
+      "text_zh": "对于这种极端关押，理查德曾表示，这也太可怕了。",
+      "draft": "Regarding this extreme confinement, Richard once stated that it was too terrifying.",
+      "translation": "Regarding this extreme confinement, Richard once stated that it was too terrifying.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 411,
+      "text_zh": "我曾亲眼目睹其中一名囚犯精神逐渐崩溃，",
+      "draft": "I witnessed one inmate gradually lose his sanity,",
+      "translation": "I witnessed one inmate gradually lose his sanity,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 412,
+      "text_zh": "他从勉强能够正常活动，发展到出现幻听被害妄想。",
+      "draft": "going from barely being able to function normally to experiencing auditory hallucinations and paranoia.",
+      "translation": "going from barely being able to function normally to experiencing auditory hallucinations and paranoia.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 413,
+      "text_zh": "二零零八年犯罪记者拜伦尝试和狱中的理查德通信。本来他也没有抱太大的希望，",
+      "draft": "In April 2008, crime reporter Byron attempted to communicate with Richard in prison. He didn't have high hopes,",
+      "translation": "In April 2008, crime reporter Byron attempted to communicate with Richard in prison. He didn't have high hopes,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 414,
+      "text_zh": "但没想到理查德回信了，而且非常的积极。",
+      "draft": "but to his surprise, Richard replied, and very enthusiastically.",
+      "translation": "but to his surprise, Richard replied, and very enthusiastically.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 415,
+      "text_zh": "他不仅毫无保留的讲述了自己三次越狱的全过程，",
+      "draft": "He not only shared the entire process of his three escapes without reservation,",
+      "translation": "He not only shared the entire process of his three escapes without reservation,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 416,
+      "text_zh": "还将当时的心理活动和计划细节一一摊开。",
+      "draft": "but also laid out his psychological activities and planning details.",
+      "translation": "but also laid out his psychological activities and planning details.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 417,
+      "text_zh": "经过长达五年的通信，",
+      "draft": "After five years of correspondence,",
+      "translation": "After five years of correspondence,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 418,
+      "text_zh": "拜伦总共收到了理查德寄来的三百四十多封信件超过三千页。",
+      "draft": "Byron received over three hundred letters from Richard, totaling more than three thousand pages.",
+      "translation": "Byron received over three hundred letters from Richard, totaling more than three thousand pages.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 419,
+      "text_zh": "最终，这些信件被整理成一本电子书，于二零一三年正式出版。",
+      "draft": "Eventually, these letters were compiled into an e-book, officially published in 2013.",
+      "translation": "Eventually, these letters were compiled into an e-book, officially published in 2013.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 420,
+      "text_zh": "书名就是广为流传的将自己游出监狱的人。",
+      "draft": "The title is widely known as The Man Who Swam Out of Prison.",
+      "translation": "The title is widely known as The Man Who Swam Out of Prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 421,
+      "text_zh": "而在这五年的时间里，理查德一直被单独关押，无法与人交流，",
+      "draft": "During these five years, Richard was kept in solitary confinement, unable to communicate with anyone,",
+      "translation": "During these five years, Richard was kept in solitary confinement, unable to communicate with anyone,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 422,
+      "text_zh": "这或许也是他愿意和拜伦通信并讲述自己故事的原因。",
+      "draft": "which might be why he was willing to correspond with Byron and share his story.",
+      "translation": "which might be why he was willing to correspond with Byron and share his story.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 423,
+      "text_zh": "毕竟人是群体，动物长期不交流，憋死都有可能啊。",
+      "draft": "After all, humans are social animals, and long-term lack of communication can be detrimental.",
+      "translation": "After all, humans are social animals, and long-term lack of communication can be detrimental.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 424,
+      "text_zh": "电子书将自己游出监狱的人发布后，引发了巨大的反响。",
+      "draft": "The e-book The Man Who Swam Out of Prison sparked a huge response.",
+      "translation": "The e-book The Man Who Swam Out of Prison sparked a huge response.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 425,
+      "text_zh": "甚至在监狱内部都传开了，",
+      "draft": "It even spread within the prison,",
+      "translation": "It even spread within the prison,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 426,
+      "text_zh": "不知道预防是出于压力还是理查德确实表现的规规矩矩。",
+      "draft": "and it's unclear whether the preventive measures were due to pressure or if Richard was indeed behaving well.",
+      "translation": "and it's unclear whether the preventive measures were due to pressure or if Richard was indeed behaving well.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 427,
+      "text_zh": "二零一三年九月，他终于被从极端隔离状态中解禁，",
+      "draft": "In September 2013, he was finally released from extreme isolation,",
+      "translation": "In September 2013, he was finally released from extreme isolation,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 428,
+      "text_zh": "转到了普通牢房，能够和其他狱友正常交流。他说，那一刻，感觉自己重生了。",
+      "draft": "transferred to a regular cell where he could communicate normally with other inmates. He said that at that moment, he felt reborn.",
+      "translation": "transferred to a regular cell where he could communicate normally with other inmates. He said that at that moment, he felt reborn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 429,
+      "text_zh": "随着书籍爆红，他的故事开始在纪录片媒体中广为流传。",
+      "draft": "As the book became a hit, his story began to spread widely in documentary media.",
+      "translation": "As the book became a hit, his story began to spread widely in documentary media.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 430,
+      "text_zh": "所以说，他本人人在铁窗之下，",
+      "draft": "So, while he was behind bars,",
+      "translation": "So, while he was behind bars,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 431,
+      "text_zh": "但却被誉为美国最伟大的狱狱，犯成了监狱里的网红。",
+      "draft": "he was hailed as one of America's greatest inmates, becoming a sensation in prison.",
+      "translation": "he was hailed as one of America's greatest inmates, becoming a sensation in prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 432,
+      "text_zh": "二零二零年，这本书的纸质版发行再一次热销，这也让他在狱外的名气更进一步。",
+      "draft": "In 2020, the paperback version of this book was released again and became a bestseller, further increasing his fame outside prison.",
+      "translation": "In 2020, the paperback version of this book was released again and became a bestseller, further increasing his fame outside prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 433,
+      "text_zh": "尽管落基山脉恶魔岛监管森严，",
+      "draft": "Despite the strict supervision at Devil's Island of the Rocky Mountains,",
+      "translation": "Despite the strict supervision at Devil's Island of the Rocky Mountains,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 434,
+      "text_zh": "甚至有点把人不当人，但狱中的理查德形态还不错，",
+      "draft": "and the feeling that they don't treat people like humans, Richard was doing quite well,",
+      "translation": "and the feeling that they don't treat people like humans, Richard was doing quite well,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 435,
+      "text_zh": "他还感慨道，感谢有这个监狱的存在。",
+      "draft": "and he expressed gratitude for the existence of this prison.",
+      "translation": "and he expressed gratitude for the existence of this prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 436,
+      "text_zh": "这里关着太多极度危险的家伙，",
+      "draft": "It holds too many extremely dangerous individuals,",
+      "translation": "It holds too many extremely dangerous individuals,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 437,
+      "text_zh": "尽是些你绝不愿意让其靠近家人或接触社会的禽兽。",
+      "draft": "beasts you would never want near your family or in society.",
+      "translation": "beasts you would never want near your family or in society.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 438,
+      "text_zh": "二零二二年十一月，鉴于理查德近十四年来的良好表现，",
+      "draft": "In November 2022, considering Richard's good behavior over the past fourteen years,",
+      "translation": "In November 2022, considering Richard's good behavior over the past fourteen years,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 439,
+      "text_zh": "已经六十四岁的他被转移出佛罗伦斯超级监狱，",
+      "draft": "he was transferred out of Florence Supermax Prison at the age of sixty-four.",
+      "translation": "he was transferred out of Florence Supermax Prison at the age of sixty-four.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 440,
+      "text_zh": "安排到旁边安全级别略低的联邦检狱，一年之后又被两度转移。",
+      "draft": "He was placed in a slightly lower security federal prison next door, and was transferred twice again after a year.",
+      "translation": "He was placed in a slightly lower security federal prison next door and was transferred twice again after a year.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 441,
+      "text_zh": "目前，被关在肯塔基州的麦克雷里，联邦监狱这一座监狱虽然仍属于中高安全等级，",
+      "draft": "Currently, he is held in McCreary, Kentucky. Although this federal prison is still of medium to high security,",
+      "translation": "Currently, he is held in McCreary, Kentucky. Although this federal prison is still medium to high security,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 442,
+      "text_zh": "但远比超级监狱更加自由。",
+      "draft": "it is much more free than a supermax prison.",
+      "translation": "it is much more free than a supermax prison.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 443,
+      "text_zh": "此时，六十七岁的理查德年事已高，大概率也没有爬窗钻带的冲动。",
+      "draft": "At this time, sixty-seven-year-old Richard is quite old and likely has no impulse to escape.",
+      "translation": "At sixty-seven, Richard is quite old and likely has no impulse to escape.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 444,
+      "text_zh": "他的下次假释机会将是在二零二八年，",
+      "draft": "His next chance for parole will be in 2028,",
+      "translation": "His next chance for parole will be in 2028,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 445,
+      "text_zh": "也不知道那时已满七十岁的他能否可以合法的走出监狱。",
+      "draft": "and it is uncertain if he will be able to legally walk out of prison at seventy.",
+      "translation": "and it is uncertain if he will be able to legally walk out of prison at seventy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 446,
+      "text_zh": "最后我们再来看一下这段广为流传的名场面。",
+      "draft": "Finally, let's take a look at this widely circulated famous scene.",
+      "translation": "Finally, let's take a look at this widely circulated famous scene.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 447,
+      "text_zh": "当初在铁道附近拦截到理查德的警官名叫卡尔伯德龙，",
+      "draft": "The officer who intercepted Richard near the railroad was named Carl Burdron,",
+      "translation": "The officer who intercepted Richard near the railroad was named Carl Burdron,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 448,
+      "text_zh": "虽然他放走了理查德，但从整个问询过程来看，他其实算是尽心尽责、表现专业。",
+      "draft": "and although he let Richard go, he actually performed his duties responsibly and professionally throughout the inquiry.",
+      "translation": "and although he let Richard go, he actually performed his duties responsibly and professionally throughout the inquiry.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 449,
+      "text_zh": "因此事后他并没有被追责，反而因为表现良好，勤勤恳恳升任助理警察局长。",
+      "draft": "As a result, he was not held accountable afterward; instead, he was promoted to assistant police chief for his good performance.",
+      "translation": "As a result, he was not held accountable afterward; instead, he was promoted to assistant police chief for his good performance.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 450,
+      "text_zh": "不过在二零一五年一月十日，他在执勤时因心脏病去世，终年仅五十二岁。",
+      "draft": "However, on January 10, 2015, he passed away from a heart attack while on duty, at the age of only fifty-two.",
+      "translation": "However, on January 10, 2015, he passed away from a heart attack while on duty, at the age of only fifty-two.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 451,
+      "text_zh": "那以上就经的故事帮忙给个三连支持一下。你动动手指，就是对我莫大的鼓励，我是东峰，我们下期见。",
+      "draft": "So please give a three-link support for the stories above. A simple click is a great encouragement for me. I'm Dongfeng, see you next time.",
+      "translation": "So please give a three-link support for the stories above. A simple click is a great encouragement for me. I'm Dongfeng, see you next time.",
+      "reviewed": true,
+      "cache_hit": false
+    }
+  ]
+}

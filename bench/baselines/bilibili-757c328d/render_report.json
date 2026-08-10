@@ -1,0 +1,1739 @@
+{
+  "schema": 1,
+  "outputs": [
+    "output\\美国最会逃的男人越狱界的扛把子三次越狱直接封神_哔哩哔哩_bilibili.vi.srt",
+    "output\\美国最会逃的男人越狱界的扛把子三次越狱直接封神_哔哩哔哩_bilibili.vi.ass",
+    "output\\美国最会逃的男人越狱界的扛把子三次越狱直接封神_哔哩哔哩_bilibili.en.srt",
+    "output\\美国最会逃的男人越狱界的扛把子三次越狱直接封神_哔哩哔哩_bilibili.en.ass"
+  ],
+  "warnings": [
+    {
+      "segment_id": 0,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Anh ta là nhân vật nổi bật trong lịch sử' còn 25.2 CPS sau khi đã kéo dài",
+      "value": 25.15,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 2,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Người bình thường chỉ cần vượt ngục một ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 8,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Cảnh tượng nổi tiếng này đã được lan tru' còn 21.2 CPS sau khi đã kéo dài",
+      "value": 21.16,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 9,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Bạn xem bao nhiêu lần, mỗi lần đều không' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 11,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Xin chào mọi người, đây là Phòng Quan Sá' còn 25.7 CPS sau khi đã kéo dài",
+      "value": 25.71,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 19,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'đặt mục tiêu cuộc đời là phục vụ quân độ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 37,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'lo lắng rằng hiện trường không được xử l' còn 23.8 CPS sau khi đã kéo dài",
+      "value": 23.81,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 44,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Đối mặt với cáo buộc một người chết và m' còn 28.3 CPS sau khi đã kéo dài",
+      "value": 28.32,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 45,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Là một quân nhân, anh ta rất rõ ràng về ' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.14,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 49,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Vào tháng 2 năm 1988, trong một cuộc thẩ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 52,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'thì còn đợi đến khi nào. Thật trùng hợp,' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 55,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Sau đó, anh ta không do dự mà lao ra khỏ' còn 21.2 CPS sau khi đã kéo dài",
+      "value": 21.23,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 56,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Cuối cùng, anh ta bị dồn vào tầng ba của' còn 21.9 CPS sau khi đã kéo dài",
+      "value": 21.88,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 58,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Thất bại trong việc trốn thoát.' còn 23.3 CPS sau khi đã kéo dài",
+      "value": 23.31,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 59,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Đây là lần đầu tiên anh ta vượt ngục.' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 63,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Tuy nhiên, ngay sau khi anh ta bị chuyển' còn 23.1 CPS sau khi đã kéo dài",
+      "value": 23.05,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 64,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Trong phòng giam có hai viên gạch tường ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 65,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Rõ ràng, anh ta đang lên kế hoạch vượt n' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.41,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 76,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Bước đầu tiên tự nhiên là làm sạch danh ' còn 22.7 CPS sau khi đã kéo dài",
+      "value": 22.69,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 79,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Anh ta không dính dáng đến những hình mẫ' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.35,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 84,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'cần phải biết nhiều kỹ năng sinh tồn và ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 90,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Thời điểm đó, trong nhà tù, trên tầng má' còn 26.3 CPS sau khi đã kéo dài",
+      "value": 26.27,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 101,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Nhưng điều này đối với anh ta, người đã ' còn 21.6 CPS sau khi đã kéo dài",
+      "value": 21.65,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 108,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Những người đã xem phim vượt ngục và cứu' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.27,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 123,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Để trốn tránh sự truy đuổi của cảnh sát,' còn 26.6 CPS sau khi đã kéo dài",
+      "value": 26.57,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 141,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Để làm điều đó, anh đã liên kết với các ' còn 23.9 CPS sau khi đã kéo dài",
+      "value": 23.92,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 142,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'không ăn uống cũng không làm việc, từ ch' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.41,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 143,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Nhà tù thấy vậy, đây cũng không phải là ' còn 25.1 CPS sau khi đã kéo dài",
+      "value": 25.07,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 148,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'hầu như không tìm thấy hy vọng trốn thoá' còn 22.6 CPS sau khi đã kéo dài",
+      "value": 22.57,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 159,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Vào tháng 9 năm 2005, mình chính thức đư' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.27,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 169,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'dù không thể ghép lại toàn bộ bức tranh,' còn 23.4 CPS sau khi đã kéo dài",
+      "value": 23.38,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 173,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Nhưng tất cả những điều này đều không kh' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.14,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 178,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'không bao giờ chê bai công việc nặng nhọ' còn 22.1 CPS sau khi đã kéo dài",
+      "value": 22.13,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 180,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'khi nào bưu kiện sẽ được xe nâng chuyển ' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.31,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 182,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Nhưng làm thế nào để có thể hòa lẫn một ' còn 23.4 CPS sau khi đã kéo dài",
+      "value": 23.42,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 184,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Ngay cả khi có thể chứa người, thì cũng ' còn 23.2 CPS sau khi đã kéo dài",
+      "value": 23.19,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 190,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Dựa trên phong cách của một người tốt bụ' còn 22.2 CPS sau khi đã kéo dài",
+      "value": 22.22,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 199,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Nhưng buồng thoát hiểm đầu tiên, không g' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.3,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 201,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Sau khi làm xong buồng thoát hiểm, mình ' còn 25.2 CPS sau khi đã kéo dài",
+      "value": 25.18,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 203,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Đây chỉ là những thứ cần thiết cho giai ' còn 22.7 CPS sau khi đã kéo dài",
+      "value": 22.74,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 212,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Tuy nhiên, kế hoạch không theo kịp sự th' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 216,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Vào lúc bảy giờ năm mươi, mình đã dùng x' còn 25.4 CPS sau khi đã kéo dài",
+      "value": 25.35,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 228,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Mình cảm thấy từng giây từng phút đều là' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 231,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Nhưng sau sự phấn khích là nỗi đau đớn. ' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.1,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 236,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Thật tiếc là công nhân ở bên cạnh vẫn đa' còn 21.8 CPS sau khi đã kéo dài",
+      "value": 21.77,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 238,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Cân nhắc rằng nhà tù có cuộc điểm danh đ' còn 22.5 CPS sau khi đã kéo dài",
+      "value": 22.55,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 251,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Chạy điên cuồng về phía nam dọc theo đườ' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.12,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 254,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Theo kế hoạch của tôi, vì đến bốn giờ sá' còn 21.7 CPS sau khi đã kéo dài",
+      "value": 21.71,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 256,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Và ngay lập tức phát ra báo động vượt ng' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 261,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Tôi biết đó là để bắt tôi, nhưng có thể ' còn 21.2 CPS sau khi đã kéo dài",
+      "value": 21.18,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 271,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Chuyện gì đang xảy ra với việc chạy trốn' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 277,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Ừ, tôi sẽ đợi một chút, tôi' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 283,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Không có thư. Chúng tôi chỉ đi vào chi t' còn 23.8 CPS sau khi đã kéo dài",
+      "value": 23.82,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 303,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Không mua gì cả, mình sẽ không nói về bạ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 313,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Đúng vậy, cũng là một CP tám,' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 324,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Xem xong video, không biết mọi người chấ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 325,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Dù sao mình cũng khá hài lòng với màn tr' còn 23.2 CPS sau khi đã kéo dài",
+      "value": 23.19,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 326,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Mình đã sử dụng kiến thức địa hình chuẩn' còn 22.9 CPS sau khi đã kéo dài",
+      "value": 22.94,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 327,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'và còn hoàn hảo giải thích vết thương ở ' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.34,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 336,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Do đó, viên cảnh sát không thể xác định ' còn 24.4 CPS sau khi đã kéo dài",
+      "value": 24.4,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 340,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Ngày 8 tháng 4 năm 2006, ba ngày sau khi' còn 23.8 CPS sau khi đã kéo dài",
+      "value": 23.81,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 342,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Năm ngày sau, Cục Cảnh sát Liên bang Mỹ ' còn 21.5 CPS sau khi đã kéo dài",
+      "value": 21.48,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 350,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Dù anh đã thành công trốn thoát, nhưng h' còn 22.7 CPS sau khi đã kéo dài",
+      "value": 22.74,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 352,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Sau đó, cảnh sát Canada đã đặc biệt chú ' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.4,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 388,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'thậm chí còn khen ngợi cảnh sát phát hiệ' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.34,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 391,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'ngay lập tức liên lạc với phía Canada để' còn 23.8 CPS sau khi đã kéo dài",
+      "value": 23.81,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 401,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Xét đến tiền án vượt ngục của Richard,' còn 21.6 CPS sau khi đã kéo dài",
+      "value": 21.6,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 411,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Mình từng chứng kiến một tù nhân trong s' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 419,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Cuối cùng, những bức thư này được biên s' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 425,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Thậm chí trong nội bộ nhà tù cũng lan tr' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 427,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Vào tháng 9 năm 2013, cuối cùng anh cũng' còn 23.4 CPS sau khi đã kéo dài",
+      "value": 23.44,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 429,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Khi cuốn sách trở nên nổi tiếng, câu chu' còn 22.1 CPS sau khi đã kéo dài",
+      "value": 22.14,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 433,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Mặc dù nhà tù Rocky Mountain Demon Islan' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.45,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 446,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Cuối cùng, chúng ta hãy cùng nhìn lại mộ' còn 23.5 CPS sau khi đã kéo dài",
+      "value": 23.48,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 451,
+      "lang": "vi",
+      "kind": "cps_over",
+      "detail": "'Vậy là câu chuyện trên đây mong mọi ngườ' còn 21.5 CPS sau khi đã kéo dài",
+      "value": 21.51,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 0,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Anh ta là nhân vật nổi bật trong lịch sử' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 7,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'đầu óc bình tĩnh đến mức bệnh hoạn, có t' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 11,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Xin chào mọi người, đây là Phòng Quan Sá' cần 5 dòng",
+      "value": 5.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 27,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Đột nhiên, anh nảy ra ý tưởng kiếm chút ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 53,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Lúc đó trong túi anh ta có một thỏi son ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 55,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Sau đó, anh ta không do dự mà lao ra khỏ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 56,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Cuối cùng, anh ta bị dồn vào tầng ba của' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 61,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Sau khi được điều trị, anh ta bị đưa vào' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 63,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Tuy nhiên, ngay sau khi anh ta bị chuyển' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 65,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Rõ ràng, anh ta đang lên kế hoạch vượt n' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 82,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Vì vậy, mỗi ngày anh ta đều kiên trì tập' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 108,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Những người đã xem phim vượt ngục và cứu' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 148,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'hầu như không tìm thấy hy vọng trốn thoá' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 193,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Mình thật may mắn, khi đó các bạn tù khá' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 199,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Nhưng buồng thoát hiểm đầu tiên, không g' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 212,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Tuy nhiên, kế hoạch không theo kịp sự th' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 215,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Mặc dù bị quản lý trực ca phát hiện, như' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 230,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Khoảnh khắc đó, mình gần như không thể k' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 231,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Nhưng sau sự phấn khích là nỗi đau đớn. ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 235,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Cuối cùng vào khoảng chín giờ, khung đã ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 247,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Để tiếp tục đánh lừa chó cảnh sát, tôi đ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 261,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Tôi biết đó là để bắt tôi, nhưng có thể ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 265,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'May mắn thay, đối phương chỉ hỏi, tiếp t' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 319,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Hôm nay mình cũng không có ai gửi, không' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 340,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Ngày 8 tháng 4 năm 2006, ba ngày sau khi' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 385,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Là người trẻ tuổi không sợ khổ, anh lập ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 407,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Ba bữa ăn đều do cảnh sát nhà tù mang đế' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 428,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'chuyển đến phòng giam bình thường, có th' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 432,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Năm 2020, phiên bản giấy của cuốn sách n' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 451,
+      "lang": "vi",
+      "kind": "too_many_lines",
+      "detail": "'Vậy là câu chuyện trên đây mong mọi ngườ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 3,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Three times that shocked the entire nati' còn 23.7 CPS sau khi đã kéo dài",
+      "value": 23.71,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 9,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'No matter how many times you watch it, y' còn 24.7 CPS sau khi đã kéo dài",
+      "value": 24.71,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 15,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'with a father who was a reserve police o' còn 22.0 CPS sau khi đã kéo dài",
+      "value": 21.96,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 18,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'In his youth, Richard loved sports and e' còn 21.5 CPS sau khi đã kéo dài",
+      "value": 21.55,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 33,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"He couldn't even think about stealing an\" còn 21.7 CPS sau khi đã kéo dài",
+      "value": 21.67,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 37,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"worried that he hadn't cleaned up the sc\" còn 27.2 CPS sau khi đã kéo dài",
+      "value": 27.21,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 39,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After being shot, he endured the pain an' còn 21.4 CPS sau khi đã kéo dài",
+      "value": 21.45,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 40,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After Richard left, he immediately calle' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 44,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Faced with charges of one death and one ' còn 24.3 CPS sau khi đã kéo dài",
+      "value": 24.34,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 46,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'But he was unwilling to accept it; he be' còn 21.6 CPS sau khi đã kéo dài",
+      "value": 21.63,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 53,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'coincidentally, he had a lip balm in his' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 55,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Then, without hesitation, he rushed out ' còn 22.7 CPS sau khi đã kéo dài",
+      "value": 22.72,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 56,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Ultimately, he was cornered on the rooft' còn 22.7 CPS sau khi đã kéo dài",
+      "value": 22.68,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 73,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'But Richard was determined to prove them' còn 22.6 CPS sau khi đã kéo dài",
+      "value": 22.6,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 80,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'As time went on, even the prison guards ' còn 21.6 CPS sau khi đã kéo dài",
+      "value": 21.6,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 84,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He needed to learn various survival skil' còn 22.2 CPS sau khi đã kéo dài",
+      "value": 22.18,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 90,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"At that time, the prison's factory build\" còn 22.5 CPS sau khi đã kéo dài",
+      "value": 22.47,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 105,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After searching around, he still focused' còn 21.2 CPS sau khi đã kéo dài",
+      "value": 21.24,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 113,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'To safely descend from the high wall to ' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.06,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 116,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"and while the prison's education room wa\" còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 119,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'and used their homemade cloth rope to cl' còn 21.9 CPS sau khi đã kéo dài",
+      "value": 21.95,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 143,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'The prison saw this as a problem; how co' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 146,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'This time it was to a place with even st' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 150,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He applied to be transferred to Pollock ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 152,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"The prison thought he wouldn't gain any \" còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 153,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Little did they know that Pollock Federa' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.27,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 159,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'In September 2005, I was officially tran' còn 24.9 CPS sau khi đã kéo dài",
+      "value": 24.86,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 160,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'From previous experience, I understand t' còn 22.1 CPS sau khi đã kéo dài",
+      "value": 22.14,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 166,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Just three months into my prison term, I' còn 23.2 CPS sau khi đã kéo dài",
+      "value": 23.2,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 168,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He required collecting fragmented intell' còn 21.2 CPS sau khi đã kéo dài",
+      "value": 21.15,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 169,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"even if the whole picture couldn't be pi\" còn 24.4 CPS sau khi đã kéo dài",
+      "value": 24.38,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 180,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'when the packages would be transported b' còn 24.3 CPS sau khi đã kéo dài",
+      "value": 24.3,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 184,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Even if they could fit a person, it woul' còn 22.6 CPS sau khi đã kéo dài",
+      "value": 22.59,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 186,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Although the support frame was limited i' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.1,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 190,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Based on my style of being a hardworking' còn 21.4 CPS sau khi đã kéo dài",
+      "value": 21.37,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 197,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Although this plan was risky and could e' còn 21.3 CPS sau khi đã kéo dài",
+      "value": 21.26,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 201,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After building the escape pod, I began p' còn 21.5 CPS sau khi đã kéo dài",
+      "value": 21.55,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 204,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Once I escape from prison, the authoriti' còn 21.1 CPS sau khi đã kéo dài",
+      "value": 21.05,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 209,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"because that day is April Fool's Day.\" còn 21.6 CPS sau khi đã kéo dài",
+      "value": 21.64,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 211,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'so the likelihood of that happening is v' còn 21.2 CPS sau khi đã kéo dài",
+      "value": 21.19,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 212,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"However, plans can't keep up with change\" còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 218,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'To ensure someone could transport the ra' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.41,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 219,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'lying that I needed to go to the medical' còn 21.9 CPS sau khi đã kéo dài",
+      "value": 21.88,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 224,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'I deliberately stuck a label on the outs' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 231,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'But after the excitement came the pain. ' còn 22.3 CPS sau khi đã kéo dài",
+      "value": 22.26,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 233,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'and I felt like I could faint and die in' còn 22.1 CPS sau khi đã kéo dài",
+      "value": 22.1,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 238,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Considering that the prison conducts rol' còn 23.5 CPS sau khi đã kéo dài",
+      "value": 23.53,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 244,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'crossing the narrow asphalt road that ru' còn 22.9 CPS sau khi đã kéo dài",
+      "value": 22.87,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 254,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'According to my plan, since my movements' còn 25.4 CPS sau khi đã kéo dài",
+      "value": 25.43,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 256,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'And immediately issue a prison break ale' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 297,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He believes with them guys do.' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 301,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Still lucky to have a cushion,' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 313,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Right, also one CP eight,' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 318,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Always say that, like that,' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 324,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After watching the video, I wonder how e' còn 23.3 CPS sau khi đã kéo dài",
+      "value": 23.27,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 325,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"Anyway, I'm quite satisfied with my perf\" còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 326,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'I used the terrain knowledge I prepared ' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.35,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 336,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"Therefore, the officer couldn't determin\" còn 24.7 CPS sau khi đã kéo dài",
+      "value": 24.74,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 342,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Five days later, the U.S. Marshals Servi' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 343,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'offering a reward of twenty-five thousan' còn 21.9 CPS sau khi đã kéo dài",
+      "value": 21.93,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 346,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'as the situation became increasingly sev' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 348,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Here, he decided to use the same trick a' còn 21.9 CPS sau khi đã kéo dài",
+      "value": 21.86,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 349,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Unexpectedly, during his first car theft' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 354,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'Richard felt that life in Canada was als' còn 21.9 CPS sau khi đã kéo dài",
+      "value": 21.9,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 359,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'no matter where you are.' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 363,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He was always ready to flee.' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 365,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'he would keep a low profile for the next' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 368,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He was also skilled at disguising himsel' còn 22.4 CPS sau khi đã kéo dài",
+      "value": 22.36,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 383,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'So he noted the license plate number and' còn 21.4 CPS sau khi đã kéo dài",
+      "value": 21.41,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 389,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After a year and a half, Richard was fin' còn 22.5 CPS sau khi đã kéo dài",
+      "value": 22.55,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 391,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'They immediately communicated with Canad' còn 25.4 CPS sau khi đã kéo dài",
+      "value": 25.4,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 396,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'After this arrest, he only received a fe' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 398,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"This facility, known as the Devil's Isla\" còn 28.1 CPS sau khi đã kéo dài",
+      "value": 28.13,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 400,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'It is specifically designed to hold the ' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 401,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"Considering Richard's history of prison \" còn 26.7 CPS sau khi đã kéo dài",
+      "value": 26.72,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 426,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"and it's unclear whether the preventive \" còn 25.0 CPS sau khi đã kéo dài",
+      "value": 25.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 433,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"Despite the strict supervision at Devil'\" còn 24.5 CPS sau khi đã kéo dài",
+      "value": 24.49,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 434,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"and the feeling that they don't treat pe\" còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 438,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "\"In November 2022, considering Richard's \" còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 440,
+      "lang": "en",
+      "kind": "cps_over",
+      "detail": "'He was placed in a slightly lower securi' còn 21.0 CPS sau khi đã kéo dài",
+      "value": 21.0,
+      "limit": 21.0
+    },
+    {
+      "segment_id": 11,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'Hello everyone, this is the Fantasy Obse' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 15,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'with a father who was a reserve police o' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 27,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'On that day, he suddenly got a wild idea' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 29,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "\"but things didn't go as planned. Just as\" cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 46,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'But he was unwilling to accept it; he be' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 53,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'coincidentally, he had a lip balm in his' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 55,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'Then, without hesitation, he rushed out ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 56,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'Ultimately, he was cornered on the rooft' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 61,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'After treatment, he was sent to Ward Cou' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 65,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'Clearly, he was planning an escape, and ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 80,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'As time went on, even the prison guards ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 112,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'They accurately measured the route from ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 165,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'They handle some preventive work against' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 172,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'I studied various escape methods, which ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 193,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'I was lucky; at that time, other inmates' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 211,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'so the likelihood of that happening is v' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 212,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "\"However, plans can't keep up with change\" cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 215,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'Although the duty manager found out, my ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 218,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'To ensure someone could transport the ra' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 230,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'At that moment, I could hardly contain m' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 231,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'But after the excitement came the pain. ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 232,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'the sun blazed down, the temperature ins' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 235,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "\"Finally, around nine o'clock, the rack w\" cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 247,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'To further confuse the police dogs, I ci' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 319,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "\"I also didn't send anyone today, no pres\" cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 373,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'Ultimately, he drove a stolen car from w' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 400,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'It is specifically designed to hold the ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 428,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'transferred to a regular cell where he c' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 432,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'In 2020, the paperback version of this b' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 449,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'As a result, he was not held accountable' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    },
+    {
+      "segment_id": 451,
+      "lang": "en",
+      "kind": "too_many_lines",
+      "detail": "'So please give a three-link support for ' cần 4 dòng",
+      "value": 4.0,
+      "limit": 3.0
+    }
+  ]
+}

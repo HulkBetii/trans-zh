@@ -1,0 +1,450 @@
+{
+  "schema": 1,
+  "version": 1,
+  "terms": [
+    {
+      "zh": "FBI",
+      "pinyin": "FBI",
+      "vi": "FBI",
+      "en": "FBI",
+      "type": "org",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "明医托市警局",
+      "pinyin": "Míngyītuōshì jǐngjú",
+      "vi": "Cảnh sát thành phố Minot",
+      "en": "Minot Police Department",
+      "type": "org",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "空军",
+      "pinyin": "Kōngjūn",
+      "vi": "Không quân",
+      "en": "Air Force",
+      "type": "org",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "美国法警局",
+      "pinyin": "Měiguó fǎjǐngjú",
+      "vi": "Cục Cảnh sát Liên bang Mỹ",
+      "en": "U.S. Marshals Service",
+      "type": "org",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "拜伦",
+      "pinyin": "Bàilún",
+      "vi": "Byron",
+      "en": "Byron",
+      "type": "person",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "理查德",
+      "pinyin": "Lǐchádé",
+      "vi": "Richard",
+      "en": "Richard",
+      "type": "person",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "理查德·里麦克奈尔",
+      "pinyin": "Lǐchádé Lǐmàikènái'ěr",
+      "vi": "Richard McNair",
+      "en": "Richard McNair",
+      "type": "person",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "不列颠哥伦比亚省",
+      "pinyin": "Bùlièdiān gēlúnbǐyǎ shěng",
+      "vi": "Tỉnh British Columbia",
+      "en": "British Columbia",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "亚历山大市",
+      "pinyin": "Yàlìshāndà shì",
+      "vi": "Thành phố Alexandria",
+      "en": "Alexandria",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "佛罗伦斯超级监狱",
+      "pinyin": "Fóluólúnsī chāojí jiānyù",
+      "vi": "Nhà tù siêu cấp Florence",
+      "en": "Florence Supermax Prison",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "北达克科塔州监狱",
+      "pinyin": "Běidákè kētǎ zhōu jiànyù",
+      "vi": "Nhà tù Bắc Dakota",
+      "en": "North Dakota State Prison",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "北达科他州",
+      "pinyin": "Běidákēitāzhōu",
+      "vi": "Bang Bắc Dakota",
+      "en": "North Dakota",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "华盛顿州",
+      "pinyin": "Huáshèngdùn zhōu",
+      "vi": "Tiểu bang Washington",
+      "en": "Washington State",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "单柳鱼岛",
+      "pinyin": "Dān liǔ yú dǎo",
+      "vi": "Đảo Cá Chép",
+      "en": "Single Willow Fish Island",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "布洛克联邦监狱",
+      "pinyin": "Bùluòkè liánbāng jiànyù",
+      "vi": "Nhà tù liên bang Block",
+      "en": "Block Federal Correctional Institution",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "明尼苏达州",
+      "pinyin": "Míngnísūdá zhōu",
+      "vi": "Minnesota",
+      "en": "Minnesota",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "橡树公园高地成教所",
+      "pinyin": "Xiàngshù gōngyuán gāodì chéngjiàosuǒ",
+      "vi": "Trại giáo dưỡng cao đất Công viên Cây Sồi",
+      "en": "Oak Park Heights Correctional Facility",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "沃德县监狱",
+      "pinyin": "Wòdéxiànjiānyù",
+      "vi": "Nhà tù quận Ward",
+      "en": "Ward County Jail",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "波洛克联邦监狱",
+      "pinyin": "Bōluòkè liánbāng jiànyù",
+      "vi": "Nhà tù liên bang Pollock",
+      "en": "Pollock Federal Correctional Institution",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "洛基山脉恶魔岛",
+      "pinyin": "Luòjī shānmài èmó dǎo",
+      "vi": "Đảo Quỷ dãy núi Rocky",
+      "en": "Devil's Island of the Rocky Mountains",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "科罗拉多州弗罗伦斯联邦监狱",
+      "pinyin": "Kēluólāduō zhōu Fúluólúnsī liánbāng jiànyù",
+      "vi": "Nhà tù liên bang Florence, Colorado",
+      "en": "Florence Federal Correctional Institution, Colorado",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "联邦检狱",
+      "pinyin": "Liánbāng jiǎnyù",
+      "vi": "Nhà tù liên bang",
+      "en": "Federal Correctional Institution",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "路易斯安那州",
+      "pinyin": "Lùyìsī'ānnà zhōu",
+      "vi": "Tiểu bang Louisiana",
+      "en": "Louisiana",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "鲍尔镇",
+      "pinyin": "Bào'ěr zhèn",
+      "vi": "Thị trấn Ball",
+      "en": "Ball",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "麦克雷里",
+      "pinyin": "Màikèléilǐ",
+      "vi": "McCreary",
+      "en": "McCreary",
+      "type": "place",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "三连",
+      "pinyin": "Sān lián",
+      "vi": "Ba liên kết",
+      "en": "Three Links",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "假证件",
+      "pinyin": "Jiǎ zhèngjiàn",
+      "vi": "Giấy tờ giả",
+      "en": "Fake documents",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "图书馆",
+      "pinyin": "Túshūguǎn",
+      "vi": "Thư viện",
+      "en": "Library",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "声东击西",
+      "pinyin": "Shēngdōng jīxī",
+      "vi": "Kích tướng Đông đánh Tây",
+      "en": "Feint to the East and Attack in the West",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "奥斯卡影帝",
+      "pinyin": "Àosīkǎ Yǐngdì",
+      "vi": "Nam diễn viên chính Oscar",
+      "en": "Oscar-winning actor",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "审讯室",
+      "pinyin": "Shěnxùn shì",
+      "vi": "Phòng thẩm vấn",
+      "en": "Interrogation room",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "将自己游出监狱的人",
+      "pinyin": "Jiāng zìjǐ yóu chū jiānyù de rén",
+      "vi": "Người tự bơi ra khỏi nhà tù",
+      "en": "The Man Who Swam Out of Prison",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "普通家庭",
+      "pinyin": "Pǔtōng jiātíng",
+      "vi": "Gia đình bình thường",
+      "en": "Ordinary family",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "油包",
+      "pinyin": "Yóubāo",
+      "vi": "Bao dầu",
+      "en": "oil bag",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "灯下黑",
+      "pinyin": "Dēngxià hēi",
+      "vi": "Tối tăm dưới đèn",
+      "en": "Darkness under the lamp",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "狱警",
+      "pinyin": "Yùjǐng",
+      "vi": "Cảnh sát nhà tù",
+      "en": "Prison guard",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "监狱安保主管",
+      "pinyin": "Jiānyù ānbǎo zhǔguǎn",
+      "vi": "Giám đốc an ninh nhà tù",
+      "en": "Prison security chief",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "联邦监狱",
+      "pinyin": "liánbāng jiānyù",
+      "vi": "Nhà tù liên bang",
+      "en": "federal prison",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "警局",
+      "pinyin": "Jǐngjú",
+      "vi": "Cảnh sát",
+      "en": "Police station",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "警探",
+      "pinyin": "Jǐngtàn",
+      "vi": "Thám tử",
+      "en": "Detective",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "越狱传奇",
+      "pinyin": "Yuèyù chuánqí",
+      "vi": "Huyền thoại vượt ngục",
+      "en": "Prison break legend",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "逃生舱",
+      "pinyin": "Táoshēng cāng",
+      "vi": "Buồng thoát hiểm",
+      "en": "escape pod",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "逃生通道",
+      "pinyin": "Táoshēng tōngdào",
+      "vi": "Lối thoát hiểm",
+      "en": "Escape route",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "逃跑计划",
+      "pinyin": "Táopǎo jìhuà",
+      "vi": "Kế hoạch trốn thoát",
+      "en": "Escape plan",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "通风口",
+      "pinyin": "Tōngfēngkǒu",
+      "vi": "Cửa thông gió",
+      "en": "Vent",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "重刑犯",
+      "pinyin": "Zhòngxíngfàn",
+      "vi": "Tội phạm nặng",
+      "en": "Felon",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    },
+    {
+      "zh": "黑白照片",
+      "pinyin": "hēibái zhàopiàn",
+      "vi": "Ảnh đen trắng",
+      "en": "black and white photo",
+      "type": "term",
+      "keep_source": false,
+      "note": ""
+    }
+  ],
+  "address_terms": [
+    {
+      "speaker": "理查德",
+      "addressee": "理查德·里麦克奈尔",
+      "vi_self": "mình",
+      "vi_other": "anh",
+      "basis": "Họ là cùng một người, nên dùng 'mình' và 'anh' để thể hiện sự thân mật."
+    },
+    {
+      "speaker": "理查德",
+      "addressee": "拜伦",
+      "vi_self": "mình",
+      "vi_other": "ông",
+      "basis": "理查德 có thể lớn tuổi hơn拜伦, nên dùng 'ông' để thể hiện sự tôn trọng."
+    }
+  ],
+  "style": {
+    "speech_register": "hài hước, kể chuyện",
+    "narrator_self_vi": "mình",
+    "audience_vi": "mọi người"
+  }
+}

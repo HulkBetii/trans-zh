@@ -1,0 +1,3626 @@
+{
+  "schema": 1,
+  "lang": "vi",
+  "model": "gpt-4o-mini",
+  "prompt_version": 6,
+  "glossary_hash": "06c2c9e747528bd847a69634572d5c9441de89b85f202e9c9de85e81fd895ca6",
+  "segments_hash": "46aaa593981ecbad903b0c19d736a681eec5b1387b9cc6b558fb03cb90dc40b1",
+  "items": [
+    {
+      "id": 0,
+      "text_zh": "他是美国越狱史上的扛把子，被称为美国最会逃的男人。他的人生信条很简单，",
+      "draft": "Anh ta là nhân vật nổi bật trong lịch sử vượt ngục của Mỹ, được mệnh danh là người đàn ông biết trốn thoát nhất nước Mỹ. Châm ngôn cuộc đời của anh ta rất đơn giản,",
+      "translation": "Anh ta là nhân vật nổi bật trong lịch sử vượt ngục của Mỹ, được mệnh danh là người đàn ông biết trốn thoát nhất nước Mỹ. Châm ngôn cuộc đời của anh ta rất đơn giản,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 1,
+      "text_zh": "要么越狱，要么死",
+      "draft": "hoặc vượt ngục, hoặc chết.",
+      "translation": "hoặc vượt ngục, hoặc chết.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 2,
+      "text_zh": "普通人越狱一次就足以写进纪录片。而他呢硬生生来了三次",
+      "draft": "Người bình thường chỉ cần vượt ngục một lần là đủ để viết thành phim tài liệu. Còn anh ta thì đã làm điều đó đến ba lần.",
+      "translation": "Người bình thường chỉ cần vượt ngục một lần là đủ để viết thành phim tài liệu. Còn anh ta thì đã làm điều đó đến ba lần.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 3,
+      "text_zh": "三次震惊全美，且一次比一次离谱。",
+      "draft": "Ba lần gây chấn động toàn nước Mỹ, và mỗi lần lại một lần điên rồ hơn.",
+      "translation": "Ba lần gây chấn động toàn nước Mỹ, và mỗi lần lại một lần điên rồ hơn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 4,
+      "text_zh": "最后一次更是脑洞大开，将自己游出监狱，成为越狱史上的传奇。",
+      "draft": "Lần cuối cùng thậm chí còn sáng tạo hơn, tự bơi ra khỏi nhà tù, trở thành huyền thoại trong lịch sử vượt ngục.",
+      "translation": "Lần cuối cùng thậm chí còn sáng tạo hơn, tự bơi ra khỏi nhà tù, trở thành huyền thoại trong lịch sử vượt ngục.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 5,
+      "text_zh": "你以为这已经够离谱了，还没完呢？明明刚逃出来就被警方拦住，",
+      "draft": "Bạn nghĩ rằng như vậy đã đủ điên rồ chưa? Chưa hết đâu! Vừa mới trốn ra đã bị cảnh sát chặn lại,",
+      "translation": "Bạn nghĩ rằng như vậy đã đủ điên rồ chưa? Chưa hết đâu! Vừa mới trốn ra đã bị cảnh sát chặn lại,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 6,
+      "text_zh": "但他却凭借极度的自信，",
+      "draft": "nhưng anh ta lại nhờ vào sự tự tin cực độ,",
+      "translation": "nhưng anh ta lại nhờ vào sự tự tin cực độ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 7,
+      "text_zh": "冷静到变态的头脑，堪称影帝般的应对表演，把警察忽悠的心服口服。",
+      "draft": "đầu óc bình tĩnh đến mức bệnh hoạn, có thể nói là màn trình diễn như một diễn viên chính Oscar, khiến cảnh sát phải phục tùng.",
+      "translation": "đầu óc bình tĩnh đến mức bệnh hoạn, có thể nói là màn trình diễn như một diễn viên chính Oscar, khiến cảnh sát phải phục tùng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 8,
+      "text_zh": "这个名场面被全网疯传，超四千万人观看恐论。",
+      "draft": "Cảnh tượng nổi tiếng này đã được lan truyền khắp mạng, thu hút hơn bốn mươi triệu lượt xem.",
+      "translation": "Cảnh tượng nổi tiếng này đã được lan truyền khắp mạng, thu hút hơn bốn mươi triệu lượt xem.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 9,
+      "text_zh": "你看多少遍，每次都会忍不住为他捏一把冷汗。",
+      "draft": "Bạn xem bao nhiêu lần, mỗi lần đều không thể không toát mồ hôi cho anh.",
+      "translation": "Bạn xem bao nhiêu lần, mỗi lần đều không thể không toát mồ hôi cho anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 10,
+      "text_zh": "他的表现连真正的奥斯卡影帝见了，恐怕也要自叹不如吧。",
+      "draft": "Phần thể hiện của anh ta ngay cả một diễn viên chính Oscar thực thụ cũng phải tự thấy mình kém cỏi.",
+      "translation": "Phần thể hiện của anh ta ngay cả một diễn viên chính Oscar thực thụ cũng phải tự thấy mình kém cỏi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 11,
+      "text_zh": "大家好，这里是奇幻观察室，我是长峰。那么，这位越狱天才的故事究竟有多精彩，就让我们先穿越回。",
+      "draft": "Xin chào mọi người, đây là Phòng Quan Sát Kỳ Diệu, mình là Trường Phong. Vậy, câu chuyện của thiên tài vượt ngục này thực sự thú vị đến mức nào, hãy cùng mình quay ngược thời gian.",
+      "translation": "Xin chào mọi người, đây là Phòng Quan Sát Kỳ Diệu, mình là Trường Phong. Vậy, câu chuyện của thiên tài vượt ngục này thực sự thú vị đến mức nào, hãy cùng mình quay ngược thời gian.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 12,
+      "text_zh": "一九五八年听一听这位美国最会淘的男人的故事，",
+      "draft": "Năm 1958, hãy lắng nghe câu chuyện của người đàn ông biết trốn thoát nhất nước Mỹ,",
+      "translation": "Năm 1958, hãy lắng nghe câu chuyện của người đàn ông biết trốn thoát nhất nước Mỹ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 13,
+      "text_zh": "理查德里麦克奈尔。",
+      "draft": "Richard McNair.",
+      "translation": "Richard McNair.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 14,
+      "text_zh": "一九五八年十二月十九日，出生于俄克拉荷马州的一个普通家庭，是家里四个孩子中的老大，",
+      "draft": "Ngày 19 tháng 12 năm 1958, sinh ra trong một gia đình bình thường ở bang Oklahoma, là anh cả trong bốn đứa trẻ,",
+      "translation": "Ngày 19 tháng 12 năm 1958, sinh ra trong một gia đình bình thường ở bang Oklahoma, là anh cả trong bốn đứa trẻ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 15,
+      "text_zh": "父亲是一名预备役警察，父母恩爱，家庭和睦，是一个标准的美国家庭，",
+      "draft": "Cha của anh là một cảnh sát dự bị, cha mẹ yêu thương nhau, gia đình hòa thuận, là một gia đình kiểu Mỹ tiêu biểu,",
+      "translation": "Cha của anh là một cảnh sát dự bị, cha mẹ yêu thương nhau, gia đình hòa thuận, là một gia đình kiểu Mỹ tiêu biểu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 16,
+      "text_zh": "从小理查德就表现的聪明伶俐，头脑灵活，是身边人公认的小机灵鬼。",
+      "draft": "Từ nhỏ, Richard đã thể hiện sự thông minh, nhanh nhẹn, là cậu bé lanh lợi được mọi người công nhận.",
+      "translation": "Từ nhỏ, Richard đã thể hiện sự thông minh, nhanh nhẹn, là cậu bé lanh lợi được mọi người công nhận.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 17,
+      "text_zh": "用他弟弟的话来说啊，哥哥是我见过最聪明的人，一直以来都是我的学习榜样。",
+      "draft": "Theo lời của em trai anh, anh là người thông minh nhất mà mình từng thấy, luôn là hình mẫu học tập của mình.",
+      "translation": "Theo lời của em trai anh, anh là người thông minh nhất mà mình từng thấy, luôn là hình mẫu học tập của mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 18,
+      "text_zh": "少年时期的理查德酷爱运动，品学兼优，以父亲为楷模，",
+      "draft": "Thời niên thiếu, Richard rất thích thể thao, học giỏi, lấy cha làm hình mẫu,",
+      "translation": "Thời niên thiếu, Richard rất thích thể thao, học giỏi, lấy cha làm hình mẫu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 19,
+      "text_zh": "把从军当做人生目标，最终顺利成为美国空军的一员。",
+      "draft": "đặt mục tiêu cuộc đời là phục vụ quân đội, cuối cùng trở thành một thành viên của Không quân Mỹ.",
+      "translation": "đặt mục tiêu cuộc đời là phục vụ quân đội, cuối cùng trở thành một thành viên của Không quân Mỹ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 20,
+      "text_zh": "在部队里，他依旧表现出色，不仅是一位合格的士兵，",
+      "draft": "Trong quân đội, anh vẫn thể hiện xuất sắc, không chỉ là một người lính đủ tiêu chuẩn,",
+      "translation": "Trong quân đội, anh vẫn thể hiện xuất sắc, không chỉ là một người lính đủ tiêu chuẩn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 21,
+      "text_zh": "还是当地警方的信任，帮助警方破获了数起违禁品案件。",
+      "draft": "mà còn được cảnh sát địa phương tin tưởng, giúp họ phá án nhiều vụ buôn lậu.",
+      "translation": "mà còn được cảnh sát địa phương tin tưởng, giúp họ phá án nhiều vụ buôn lậu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 22,
+      "text_zh": "那时的他没有不良嗜好，看上去前途无量。",
+      "draft": "Thời điểm đó, anh không có thói quen xấu, nhìn chung có triển vọng sáng sủa.",
+      "translation": "Thời điểm đó, anh không có thói quen xấu, nhìn chung có triển vọng sáng sủa.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 23,
+      "text_zh": "如果非要挑个毛病，那就是花钱大手大脚的没个储蓄意识，",
+      "draft": "Nếu phải chỉ trích điều gì, thì đó là anh tiêu tiền phung phí mà không có ý thức tiết kiệm,",
+      "translation": "Nếu phải chỉ trích điều gì, thì đó là anh tiêu tiền phung phí mà không có ý thức tiết kiệm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 24,
+      "text_zh": "而这一点也将成为其人生悲剧的导火索。",
+      "draft": "và điều này sẽ trở thành ngòi nổ cho bi kịch cuộc đời anh.",
+      "translation": "và điều này sẽ trở thành ngòi nổ cho bi kịch cuộc đời anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 25,
+      "text_zh": "转折点发生在一九八七年十一月十七日，",
+      "draft": "Bước ngoặt xảy ra vào ngày 17 tháng 11 năm 1987,",
+      "translation": "Bước ngoặt xảy ra vào ngày 17 tháng 11 năm 1987,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 26,
+      "text_zh": "这一天正驻扎在北达科他州麦诺特空军基地的理查德。",
+      "draft": "Ngày hôm đó, Richard đang đóng quân tại căn cứ Không quân Minot ở bang Bắc Dakota.",
+      "translation": "Ngày hôm đó, Richard đang đóng quân tại căn cứ Không quân Minot ở bang Bắc Dakota.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 27,
+      "text_zh": "突然脑袋一热，想搞点钱花一花。他知道啊，基地附近有一个谷仓，晚上几乎没人上班。",
+      "draft": "Đột nhiên, anh nảy ra ý tưởng kiếm chút tiền tiêu. Anh biết rằng gần căn cứ có một kho thóc, ban đêm gần như không có ai làm việc.",
+      "translation": "Đột nhiên, anh nảy ra ý tưởng kiếm chút tiền tiêu. Anh biết rằng gần căn cứ có một kho thóc, ban đêm gần như không có ai làm việc.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 28,
+      "text_zh": "他想着神不知鬼不觉的偷点值钱的东西，应该不会被人发现了，",
+      "draft": "Anh nghĩ rằng việc lén lút lấy một số đồ giá trị sẽ không bị phát hiện,",
+      "translation": "Anh nghĩ rằng việc lén lút lấy một số đồ giá trị sẽ không bị phát hiện,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 29,
+      "text_zh": "可天不随人愿。他刚趁着夜色偷偷潜入谷仓，就撞进了值班经理基斯曼。",
+      "draft": "Nhưng trời không chiều lòng người. Anh vừa lén lút vào kho thóc thì đụng phải quản lý trực ca, Gitzman.",
+      "translation": "Nhưng trời không chiều lòng người. Anh vừa lén lút vào kho thóc thì đụng phải quản lý trực ca, Gitzman.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 30,
+      "text_zh": "按理说啊，他完全可以转身跑开，一点事都没有。",
+      "draft": "Lẽ ra, anh hoàn toàn có thể quay đầu bỏ chạy, không có chuyện gì xảy ra.",
+      "translation": "Lẽ ra, anh hoàn toàn có thể quay đầu bỏ chạy, không có chuyện gì xảy ra.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 31,
+      "text_zh": "可也不知道是军人的本能警觉，还是太过心虚紧张，他想都没想，",
+      "draft": "Nhưng không biết là do bản năng cảnh giác của quân nhân hay quá lo lắng, anh không nghĩ ngợi,",
+      "translation": "Nhưng không biết là do bản năng cảnh giác của quân nhân hay quá lo lắng, anh không nghĩ ngợi,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 32,
+      "text_zh": "就掏出身上的配枪，对着吉茨曼连开四枪，看着对方倒地，鲜血横流。",
+      "draft": "mà rút súng ra, bắn bốn phát vào Gitzman, nhìn anh ta ngã xuống, máu chảy bê bết.",
+      "translation": "mà rút súng ra, bắn bốn phát vào Gitzman, nhìn anh ta ngã xuống, máu chảy bê bết.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 33,
+      "text_zh": "他一时也顾不上偷东西，转身逃跑了。",
+      "draft": "Anh nhất thời không còn tâm trí để lấy đồ, quay người bỏ chạy.",
+      "translation": "Anh nhất thời không còn tâm trí để lấy đồ, quay người bỏ chạy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 34,
+      "text_zh": "可刚跑到门口，又看到一名卡车司机坐在驾驶室",
+      "draft": "Nhưng vừa chạy đến cửa, lại thấy một tài xế xe tải ngồi trong cabin.",
+      "translation": "Nhưng vừa chạy đến cửa, lại thấy một tài xế xe tải ngồi trong cabin.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 35,
+      "text_zh": "杀红眼的理查德，二话不说，对着司机又是连开数枪，随后消失在了夜色当中。",
+      "draft": "Richard điên cuồng, không nói hai lời, bắn liên tiếp vào tài xế, rồi biến mất trong bóng đêm.",
+      "translation": "Richard điên cuồng, không nói hai lời, bắn liên tiếp vào tài xế, rồi biến mất trong bóng đêm.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 36,
+      "text_zh": "接下来的几周里，尽管警方没有找上门，但他始终心神不宁，",
+      "draft": "Trong vài tuần tiếp theo, mặc dù cảnh sát không tìm đến, nhưng anh luôn cảm thấy bất an,",
+      "translation": "Trong vài tuần tiếp theo, mặc dù cảnh sát không tìm đến, nhưng anh luôn cảm thấy bất an,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 37,
+      "text_zh": "担心现场没有处理干净，会留下什么线索。",
+      "draft": "lo lắng rằng hiện trường không được xử lý sạch sẽ, sẽ để lại manh mối.",
+      "translation": "lo lắng rằng hiện trường không được xử lý sạch sẽ, sẽ để lại manh mối.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 38,
+      "text_zh": "果不其然，他的担心成真了。实际上，当前身中四枪的基茨曼并未去世。",
+      "draft": "Quả thật, lo lắng của anh đã thành hiện thực. Thực tế, Gitzman, người bị bắn bốn phát, vẫn chưa chết.",
+      "translation": "Quả thật, lo lắng của anh đã thành hiện thực. Thực tế, Gitzman, người bị bắn bốn phát, vẫn chưa chết.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 39,
+      "text_zh": "中枪后，他强忍剧痛，一动不动的躺在地上装死。",
+      "draft": "Sau khi bị bắn, anh ta chịu đựng cơn đau dữ dội, nằm bất động trên đất giả chết.",
+      "translation": "Sau khi bị bắn, anh ta chịu đựng cơn đau dữ dội, nằm bất động trên đất giả chết.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 40,
+      "text_zh": "理查德离开后，他第一时间就报了警，",
+      "draft": "Sau khi Richard rời đi, anh ta lập tức báo cảnh sát,",
+      "translation": "Sau khi Richard rời đi, anh ta lập tức báo cảnh sát,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 41,
+      "text_zh": "警方根据他的口供，以及在谷仓找到了十枚弹壳。",
+      "draft": "Cảnh sát dựa vào lời khai của anh ta và tìm thấy mười viên đạn ở trong kho.",
+      "translation": "Cảnh sát dựa vào lời khai của anh ta và tìm thấy mười viên đạn ở trong kho.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 42,
+      "text_zh": "经过几周的调查，锁定了理查德后查验气枪支，确定匹配现场所遗留的弹壳，",
+      "draft": "Sau vài tuần điều tra, họ xác định Richard và kiểm tra súng, xác nhận khớp với vỏ đạn tại hiện trường,",
+      "translation": "Sau vài tuần điều tra, họ xác định Richard và kiểm tra súng, xác nhận khớp với vỏ đạn tại hiện trường,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 43,
+      "text_zh": "这一下证据确凿，直接将其给逮捕了。",
+      "draft": "Bằng chứng này rất rõ ràng, họ đã bắt giữ anh ta ngay lập tức.",
+      "translation": "Bằng chứng này rất rõ ràng, họ đã bắt giữ anh ta ngay lập tức.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 44,
+      "text_zh": "面对一死一重伤的指控，",
+      "draft": "Đối mặt với cáo buộc một người chết và một người bị thương nặng,",
+      "translation": "Đối mặt với cáo buộc một người chết và một người bị thương nặng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 45,
+      "text_zh": "作为军人的他很清楚自己的结局，终身监禁是没跑了，",
+      "draft": "Là một quân nhân, anh ta rất rõ ràng về kết cục của mình, án tù chung thân là điều không thể tránh khỏi,",
+      "translation": "Là một quân nhân, anh ta rất rõ ràng về kết cục của mình, án tù chung thân là điều không thể tránh khỏi,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 46,
+      "text_zh": "可他不甘心呢，他认为自己平时兢兢业业，只是一时犯浑才酿下惨剧。",
+      "draft": "Nhưng anh ta không cam tâm, anh ta cho rằng mình luôn làm việc chăm chỉ, chỉ là nhất thời ngu ngốc mới gây ra thảm kịch.",
+      "translation": "Nhưng anh ta không cam tâm, anh ta cho rằng mình luôn làm việc chăm chỉ, chỉ là nhất thời ngu ngốc mới gây ra thảm kịch.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 47,
+      "text_zh": "他不想一辈子被关在监狱里，怎么办呢？",
+      "draft": "Anh ta không muốn bị giam trong tù suốt đời, vậy phải làm sao?",
+      "translation": "Anh ta không muốn bị giam trong tù suốt đời, vậy phải làm sao?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 48,
+      "text_zh": "一个疯狂的念头开始在脑海里盘旋那一刻，这个念头在他脑海里扎了根。",
+      "draft": "Một ý nghĩ điên rồ bắt đầu xoay quanh trong đầu anh ta, ý nghĩ này đã bén rễ trong tâm trí anh.",
+      "translation": "Một ý nghĩ điên rồ bắt đầu xoay quanh trong đầu anh ta, ý nghĩ này đã bén rễ trong tâm trí anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 49,
+      "text_zh": "一九八八年二月，在一次常规审讯中，",
+      "draft": "Vào tháng 2 năm 1988, trong một cuộc thẩm vấn thông thường,",
+      "translation": "Vào tháng 2 năm 1988, trong một cuộc thẩm vấn thông thường,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 50,
+      "text_zh": "三位警探将其靠在明医托市警局审讯中的椅子上问话。",
+      "draft": "Ba thám tử đã đặt anh ta vào ghế trong phòng thẩm vấn của Cảnh sát thành phố Minot.",
+      "translation": "Ba thám tử đã đặt anh ta vào ghế trong phòng thẩm vấn của Cảnh sát thành phố Minot.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 51,
+      "text_zh": "中途呢三个人因为接电话短暂离开独留李超的一人，他意识到此时不跑，",
+      "draft": "Giữa chừng, ba người rời đi để nhận điện thoại, chỉ còn lại một mình Richard, anh nhận ra nếu không chạy ngay lúc này,",
+      "translation": "Giữa chừng, ba người rời đi để nhận điện thoại, chỉ còn lại một mình Richard, anh nhận ra nếu không chạy ngay lúc này,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 52,
+      "text_zh": "更待何时啊。巧的是，",
+      "draft": "thì còn đợi đến khi nào. Thật trùng hợp,",
+      "translation": "thì còn đợi đến khi nào. Thật trùng hợp,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 53,
+      "text_zh": "当时他口袋里有一只润唇膏，于是果断取出，涂在了手腕处，然后忍着剧烈的疼痛，",
+      "draft": "Lúc đó trong túi anh ta có một thỏi son dưỡng môi, vì vậy anh ta quyết định lấy ra, bôi lên cổ tay, rồi chịu đựng cơn đau dữ dội,",
+      "translation": "Lúc đó trong túi anh ta có một thỏi son dưỡng môi, vì vậy anh ta quyết định lấy ra, bôi lên cổ tay, rồi chịu đựng cơn đau dữ dội,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 54,
+      "text_zh": "硬生生的将双手从手铐中挣脱，",
+      "draft": "cố gắng thoát khỏi còng tay,",
+      "translation": "cố gắng thoát khỏi còng tay,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 55,
+      "text_zh": "接着毫不犹豫的冲出审讯室，跑出警局警员，很快就发现情况并展开追捕。",
+      "draft": "Sau đó, anh ta không do dự mà lao ra khỏi phòng thẩm vấn, chạy ra khỏi đồn cảnh sát, rất nhanh đã phát hiện ra tình hình và bắt đầu truy đuổi.",
+      "translation": "Sau đó, anh ta không do dự mà lao ra khỏi phòng thẩm vấn, chạy ra khỏi đồn cảnh sát, rất nhanh đã phát hiện ra tình hình và bắt đầu truy đuổi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 56,
+      "text_zh": "最终，他被逼到一栋公寓楼的三楼屋顶，无路可逃的他打算借助一根树枝翻下去，",
+      "draft": "Cuối cùng, anh ta bị dồn vào tầng ba của một tòa nhà chung cư, không còn đường nào để thoát, anh ta định dùng một cành cây để nhảy xuống,",
+      "translation": "Cuối cùng, anh ta bị dồn vào tầng ba của một tòa nhà chung cư, không còn đường nào để thoát, anh ta định dùng một cành cây để nhảy xuống,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 57,
+      "text_zh": "没想到树枝腐朽，他直接从八点五米高的地方重重摔落腰椎，当场骨折，",
+      "draft": "Không ngờ cành cây mục nát, anh ta rơi từ độ cao 8,5 mét, bị gãy xương sống tại chỗ,",
+      "translation": "Không ngờ cành cây mục nát, anh ta rơi từ độ cao 8,5 mét, bị gãy xương sống tại chỗ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 58,
+      "text_zh": "逃跑失败。",
+      "draft": "Thất bại trong việc trốn thoát.",
+      "translation": "Thất bại trong việc trốn thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 59,
+      "text_zh": "这是他的第一次越狱。",
+      "draft": "Đây là lần đầu tiên anh ta vượt ngục.",
+      "translation": "Đây là lần đầu tiên anh ta vượt ngục.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 60,
+      "text_zh": "虽说只持续了几个小时，但已然为他接下来的传奇拉开了序幕啊。",
+      "draft": "Dù chỉ kéo dài vài giờ, nhưng đã mở đầu cho huyền thoại tiếp theo của anh ta.",
+      "translation": "Dù chỉ kéo dài vài giờ, nhưng đã mở đầu cho huyền thoại tiếp theo của anh ta.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 61,
+      "text_zh": "经过治疗后，他被送进沃德县监狱后，因谋杀和谋杀未遂被判处两个终身监禁，",
+      "draft": "Sau khi được điều trị, anh ta bị đưa vào Nhà tù quận Ward, bị kết án hai án tù chung thân vì tội giết người và cố ý giết người,",
+      "translation": "Sau khi được điều trị, anh ta bị đưa vào Nhà tù quận Ward, bị kết án hai án tù chung thân vì tội giết người và cố ý giết người,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 62,
+      "text_zh": "外加入室盗窃三十年监禁，接着被转移至戒备森严的北达科他州州夜监狱。",
+      "draft": "Ngoài ra còn bị kết án ba mươi năm tù vì tội trộm cắp, sau đó bị chuyển đến Nhà tù Bắc Dakota.",
+      "translation": "Ngoài ra còn bị kết án ba mươi năm tù vì tội trộm cắp, sau đó bị chuyển đến Nhà tù Bắc Dakota.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 63,
+      "text_zh": "然而，就在其被转移走后，沃德县监狱狱警在检查其牢房时，惊讶的发现，",
+      "draft": "Tuy nhiên, ngay sau khi anh ta bị chuyển đi, các cảnh sát nhà tù ở quận Ward khi kiểm tra phòng giam của anh ta đã ngạc nhiên phát hiện,",
+      "translation": "Tuy nhiên, ngay sau khi anh ta bị chuyển đi, các cảnh sát nhà tù ở quận Ward khi kiểm tra phòng giam của anh ta đã ngạc nhiên phát hiện,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 64,
+      "text_zh": "牢房里有两块墙砖，几乎被凿穿，里面还藏着床单等逃生物品。",
+      "draft": "Trong phòng giam có hai viên gạch tường gần như bị khoét thủng, bên trong còn giấu chăn và các vật dụng để trốn thoát.",
+      "translation": "Trong phòng giam có hai viên gạch tường gần như bị khoét thủng, bên trong còn giấu chăn và các vật dụng để trốn thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 65,
+      "text_zh": "很显然，他正计划着越狱，幸好转移监狱，打断了他的施法，不然后果不堪设想。",
+      "draft": "Rõ ràng, anh ta đang lên kế hoạch vượt ngục, may mắn thay việc chuyển nhà tù đã ngăn chặn được kế hoạch của anh, nếu không hậu quả sẽ không thể tưởng tượng nổi.",
+      "translation": "Rõ ràng, anh ta đang lên kế hoạch vượt ngục, may mắn thay việc chuyển nhà tù đã ngăn chặn được kế hoạch của anh, nếu không hậu quả sẽ không thể tưởng tượng nổi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 66,
+      "text_zh": "而这一次，他被送进了北达科他州戒备最森严的监狱，",
+      "draft": "Lần này, anh ta được đưa vào nhà tù nghiêm ngặt nhất ở Bắc Dakota,",
+      "translation": "Lần này, anh ta được đưa vào nhà tù nghiêm ngặt nhất ở Bắc Dakota,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 67,
+      "text_zh": "这个地方主要用于关押长期服刑的重刑犯。",
+      "draft": "Nơi này chủ yếu giam giữ các tội phạm nặng phải chịu án lâu dài.",
+      "translation": "Nơi này chủ yếu giam giữ các tội phạm nặng phải chịu án lâu dài.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 68,
+      "text_zh": "对于许多囚犯而言，这里或许就是人生的尽头，",
+      "draft": "Đối với nhiều tù nhân, đây có thể là điểm kết thúc của cuộc đời họ,",
+      "translation": "Đối với nhiều tù nhân, đây có thể là điểm kết thúc của cuộc đời họ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 69,
+      "text_zh": "而理查德却认为这只不过是他越狱传奇的开端。",
+      "draft": "Nhưng Richard lại cho rằng đây chỉ là khởi đầu cho huyền thoại vượt ngục của anh.",
+      "translation": "Nhưng Richard lại cho rằng đây chỉ là khởi đầu cho huyền thoại vượt ngục của anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 70,
+      "text_zh": "因为他前脚刚迈进牢房，后脚就已经在为下一次越狱做着全面的准备了。",
+      "draft": "Bởi vì ngay khi anh ta vừa bước vào phòng giam, anh ta đã bắt đầu chuẩn bị cho lần vượt ngục tiếp theo.",
+      "translation": "Bởi vì ngay khi anh ta vừa bước vào phòng giam, anh ta đã bắt đầu chuẩn bị cho lần vượt ngục tiếp theo.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 71,
+      "text_zh": "北达克他州州立监狱考虑到理查德之前的越狱前科，狱警们对其特别关照，严加看管，",
+      "draft": "Nhà tù Bắc Dakota, với tiền án vượt ngục của Richard, các cảnh sát nhà tù đặc biệt chú ý đến anh ta, quản lý rất chặt chẽ,",
+      "translation": "Nhà tù Bắc Dakota, với tiền án vượt ngục của Richard, các cảnh sát nhà tù đặc biệt chú ý đến anh ta, quản lý rất chặt chẽ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 72,
+      "text_zh": "加上这里本来就戒备森严，所以狱防自信满满的，认为没有人能够逃得出去。",
+      "draft": "Hơn nữa, nơi này vốn đã nghiêm ngặt, vì vậy các nhân viên bảo vệ rất tự tin, cho rằng không ai có thể trốn thoát.",
+      "translation": "Hơn nữa, nơi này vốn đã nghiêm ngặt, vì vậy các nhân viên bảo vệ rất tự tin, cho rằng không ai có thể trốn thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 73,
+      "text_zh": "可理查德偏偏不信邪，",
+      "draft": "Nhưng Richard lại không tin vào điều đó,",
+      "translation": "Nhưng Richard lại không tin vào điều đó,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 74,
+      "text_zh": "他把上一次逃跑失败，归结于太过冲动，毛躁，毫无计划。",
+      "draft": "Anh ta cho rằng lần trốn thoát trước thất bại là do quá bốc đồng, nóng vội, không có kế hoạch.",
+      "translation": "Anh ta cho rằng lần trốn thoát trước thất bại là do quá bốc đồng, nóng vội, không có kế hoạch.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 75,
+      "text_zh": "因此，这一次他制定了一个详细的越狱方案，",
+      "draft": "Vì vậy, lần này anh ta đã lập một kế hoạch vượt ngục chi tiết,",
+      "translation": "Vì vậy, lần này anh ta đã lập một kế hoạch vượt ngục chi tiết,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 76,
+      "text_zh": "第一步自然是洗白自己，",
+      "draft": "Bước đầu tiên tự nhiên là làm sạch danh tính của mình,",
+      "translation": "Bước đầu tiên tự nhiên là làm sạch danh tính của mình,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 77,
+      "text_zh": "他不再惹是生非，不掺和打架斗殴，",
+      "draft": "Anh ta không còn gây rối, không tham gia đánh nhau,",
+      "translation": "Anh ta không còn gây rối, không tham gia đánh nhau,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 78,
+      "text_zh": "平时话也不多，总是独来独往、抽烟、喝酒、打孔纹身",
+      "draft": "Thường ngày cũng không nói nhiều, luôn sống độc lập, hút thuốc, uống rượu, xăm mình.",
+      "translation": "Thường ngày cũng không nói nhiều, luôn sống độc lập, hút thuốc, uống rượu, xăm mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 79,
+      "text_zh": "这些典型的囚犯表签，他是一样不沾。对于狱警言听计从，",
+      "draft": "Anh ta không dính dáng đến những hình mẫu tù nhân điển hình này. Đối với các cảnh sát, anh ta hoàn toàn nghe theo.",
+      "translation": "Anh ta không dính dáng đến những hình mẫu tù nhân điển hình này. Đối với các cảnh sát, anh ta hoàn toàn nghe theo.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 80,
+      "text_zh": "发展到后来，连狱警都觉得他不像是个重刑犯，倒像是哪个图书馆走错门的学生。",
+      "draft": "Phát triển đến sau này, ngay cả cảnh sát cũng cảm thấy anh ta không giống tội phạm nặng, mà giống như một sinh viên lạc đường vào thư viện.",
+      "translation": "Đến sau này, ngay cả cảnh sát cũng thấy anh ta không giống tội phạm nặng, mà giống như một sinh viên lạc vào thư viện.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 81,
+      "text_zh": "其次就是勤家锻炼，越狱逃跑得有一个好的训练。",
+      "draft": "Thứ hai là chăm chỉ rèn luyện, để có một sự chuẩn bị tốt cho việc trốn thoát.",
+      "translation": "Thứ hai là chăm chỉ rèn luyện, để có sự chuẩn bị tốt cho việc trốn thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 82,
+      "text_zh": "因此，他每日风雨无阻的健身锻炼放风，就跑步，在牢房就俯卧撑等力量训练。",
+      "draft": "Vì vậy, mỗi ngày anh ta đều kiên trì tập thể dục, chạy bộ, và trong phòng giam thì tập chống đẩy và các bài tập sức mạnh khác.",
+      "translation": "Vì vậy, mỗi ngày anh ta đều kiên trì tập thể dục, chạy bộ, và trong phòng giam thì tập chống đẩy và các bài tập sức mạnh khác.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 83,
+      "text_zh": "最后就是用知识武装自己，他认为越狱光莽撞不行，",
+      "draft": "Cuối cùng là trang bị kiến thức cho bản thân, anh ta cho rằng chỉ có liều lĩnh không đủ,",
+      "translation": "Cuối cùng là trang bị kiến thức cho bản thân, anh ta cho rằng chỉ có liều lĩnh không đủ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 84,
+      "text_zh": "得会各种求生技巧和相关的知识。",
+      "draft": "cần phải biết nhiều kỹ năng sinh tồn và kiến thức liên quan.",
+      "translation": "cần phải biết nhiều kỹ năng sinh tồn và kiến thức liên quan.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 85,
+      "text_zh": "只有这样，才能将任何物品变成工具。",
+      "draft": "Chỉ có như vậy, mới có thể biến bất kỳ vật phẩm nào thành công cụ.",
+      "translation": "Chỉ có như vậy, mới có thể biến bất kỳ vật phẩm nào thành công cụ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 86,
+      "text_zh": "因此，他超级爱去监狱的图书馆，而且一呆就是数个小时，埋头钻研各类书籍，杂志，",
+      "draft": "Vì vậy, anh ta rất thích đến thư viện của nhà tù, và ở lại hàng giờ đồng hồ, chăm chú nghiên cứu các loại sách và tạp chí,",
+      "translation": "Vì vậy, anh ta rất thích đến thư viện của nhà tù, và ở lại hàng giờ đồng hồ, chăm chú nghiên cứu các loại sách và tạp chí,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 87,
+      "text_zh": "主要是野外生存技能之类的，为最终计划做着准备。",
+      "draft": "chủ yếu là về kỹ năng sinh tồn ngoài trời, để chuẩn bị cho kế hoạch cuối cùng.",
+      "translation": "chủ yếu là về kỹ năng sinh tồn ngoài trời, để chuẩn bị cho kế hoạch cuối cùng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 88,
+      "text_zh": "他这一准备就是近三年时间。到了一九九一年初，理查德终于发现了一个逃生通道，",
+      "draft": "Anh ta đã chuẩn bị như vậy trong gần ba năm. Đến đầu năm 1991, Richard cuối cùng phát hiện ra một lối thoát,",
+      "translation": "Anh ta đã chuẩn bị như vậy trong gần ba năm. Đến đầu năm 1991, Richard cuối cùng phát hiện ra một lối thoát,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 89,
+      "text_zh": "那就是通风口。",
+      "draft": "đó chính là cửa thông gió.",
+      "translation": "đó chính là cửa thông gió.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 90,
+      "text_zh": "当时监狱内厂区顶楼都配有通风口，",
+      "draft": "Thời điểm đó, trong nhà tù, trên tầng mái của khu vực nhà máy đều có cửa thông gió,",
+      "translation": "Thời điểm đó, trong nhà tù, trên tầng mái của khu vực nhà máy đều có cửa thông gió,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 91,
+      "text_zh": "只要穿过了通风口，就离外面的自由世界不远了。",
+      "draft": "chỉ cần vượt qua cửa thông gió, sẽ không còn xa với thế giới tự do bên ngoài.",
+      "translation": "chỉ cần vượt qua cửa thông gió, sẽ không còn xa với thế giới tự do bên ngoài.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 92,
+      "text_zh": "可想要穿过这扇自由之门并不容易。",
+      "draft": "Nhưng muốn vượt qua cánh cửa tự do này không hề dễ dàng.",
+      "translation": "Nhưng muốn vượt qua cánh cửa tự do này không hề dễ dàng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 93,
+      "text_zh": "塔楼警卫一旦发现就会开枪射击，且通风口内安装了大量的金属防护网，",
+      "draft": "Nếu lính gác tháp phát hiện sẽ lập tức nổ súng, và bên trong cửa thông gió đã lắp đặt rất nhiều lưới bảo vệ kim loại,",
+      "translation": "Nếu lính gác tháp phát hiện sẽ lập tức nổ súng, và bên trong cửa thông gió đã lắp đặt rất nhiều lưới bảo vệ kim loại,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 94,
+      "text_zh": "正常情况下根本就钻不进去。但理查德并不着急，",
+      "draft": "Trong điều kiện bình thường, không thể chui vào được. Nhưng Richard không vội vàng,",
+      "translation": "Trong điều kiện bình thường, không thể chui vào được. Nhưng Richard không vội vàng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 95,
+      "text_zh": "他联合了一名狱友，花费数周时间，利用做空的机会一点一点的拆除了，这些防护装置",
+      "draft": "anh ta đã hợp tác với một người bạn tù, mất vài tuần để từ từ tháo dỡ những thiết bị bảo vệ này.",
+      "translation": "anh ta đã hợp tác với một người bạn tù, mất vài tuần để từ từ tháo dỡ những thiết bị bảo vệ này.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 96,
+      "text_zh": "逃生通道被打通了。",
+      "draft": "Lối thoát đã được thông.",
+      "translation": "Lối thoát đã được thông.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 97,
+      "text_zh": "结果万万没想到，就在他们准备行动的前一晚，被其他狱友给举报",
+      "draft": "Kết quả không ngờ, ngay trước đêm họ chuẩn bị hành động, đã bị những bạn tù khác báo cáo.",
+      "translation": "Kết quả không ngờ, ngay trước đêm họ chuẩn bị hành động, đã bị những bạn tù khác báo cáo.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 98,
+      "text_zh": "了。一九九一年四月二十一日，监狱安保主管根据举报对通风口进行检查，",
+      "draft": "Vào ngày 21 tháng 4 năm 1991, giám đốc an ninh nhà tù đã kiểm tra cửa thông gió theo báo cáo,",
+      "translation": "Vào ngày 21 tháng 4 năm 1991, giám đốc an ninh nhà tù đã kiểm tra cửa thông gió theo báo cáo,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 99,
+      "text_zh": "果然发现了大部分安全装置，都已被拆除，",
+      "draft": "quả nhiên phát hiện hầu hết các thiết bị an toàn đã bị tháo dỡ,",
+      "translation": "quả nhiên phát hiện hầu hết các thiết bị an toàn đã bị tháo dỡ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 100,
+      "text_zh": "狱警迅速将理查德和另一名囚犯逮捕，最终理查德被判处三年监禁。",
+      "draft": "cảnh sát nhanh chóng bắt Richard và một tù nhân khác, cuối cùng Richard bị kết án ba năm tù giam.",
+      "translation": "cảnh sát nhanh chóng bắt Richard và một tù nhân khác, cuối cùng Richard bị kết án ba năm tù giam.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 101,
+      "text_zh": "不过这对于已经终身监禁的他来说啊，无所谓。",
+      "draft": "Nhưng điều này đối với anh ta, người đã bị kết án tù chung thân, thì không có gì cả.",
+      "translation": "Nhưng điều này đối với anh ta, người đã bị kết án tù chung thân, thì không có gì cả.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 102,
+      "text_zh": "此次越狱计划虽然被打断，但理查德并未灰心，反而越战越勇。",
+      "draft": "Kế hoạch trốn thoát lần này tuy bị ngắt quãng, nhưng Richard không nản lòng, mà càng quyết tâm hơn.",
+      "translation": "Kế hoạch trốn thoát lần này tuy bị ngắt quãng, nhưng Richard không nản lòng, mà càng quyết tâm hơn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 103,
+      "text_zh": "在接下来的两年里，他故技重施，",
+      "draft": "Trong hai năm tiếp theo, anh ta lại sử dụng chiêu cũ,",
+      "translation": "Trong hai năm tiếp theo, anh ta lại sử dụng chiêu cũ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 104,
+      "text_zh": "一边伪造老好人的形象，一边继续寻找逃生通道。",
+      "draft": "vừa giả vờ làm người tốt, vừa tiếp tục tìm kiếm lối thoát.",
+      "translation": "vừa giả vờ làm người tốt, vừa tiếp tục tìm kiếm lối thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 105,
+      "text_zh": "找来找去还是瞄上了通风口。尽管狱方已经做了全面防范，",
+      "draft": "Tìm đi tìm lại, anh ta vẫn nhắm vào cửa thông gió. Dù cho nhà tù đã thực hiện nhiều biện pháp phòng ngừa,",
+      "translation": "Tìm đi tìm lại, anh ta vẫn nhắm vào cửa thông gió. Dù cho nhà tù đã thực hiện nhiều biện pháp phòng ngừa,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 106,
+      "text_zh": "但理查德反向推理认为最危险的地方反而最安全，",
+      "draft": "nhưng Richard lại suy luận rằng những nơi nguy hiểm nhất lại an toàn nhất,",
+      "translation": "nhưng Richard lại suy luận rằng những nơi nguy hiểm nhất lại an toàn nhất,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 107,
+      "text_zh": "这就是所谓的灯下黑。",
+      "draft": "đó chính là cái gọi là tối tăm dưới đèn.",
+      "translation": "đó chính là cái gọi là tối tăm dưới đèn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 108,
+      "text_zh": "看过越狱和肖申克救赎的朋友肯定明白，想要越狱仅靠一个人是不现实的。",
+      "draft": "Những người đã xem phim vượt ngục và cứu rỗi Shawshank chắc chắn hiểu rằng, muốn trốn thoát chỉ dựa vào một người là không thực tế.",
+      "translation": "Những người đã xem phim vượt ngục và cứu rỗi Shawshank chắc chắn hiểu rằng, muốn trốn thoát chỉ dựa vào một người là không thực tế.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 109,
+      "text_zh": "因此，他找了两名志同道合的狱友，",
+      "draft": "Vì vậy, anh ta đã tìm hai người bạn tù cùng chí hướng,",
+      "translation": "Vì vậy, anh ta đã tìm hai người bạn tù cùng chí hướng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 110,
+      "text_zh": "三个人默契配合，首先摸清了狱警交接班规律、巡视盲点等等，",
+      "draft": "Ba người phối hợp ăn ý, đầu tiên nắm rõ quy luật chuyển ca của cảnh sát, các điểm mù trong tuần tra, v.v.",
+      "translation": "Ba người phối hợp ăn ý, đầu tiên nắm rõ quy luật chuyển ca của cảnh sát, các điểm mù trong tuần tra, v.v.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 111,
+      "text_zh": "然后相互掩护，一步步拆除牢房天花板的石膏板与金属网，",
+      "draft": "Sau đó, họ hỗ trợ lẫn nhau, từng bước tháo dỡ tấm thạch cao và lưới kim loại trên trần phòng giam,",
+      "translation": "Sau đó, họ hỗ trợ lẫn nhau, từng bước tháo dỡ tấm thạch cao và lưới kim loại trên trần phòng giam,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 112,
+      "text_zh": "并精确测量了从房顶通风管进入主通风道，在绕行至监狱外墙屋顶的路线。",
+      "draft": "và đo đạc chính xác từ ống thông gió trên mái vào ống thông gió chính, để tìm đường vòng ra ngoài tường nhà tù.",
+      "translation": "và đo đạc chính xác từ ống thông gió trên mái vào ống thông gió chính, để tìm đường vòng ra ngoài tường nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 113,
+      "text_zh": "为了顺利从高墙下到地面，他们还准备了很多布条，拼接成的绳子，",
+      "draft": "Để thuận lợi từ dưới tường cao xuống mặt đất, họ còn chuẩn bị nhiều mảnh vải, nối lại thành dây thừng,",
+      "translation": "Để thuận lợi từ dưới tường cao xuống mặt đất, họ còn chuẩn bị nhiều mảnh vải, nối lại thành dây thừng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 114,
+      "text_zh": "一切都准备的明明白白。",
+      "draft": "mọi thứ đã được chuẩn bị rõ ràng.",
+      "translation": "mọi thứ đã được chuẩn bị rõ ràng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 115,
+      "text_zh": "一九九二年十月九日上午，三个人觉得时机成熟，",
+      "draft": "Vào sáng ngày 9 tháng 10 năm 1992, ba người cảm thấy thời cơ đã chín muồi,",
+      "translation": "Vào sáng ngày 9 tháng 10 năm 1992, ba người cảm thấy thời cơ đã chín muồi,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 116,
+      "text_zh": "趁着监狱交育室为大家播放电影时，偷偷爬进天花板，",
+      "draft": "nhân lúc phòng giáo dục nhà tù đang chiếu phim cho mọi người, lén lút leo lên trần nhà,",
+      "translation": "nhân lúc phòng giáo dục nhà tù đang chiếu phim cho mọi người, lén lút leo lên trần nhà,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 117,
+      "text_zh": "钻入早已探明的主通风管道。他们爬行穿越了三十多米长的铁管，",
+      "draft": "chui vào ống thông gió chính đã được thăm dò trước. Họ đã bò qua hơn ba mươi mét ống sắt,",
+      "translation": "chui vào ống thông gió chính đã được thăm dò trước. Họ đã bò qua hơn ba mươi mét ống sắt,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 118,
+      "text_zh": "然后顺着通风管滑行到监狱，外墙内侧的平台上，",
+      "draft": "sau đó trượt xuống nền tảng bên trong tường nhà tù,",
+      "translation": "sau đó trượt xuống nền tảng bên trong tường nhà tù,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 119,
+      "text_zh": "再靠自制的布条绳索翻越高墙，分头逃跑。",
+      "draft": "rồi dùng dây thừng tự chế để vượt qua tường cao, chia nhau trốn chạy.",
+      "translation": "rồi dùng dây thừng tự chế để vượt qua tường cao, chia nhau trốn chạy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 120,
+      "text_zh": "监狱方面直到两个小时后才反应过来，随即展开了追捕行动。",
+      "draft": "Phía nhà tù phải mất hai giờ sau mới phản ứng lại, ngay lập tức tiến hành truy bắt.",
+      "translation": "Nhà tù phải mất hai giờ sau mới phản ứng lại, ngay lập tức tiến hành truy bắt.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 121,
+      "text_zh": "他的两位狱友可能是不够精明，很快就被缉拿归案了。",
+      "draft": "Hai người bạn tù của anh ta có thể không đủ thông minh, rất nhanh đã bị bắt lại.",
+      "translation": "Hai người bạn tù của anh ta có thể không đủ thông minh, rất nhanh đã bị bắt lại.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 122,
+      "text_zh": "而理查德凭借极强的反侦察意识，彻底消失在了警方的眼皮子底下。",
+      "draft": "Còn Richard nhờ vào ý thức phản gián cực mạnh, hoàn toàn biến mất trước mắt cảnh sát.",
+      "translation": "Còn Richard nhờ vào ý thức phản gián cực mạnh, hoàn toàn biến mất trước mắt cảnh sát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 123,
+      "text_zh": "为了逃避警方的追捕，他进行了一番伪装，",
+      "draft": "Để trốn tránh sự truy đuổi của cảnh sát, anh đã thực hiện một màn cải trang,",
+      "translation": "Để trốn tránh sự truy đuổi của cảnh sát, anh đã thực hiện một màn cải trang,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 124,
+      "text_zh": "把头发留长，并染成了黄毛，戴上眼镜。乍一看很有书生气质，",
+      "draft": "để tóc dài và nhuộm thành vàng, đeo kính. Nhìn thoáng qua rất có phong thái thư sinh,",
+      "translation": "để tóc dài và nhuộm thành vàng, đeo kính. Nhìn thoáng qua rất có phong thái thư sinh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 125,
+      "text_zh": "开着偷来的车在美国到处流浪，每隔一段时间就会换一个造型换一辆车，",
+      "draft": "lái xe ăn cắp đi lang thang khắp nước Mỹ, cứ một thời gian lại đổi kiểu dáng và đổi xe,",
+      "translation": "lái xe ăn cắp đi lang thang khắp nước Mỹ, cứ một thời gian lại đổi kiểu dáng và đổi xe,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 126,
+      "text_zh": "并且不会在同一个地方停留太久。",
+      "draft": "và không ở lại một chỗ quá lâu.",
+      "translation": "và không ở lại một chỗ quá lâu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 127,
+      "text_zh": "就这样，理查德在外面自由自在的旅游了整整十个月。",
+      "draft": "Cứ như vậy, Richard đã tự do du lịch bên ngoài suốt mười tháng.",
+      "translation": "Cứ như vậy, Richard đã tự do du lịch bên ngoài suốt mười tháng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 128,
+      "text_zh": "直到一九九三年七月五日，他才在警方的一次围捕中落网。",
+      "draft": "Cho đến ngày 5 tháng 7 năm 1993, anh mới bị bắt trong một cuộc vây bắt của cảnh sát.",
+      "translation": "Cho đến ngày 5 tháng 7 năm 1993, anh mới bị bắt trong một cuộc vây bắt của cảnh sát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 129,
+      "text_zh": "他的第二次越狱也宣告失败。",
+      "draft": "Lần vượt ngục thứ hai của anh cũng tuyên bố thất bại.",
+      "translation": "Lần vượt ngục thứ hai của anh cũng tuyên bố thất bại.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 130,
+      "text_zh": "这一次逮捕理查德北达克科塔州监狱明白了一件事儿，理查德不是个普通囚犯，",
+      "draft": "Lần bắt giữ Richard tại nhà tù Bắc Dakota đã hiểu một điều, Richard không phải là một tù nhân bình thường,",
+      "translation": "Lần bắt giữ Richard tại nhà tù Bắc Dakota đã hiểu một điều, Richard không phải là một tù nhân bình thường,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 131,
+      "text_zh": "这个能在几十分钟内从手铐中滑脱，能从通风管爬出监狱的男人是个雷呀。",
+      "draft": "người có thể trượt khỏi còng tay trong vòng vài phút, có thể bò ra khỏi nhà tù qua ống thông gió.",
+      "translation": "người có thể trượt khỏi còng tay trong vòng vài phút, có thể bò ra khỏi nhà tù qua ống thông gió.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 132,
+      "text_zh": "而他们的解决方案也很直接",
+      "draft": "Giải pháp của họ cũng rất đơn giản",
+      "translation": "Giải pháp của họ cũng rất đơn giản",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 133,
+      "text_zh": "送走，越远越好。随即，根据洲际协议，",
+      "draft": "Gửi đi, càng xa càng tốt. Ngay lập tức, theo thỏa thuận liên bang,",
+      "translation": "Gửi đi, càng xa càng tốt. Ngay lập tức, theo thỏa thuận liên bang,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 134,
+      "text_zh": "理查德被送到了橡树公园高地成教所。",
+      "draft": "Richard bị chuyển đến Trại giáo dưỡng cao đất Công viên Cây Sồi.",
+      "translation": "Richard bị chuyển đến Trại giáo dưỡng cao đất Công viên Cây Sồi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 135,
+      "text_zh": "该监狱是明尼苏达州安全级别最高的监狱，",
+      "draft": "Nhà tù này là nhà tù có mức độ an toàn cao nhất tại Minnesota,",
+      "translation": "Nhà tù này là nhà tù có mức độ an toàn cao nhất tại Minnesota,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 136,
+      "text_zh": "监管森严，历史上从未有囚犯从中逃脱。",
+      "draft": "quản lý nghiêm ngặt, trong lịch sử chưa từng có tù nhân nào trốn thoát.",
+      "translation": "quản lý nghiêm ngặt, trong lịch sử chưa từng có tù nhân nào trốn thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 137,
+      "text_zh": "尽管理查德自视自己不是一般人认为没有什么监狱能够关得住他。可几年过去了，",
+      "draft": "Dù Richard tự cho mình không phải là người bình thường, nhưng không có nhà tù nào có thể giam giữ anh. Nhưng vài năm trôi qua,",
+      "translation": "Dù Richard tự cho mình không phải là người bình thường, nhưng không có nhà tù nào có thể giam giữ anh. Nhưng vài năm trôi qua,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 138,
+      "text_zh": "他逐渐意识到，我逃不出这所监狱了。",
+      "draft": "anh dần nhận ra, mình không thể trốn thoát khỏi nhà tù này.",
+      "translation": "anh dần nhận ra, mình không thể trốn thoát khỏi nhà tù này.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 139,
+      "text_zh": "面对铜墙铁壁般的监狱，他想到了另一条方案，",
+      "draft": "Đối mặt với bức tường đồng sắt thép của nhà tù, anh nghĩ đến một kế hoạch khác,",
+      "translation": "Đối mặt với bức tường đồng sắt thép của nhà tù, anh nghĩ đến một kế hoạch khác,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 140,
+      "text_zh": "换个监狱试一试。",
+      "draft": "thử đổi sang một nhà tù khác.",
+      "translation": "thử đổi sang một nhà tù khác.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 141,
+      "text_zh": "为此，他联合其他狱友发起了一场静坐罢工，",
+      "draft": "Để làm điều đó, anh đã liên kết với các bạn tù khác để phát động một cuộc biểu tình ngồi,",
+      "translation": "Để làm điều đó, anh đã liên kết với các bạn tù khác để phát động một cuộc biểu tình ngồi,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 142,
+      "text_zh": "不吃饭也不工作，拒绝和狱芳的一切交流。",
+      "draft": "không ăn uống cũng không làm việc, từ chối mọi giao tiếp với nhân viên nhà tù.",
+      "translation": "không ăn uống cũng không làm việc, từ chối mọi giao tiếp với nhân viên nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 143,
+      "text_zh": "监狱一看，这也不是个事儿啊，死我手里算咋回事呢？",
+      "draft": "Nhà tù thấy vậy, đây cũng không phải là chuyện tốt, để anh chết trong tay mình thì tính sao?",
+      "translation": "Nhà tù thấy vậy, đây cũng không phải là chuyện tốt, để anh chết trong tay mình thì tính sao?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 144,
+      "text_zh": "于是将其遣返回了北达科他州，可该州门卿啊一看灾星回来，头都大了，",
+      "draft": "Vì vậy, họ đã gửi anh trở lại Bắc Dakota, nhưng quan chức bang nhìn thấy tai họa trở lại, đau đầu,",
+      "translation": "Vì vậy, họ đã gửi anh trở lại Bắc Dakota, nhưng quan chức bang nhìn thấy tai họa trở lại, đau đầu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 145,
+      "text_zh": "赶紧再次把他送走了。",
+      "draft": "vội vàng gửi anh đi lần nữa.",
+      "translation": "vội vàng gửi anh đi lần nữa.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 146,
+      "text_zh": "这一次呢是一座监管更加严格的地方，科罗拉多州弗罗伦斯联邦监狱，",
+      "draft": "Lần này là một nơi quản lý còn nghiêm ngặt hơn, Nhà tù liên bang Florence, Colorado,",
+      "translation": "Lần này là một nơi quản lý còn nghiêm ngặt hơn, Nhà tù liên bang Florence, Colorado,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 147,
+      "text_zh": "该监狱也是铜墙铁壁般的存在。这让理查德再次崩溃，",
+      "draft": "Nhà tù này cũng là một nơi đồng sắt thép. Điều này khiến Richard lại một lần nữa sụp đổ,",
+      "translation": "Nhà tù này cũng là một nơi đồng sắt thép. Điều này khiến Richard lại một lần nữa sụp đổ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 148,
+      "text_zh": "几乎找不到逃出去的希望啊，于是他秉着此地不行，我再换一个地方的原则，",
+      "draft": "hầu như không tìm thấy hy vọng trốn thoát, vì vậy anh quyết định theo nguyên tắc, nếu không được ở đây, mình sẽ đổi sang nơi khác,",
+      "translation": "hầu như không tìm thấy hy vọng trốn thoát, vì vậy anh quyết định theo nguyên tắc, nếu không được ở đây, mình sẽ đổi sang nơi khác,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 149,
+      "text_zh": "以我想离家人居住的俄克拉荷马州近一些为由，",
+      "draft": "với lý do muốn sống gần hơn với gia đình ở Oklahoma,",
+      "translation": "với lý do muốn sống gần hơn với gia đình ở Oklahoma,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 150,
+      "text_zh": "申请调往路易斯安纳州的波洛克联邦监狱",
+      "draft": "đề nghị chuyển đến Nhà tù liên bang Pollock ở Louisiana.",
+      "translation": "đề nghị chuyển đến Nhà tù liên bang Pollock ở Louisiana.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 151,
+      "text_zh": "改监狱，同样监管森严，关押的都是联邦重刑犯。",
+      "draft": "Đổi nhà tù, cũng quản lý nghiêm ngặt, giam giữ toàn là tội phạm nặng liên bang.",
+      "translation": "Đổi nhà tù, cũng quản lý nghiêm ngặt, giam giữ toàn là tội phạm nặng liên bang.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 152,
+      "text_zh": "狱方觉得他转到这里也讨不到便宜，且申请呢也算合理，于是就同意了。",
+      "draft": "Nhà tù nghĩ rằng việc chuyển anh đến đây cũng không có lợi, mà đơn xin cũng hợp lý, vì vậy đã đồng ý.",
+      "translation": "Nhà tù nghĩ rằng việc chuyển anh đến đây cũng không có lợi, mà đơn xin cũng hợp lý, vì vậy đã đồng ý.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 153,
+      "text_zh": "和布洛克联邦监狱怎么也不会想到，",
+      "draft": "Nhà tù liên bang Block không thể nào nghĩ rằng,",
+      "translation": "Nhà tù liên bang Block không thể nào nghĩ rằng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 154,
+      "text_zh": "一场轰动全美的越狱行动，",
+      "draft": "một cuộc vượt ngục gây chấn động toàn nước Mỹ,",
+      "translation": "một cuộc vượt ngục gây chấn động toàn nước Mỹ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 155,
+      "text_zh": "让这座默默无闻名不见经传的监狱登上了全球新闻头条，",
+      "draft": "khiến nhà tù không tên tuổi này trở thành tin tức toàn cầu,",
+      "translation": "khiến nhà tù không tên tuổi này trở thành tin tức toàn cầu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 156,
+      "text_zh": "变得人尽皆知。",
+      "draft": "trở nên nổi tiếng.",
+      "translation": "trở nên nổi tiếng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 157,
+      "text_zh": "我是理查德，自从一九八八年被抓以来，我从未放弃过越狱，",
+      "draft": "Mình là Richard, từ khi bị bắt vào năm 1988, mình chưa bao giờ từ bỏ việc vượt ngục,",
+      "translation": "Mình là Richard, từ khi bị bắt vào năm 1988, mình chưa bao giờ từ bỏ việc vượt ngục,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 158,
+      "text_zh": "并时刻准备着，我知道必须要逃出去，也一定能逃出去。",
+      "draft": "và luôn sẵn sàng, mình biết mình phải trốn thoát, và chắc chắn có thể trốn thoát.",
+      "translation": "và luôn sẵn sàng, mình biết mình phải trốn thoát, và chắc chắn có thể trốn thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 159,
+      "text_zh": "二零零五年九月，我被正式转到了布洛克联邦监狱。",
+      "draft": "Vào tháng 9 năm 2005, mình chính thức được chuyển đến Nhà tù liên bang Block.",
+      "translation": "Vào tháng 9 năm 2005, mình chính thức được chuyển đến Nhà tù liên bang Block.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 160,
+      "text_zh": "根据之前的经验，我明白机会要慢慢的等。",
+      "draft": "Dựa vào kinh nghiệm trước đây, mình hiểu rằng cơ hội cần phải chờ đợi từ từ.",
+      "translation": "Dựa vào kinh nghiệm trước đây, mình hiểu rằng cơ hội cần phải chờ đợi từ từ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 161,
+      "text_zh": "本以为这一等至少需要数年时间，可出人意料的是，",
+      "draft": "Mình tưởng rằng việc chờ đợi này sẽ mất ít nhất vài năm, nhưng thật bất ngờ,",
+      "translation": "Mình tưởng rằng việc chờ đợi này sẽ mất ít nhất vài năm, nhưng thật bất ngờ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 162,
+      "text_zh": "仅仅三个月我就闻到了一丝腥味儿。布洛克监狱虽然外部监管森严，",
+      "draft": "chỉ sau ba tháng, mình đã ngửi thấy một chút mùi khả nghi. Mặc dù nhà tù Block có sự giám sát nghiêm ngặt,",
+      "translation": "chỉ sau ba tháng, mình đã ngửi thấy một chút mùi khả nghi. Mặc dù nhà tù Block có sự giám sát nghiêm ngặt,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 163,
+      "text_zh": "有数层围栏、电网与监控哨塔，但内部有多个供囚犯工作的厂房车间。",
+      "draft": "có nhiều hàng rào, lưới điện và tháp canh, nhưng bên trong có nhiều xưởng làm việc cho tù nhân.",
+      "translation": "có nhiều hàng rào, lưới điện và tháp canh, nhưng bên trong có nhiều xưởng làm việc cho tù nhân.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 164,
+      "text_zh": "白天狱友们都要上班。",
+      "draft": "Vào ban ngày, các bạn tù đều phải đi làm.",
+      "translation": "Vào ban ngày, các bạn tù đều phải đi làm.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 165,
+      "text_zh": "承担预防外接的一些工作，主要有木工、金属加工、油包、分拣、修补等等。",
+      "draft": "Họ đảm nhận một số công việc phòng ngừa bên ngoài, chủ yếu là mộc, gia công kim loại, bao dầu, phân loại, sửa chữa, v.v.",
+      "translation": "Họ đảm nhận một số công việc phòng ngừa bên ngoài, chủ yếu là mộc, gia công kim loại, bao dầu, phân loại, sửa chữa, v.v.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 166,
+      "text_zh": "刚进监狱三个月的我就被安排修补这些邮包",
+      "draft": "Mình được phân công sửa chữa những bưu kiện chỉ ba tháng sau khi vào tù.",
+      "translation": "Mình được phân công sửa chữa những bưu kiện chỉ ba tháng sau khi vào tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 167,
+      "text_zh": "多年的服役生涯交给了伟象秘诀，那就是行动保密准则。",
+      "draft": "Nhiều năm phục vụ đã dạy mình một bí quyết quan trọng, đó là quy tắc giữ bí mật hành động.",
+      "translation": "Nhiều năm phục vụ đã dạy mình một bí quyết quan trọng, đó là quy tắc giữ bí mật hành động.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 168,
+      "text_zh": "他要求从各种渠道收集零碎情报，当信息足够多时，",
+      "draft": "Ông ấy yêu cầu thu thập thông tin rời rạc từ nhiều nguồn, khi thông tin đủ nhiều,",
+      "translation": "Ông ấy yêu cầu thu thập thông tin rời rạc từ nhiều nguồn, khi thông tin đủ nhiều,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 169,
+      "text_zh": "即便不能拼出全貌，至少能勾勒出大致情况。",
+      "draft": "dù không thể ghép lại toàn bộ bức tranh, ít nhất cũng có thể phác thảo ra tình hình tổng quát.",
+      "translation": "dù không thể ghép lại toàn bộ bức tranh, ít nhất cũng có thể phác thảo ra tình hình tổng quát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 170,
+      "text_zh": "我从修补邮包的工作中意识到，这些邮包最终都要运出监狱，",
+      "draft": "Mình nhận ra rằng những bưu kiện sửa chữa cuối cùng đều phải được vận chuyển ra khỏi nhà tù,",
+      "translation": "Mình nhận ra rằng những bưu kiện sửa chữa cuối cùng đều phải được vận chuyển ra khỏi nhà tù,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 171,
+      "text_zh": "储存在附近的一个仓库，虽然中途要经过检查，但这其中暗藏身门。",
+      "draft": "lưu trữ tại một kho gần đó, mặc dù phải qua kiểm tra giữa chừng, nhưng bên trong có thể ẩn giấu lối thoát.",
+      "translation": "lưu trữ tại một kho gần đó, mặc dù phải qua kiểm tra giữa chừng, nhưng bên trong có thể ẩn giấu lối thoát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 172,
+      "text_zh": "我研究了各种越狱方法，大体归结为挖洞、挖地道、爬管子、翻墙撬锁等等。",
+      "draft": "Mình đã nghiên cứu nhiều phương pháp vượt ngục, chủ yếu là đào hầm, đào đường hầm, leo ống, trèo tường, mở khóa, v.v.",
+      "translation": "Mình đã nghiên cứu nhiều phương pháp vượt ngục, chủ yếu là đào hầm, đào đường hầm, leo ống, trèo tường, mở khóa, v.v.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 173,
+      "text_zh": "但这些在这一所监狱全部行不通。",
+      "draft": "Nhưng tất cả những điều này đều không khả thi trong nhà tù này.",
+      "translation": "Nhưng tất cả những điều này đều không khả thi trong nhà tù này.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 174,
+      "text_zh": "我苦思冥想，一个大胆疯狂，足以载入跃跃始寸的念头在我脑中成型了，",
+      "draft": "Mình đã suy nghĩ rất nhiều, một ý tưởng táo bạo và điên rồ, đủ để ghi vào lịch sử, đã hình thành trong đầu mình,",
+      "translation": "Mình đã suy nghĩ rất nhiều, một ý tưởng táo bạo và điên rồ, đủ để ghi vào lịch sử, đã hình thành trong đầu mình,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 175,
+      "text_zh": "把自己打包邮寄出去。",
+      "draft": "đó là tự mình đóng gói và gửi đi.",
+      "translation": "đó là tự mình đóng gói và gửi đi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 176,
+      "text_zh": "有了这个想法，我每天最高兴的事儿就是上班了。",
+      "draft": "Có ý tưởng này, điều vui nhất mỗi ngày của mình chính là đi làm.",
+      "translation": "Có ý tưởng này, điều vui nhất mỗi ngày của mình chính là đi làm.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 177,
+      "text_zh": "修补邮包期间，我会伪装成无比听话的老好人，任劳任怨，",
+      "draft": "Trong thời gian sửa chữa bưu kiện, mình sẽ giả vờ là một người tốt bụng, chăm chỉ và không phàn nàn,",
+      "translation": "Trong thời gian sửa chữa bưu kiện, mình sẽ giả vờ là một người tốt bụng, chăm chỉ và không phàn nàn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 178,
+      "text_zh": "从不嫌弃活多活重活脏，以此换取狱警们的信任。",
+      "draft": "không bao giờ chê bai công việc nặng nhọc hay bẩn thỉu, để đổi lấy sự tin tưởng của các cảnh sát nhà tù.",
+      "translation": "không bao giờ chê bai công việc nặng nhọc hay bẩn thỉu, để đổi lấy sự tin tưởng của các cảnh sát nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 179,
+      "text_zh": "其实，暗中我一直密切留意邮包的行走路线，",
+      "draft": "Thực ra, mình luôn theo dõi sát sao lộ trình vận chuyển của các bưu kiện,",
+      "translation": "Thực ra, mình luôn theo dõi sát sao lộ trình vận chuyển của các bưu kiện,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 180,
+      "text_zh": "什么时候邮包会被叉车转运，哪些邮包会被送进监狱外的中转仓？",
+      "draft": "khi nào bưu kiện sẽ được xe nâng chuyển đi, bưu kiện nào sẽ được gửi đến kho trung chuyển bên ngoài nhà tù?",
+      "translation": "khi nào bưu kiện sẽ được xe nâng chuyển đi, bưu kiện nào sẽ được gửi đến kho trung chuyển bên ngoài nhà tù?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 181,
+      "text_zh": "中途要经过哪些检查等等，这些都是我计划中不可或缺的一环。",
+      "draft": "Cần phải qua những kiểm tra nào, tất cả những điều này đều là những phần không thể thiếu trong kế hoạch của mình.",
+      "translation": "Cần phải qua những kiểm tra nào, tất cả những điều này đều là những phần không thể thiếu trong kế hoạch của mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 182,
+      "text_zh": "可怎么才能将一个活人混在邮包中被人打包运走呢？",
+      "draft": "Nhưng làm thế nào để có thể hòa lẫn một người sống vào trong bưu kiện để được đóng gói và vận chuyển đi?",
+      "translation": "Nhưng làm thế nào để có thể hòa lẫn một người sống vào trong bưu kiện để được đóng gói và vận chuyển đi?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 183,
+      "text_zh": "这个难题一直困扰着我，邮包不够大，根本就无法装人。",
+      "draft": "Vấn đề này luôn làm mình đau đầu, bưu kiện không đủ lớn, hoàn toàn không thể chứa người.",
+      "translation": "Vấn đề này luôn làm mình đau đầu, bưu kiện không đủ lớn, hoàn toàn không thể chứa người.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 184,
+      "text_zh": "即使能装人，那也太明显，根本就行不通。",
+      "draft": "Ngay cả khi có thể chứa người, thì cũng quá rõ ràng, hoàn toàn không khả thi.",
+      "translation": "Ngay cả khi có thể chứa người, thì cũng quá rõ ràng, hoàn toàn không khả thi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 185,
+      "text_zh": "几个月以来，我一直没有想到好的办法，最终把目光瞄向了油带下方的托架。",
+      "draft": "Trong vài tháng qua, mình không nghĩ ra cách nào hay, cuối cùng đã chú ý đến giá đỡ bên dưới bao dầu.",
+      "translation": "Trong vài tháng qua, mình không nghĩ ra cách nào hay, cuối cùng đã chú ý đến giá đỡ bên dưới bao dầu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 186,
+      "text_zh": "虽然托架高度有限，藏不住东西，但却是一个很好的承重装置。",
+      "draft": "Mặc dù chiều cao của giá đỡ có hạn, không thể giấu đồ, nhưng lại là một thiết bị chịu lực rất tốt.",
+      "translation": "Mặc dù chiều cao của giá đỡ có hạn, không thể giấu đồ, nhưng lại là một thiết bị chịu lực rất tốt.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 187,
+      "text_zh": "巧的是我从车间领班那里偷听到了一个消息说，",
+      "draft": "Thật trùng hợp, mình đã nghe lén được một tin từ quản lý xưởng rằng,",
+      "translation": "Thật trùng hợp, mình đã nghe lén được một tin từ quản lý xưởng rằng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 188,
+      "text_zh": "那些破旧的未分类的友邦会在接下来一周运到监狱外的中转仓存储。",
+      "draft": "những bưu kiện cũ chưa được phân loại sẽ được vận chuyển đến kho trung chuyển bên ngoài nhà tù trong tuần tới.",
+      "translation": "những bưu kiện cũ chưa được phân loại sẽ được vận chuyển đến kho trung chuyển bên ngoài nhà tù trong tuần tới.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 189,
+      "text_zh": "我知道机会来了，于是开始建造我的逃生舱。",
+      "draft": "Mình biết cơ hội đã đến, vì vậy bắt đầu xây dựng buồng thoát hiểm của mình.",
+      "translation": "Mình biết cơ hội đã đến, vì vậy bắt đầu xây dựng buồng thoát hiểm của mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 190,
+      "text_zh": "基于任劳任怨的老好人风格，",
+      "draft": "Dựa trên phong cách của một người tốt bụng chăm chỉ,",
+      "translation": "Dựa trên phong cách của một người tốt bụng chăm chỉ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 191,
+      "text_zh": "我的工位被安排在工厂隐藏的小角落里，整天和发霉的破油带打交道，",
+      "draft": "nơi làm việc của mình được sắp xếp ở một góc khuất trong xưởng, cả ngày tiếp xúc với những bao dầu mốc,",
+      "translation": "nơi làm việc của mình được sắp xếp ở một góc khuất trong xưởng, cả ngày tiếp xúc với những bao dầu mốc,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 192,
+      "text_zh": "而这恰好给了我更大的操作空间。",
+      "draft": "và điều này đã cho mình không gian thao tác lớn hơn.",
+      "translation": "và điều này đã cho mình không gian thao tác lớn hơn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 193,
+      "text_zh": "我运气不错，当时别的狱友都被调走，干奖金更高的分拣工作，只留我一个人在这里收尾。",
+      "draft": "Mình thật may mắn, khi đó các bạn tù khác đều được điều chuyển đi làm những công việc có thưởng cao hơn, chỉ còn mình ở lại đây để hoàn thành.",
+      "translation": "Mình thật may mắn, khi đó các bạn tù khác đều được điều chuyển đi làm những công việc có thưởng cao hơn, chỉ còn mình ở lại đây để hoàn thành.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 194,
+      "text_zh": "我将大量废弃的邮包用胶布打包成捆掏空中心。",
+      "draft": "Mình đã dùng băng dính để đóng gói nhiều bưu kiện bỏ đi thành từng bó và khoét rỗng ở giữa.",
+      "translation": "Mình đã dùng băng dính để đóng gói nhiều bưu kiện bỏ đi thành từng bó và khoét rỗng ở giữa.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 195,
+      "text_zh": "用塑料板、废弃金属等一些有支撑性的东西撑起了一个小空间，",
+      "draft": "Mình đã dùng tấm nhựa, kim loại bỏ đi và một số thứ có khả năng chịu lực để tạo ra một không gian nhỏ,",
+      "translation": "Mình đã dùng tấm nhựa, kim loại bỏ đi và một số thứ có khả năng chịu lực để tạo ra một không gian nhỏ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 196,
+      "text_zh": "并用拉链绑好，固定到托架上。最后在底部开了一个小的入口，可以从中钻进去。",
+      "draft": "và dùng khóa kéo buộc chặt vào giá đỡ. Cuối cùng, mình đã mở một lối vào nhỏ ở đáy, có thể chui vào.",
+      "translation": "và dùng khóa kéo buộc chặt vào giá đỡ. Cuối cùng, mình đã mở một lối vào nhỏ ở đáy, có thể chui vào.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 197,
+      "text_zh": "虽然这个计划很冒险，很可能会被狱警发现。",
+      "draft": "Mặc dù kế hoạch này rất mạo hiểm, có thể bị cảnh sát phát hiện.",
+      "translation": "Mặc dù kế hoạch này rất mạo hiểm, có thể bị cảnh sát phát hiện.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 198,
+      "text_zh": "我还可能会窒息其中，但我的人生信条是要不自由，要不死。",
+      "draft": "Mình có thể sẽ bị ngạt thở bên trong, nhưng phương châm sống của mình là phải tự do hoặc phải chết.",
+      "translation": "Mình có thể sẽ bị ngạt thở bên trong, nhưng phương châm sống của mình là phải tự do hoặc phải chết.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 199,
+      "text_zh": "可第一个逃生舱，其内部空间太小，根本就钻不进去。于是我又制作了头身舱，二号",
+      "draft": "Nhưng buồng thoát hiểm đầu tiên, không gian bên trong quá nhỏ, hoàn toàn không thể chui vào. Vì vậy, mình lại làm một buồng thân đầu, buồng số hai.",
+      "translation": "Nhưng buồng thoát hiểm đầu tiên, không gian bên trong quá nhỏ, hoàn toàn không thể chui vào. Vì vậy, mình lại làm một buồng thân đầu, buồng số hai.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 200,
+      "text_zh": "空间依旧狭小，但不能再扩大了，不然目标就太过明显。",
+      "draft": "Không gian vẫn chật hẹp, nhưng không thể mở rộng hơn, nếu không mục tiêu sẽ quá rõ ràng.",
+      "translation": "Không gian vẫn chật hẹp, nhưng không thể mở rộng hơn, nếu không mục tiêu sẽ quá rõ ràng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 201,
+      "text_zh": "造好逃生舱，我开始准备逃生，要准备的各种物品，",
+      "draft": "Sau khi làm xong buồng thoát hiểm, mình bắt đầu chuẩn bị cho việc trốn thoát, các vật dụng cần chuẩn bị,",
+      "translation": "Sau khi làm xong buồng thoát hiểm, mình bắt đầu chuẩn bị cho việc trốn thoát, các vật dụng cần chuẩn bị,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 202,
+      "text_zh": "用于呼吸的管子、食物、水、小刀等等。",
+      "draft": "ống thở, thức ăn, nước, dao nhỏ, v.v.",
+      "translation": "ống thở, thức ăn, nước, dao nhỏ, v.v.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 203,
+      "text_zh": "这一些还只是我越狱第一阶段所需，",
+      "draft": "Đây chỉ là những thứ cần thiết cho giai đoạn đầu của việc vượt ngục,",
+      "translation": "Đây chỉ là những thứ cần thiết cho giai đoạn đầu của việc vượt ngục,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 204,
+      "text_zh": "一旦逃离监狱，狱方肯定要展开大规模搜捕，",
+      "draft": "Một khi thoát khỏi nhà tù, chắc chắn sẽ có cuộc truy lùng quy mô lớn,",
+      "translation": "Một khi thoát khỏi nhà tù, chắc chắn sẽ có cuộc truy lùng quy mô lớn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 205,
+      "text_zh": "想要逃出包围圈，还需要准备更多东西。",
+      "draft": "Mình cần chuẩn bị nhiều thứ hơn để thoát khỏi vòng vây.",
+      "translation": "Mình cần chuẩn bị nhiều thứ hơn để thoát khỏi vòng vây.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 206,
+      "text_zh": "一身普通的运动服，一件背心，一双阿迪的运动鞋以及一张地图，",
+      "draft": "Một bộ đồ thể thao bình thường, một chiếc áo ba lỗ, một đôi giày thể thao Adidas và một bản đồ,",
+      "translation": "Một bộ đồ thể thao bình thường, một chiếc áo ba lỗ, một đôi giày thể thao Adidas và một bản đồ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 207,
+      "text_zh": "这些是我逃亡第二阶段，必要的装备。",
+      "draft": "Đây là trang bị cần thiết cho giai đoạn hai của cuộc trốn chạy.",
+      "translation": "Đây là trang bị cần thiết cho giai đoạn hai của cuộc trốn chạy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 208,
+      "text_zh": "我原计划是在四月一日行动，",
+      "draft": "Mình dự định hành động vào ngày một tháng tư,",
+      "translation": "Mình dự định hành động vào ngày một tháng tư,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 209,
+      "text_zh": "因为那天是愚人节。",
+      "draft": "vì hôm đó là ngày Cá tháng Tư.",
+      "translation": "vì hôm đó là ngày Cá tháng Tư.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 210,
+      "text_zh": "我心想，也许警方在初期接到报警时会误以为是恶作剧，",
+      "draft": "Mình nghĩ, có thể cảnh sát sẽ nhầm tưởng đó là một trò đùa khi nhận được báo cáo ban đầu,",
+      "translation": "Mình nghĩ, có thể cảnh sát sẽ nhầm tưởng đó là một trò đùa khi nhận được báo cáo ban đầu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 211,
+      "text_zh": "所以说这种可能性微乎其微，但哪怕增加万分之一的胜算，我也要考虑进去。",
+      "draft": "Vì vậy khả năng này rất nhỏ, nhưng dù chỉ tăng thêm một phần mười ngàn cơ hội, mình cũng phải tính đến.",
+      "translation": "Vì vậy khả năng này rất nhỏ, nhưng dù chỉ tăng thêm một phần mười ngàn cơ hội, mình cũng phải tính đến.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 212,
+      "text_zh": "然而，计划赶不上变化，那天是周六，厂区没有安排工作计划，只能延迟。",
+      "draft": "Tuy nhiên, kế hoạch không theo kịp sự thay đổi, hôm đó là thứ bảy, không có kế hoạch làm việc trong nhà máy, chỉ có thể hoãn lại.",
+      "translation": "Tuy nhiên, kế hoạch không theo kịp sự thay đổi, hôm đó là thứ bảy, không có kế hoạch làm việc trong nhà máy, chỉ có thể hoãn lại.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 213,
+      "text_zh": "四月五日早上六点，我兴奋的起床吃过早饭，于七点二十分准时抵达我的工作区。",
+      "draft": "Vào lúc sáu giờ sáng ngày năm tháng tư, mình phấn khởi dậy ăn sáng và đến khu làm việc đúng bảy giờ hai mươi.",
+      "translation": "Vào lúc sáu giờ sáng ngày năm tháng tư, mình phấn khởi dậy ăn sáng và đến khu làm việc đúng bảy giờ hai mươi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 214,
+      "text_zh": "偷偷藏好食物和那身逃跑用的运动服。",
+      "draft": "Mình đã giấu thức ăn và bộ đồ chạy trốn một cách bí mật.",
+      "translation": "Mình đã giấu thức ăn và bộ đồ chạy trốn một cách bí mật.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 215,
+      "text_zh": "虽然被值班经理发现了，但关键时刻老好人的形象发挥了作用。他没有深究。",
+      "draft": "Mặc dù bị quản lý trực ca phát hiện, nhưng hình ảnh của một người tốt đã phát huy tác dụng vào lúc quan trọng. Ông ta không điều tra sâu.",
+      "translation": "Mặc dù bị quản lý trực ca phát hiện, nhưng hình ảnh của một người tốt đã phát huy tác dụng vào lúc quan trọng. Ông ta không điều tra sâu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 216,
+      "text_zh": "七点五十分，我用小车拉这个托架来到我的工位，",
+      "draft": "Vào lúc bảy giờ năm mươi, mình đã dùng xe đẩy đưa cái khung này đến chỗ làm việc của mình,",
+      "translation": "Vào lúc bảy giờ năm mươi, mình đã dùng xe đẩy đưa cái khung này đến chỗ làm việc của mình,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 217,
+      "text_zh": "这一幕也成为监控，拍下我最后的画面。",
+      "draft": "Cảnh này cũng đã được camera giám sát ghi lại, ghi lại hình ảnh cuối cùng của mình.",
+      "translation": "Cảnh này cũng đã được camera giám sát ghi lại, ghi lại hình ảnh cuối cùng của mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 218,
+      "text_zh": "为确保有人能把托架运到装卸区，我特意和主管和几位狱友打了招呼，",
+      "draft": "Để đảm bảo có người có thể vận chuyển khung đến khu vực bốc dỡ, mình đã đặc biệt nói chuyện với quản lý và vài bạn tù,",
+      "translation": "Để đảm bảo có người có thể vận chuyển khung đến khu vực bốc dỡ, mình đã đặc biệt nói chuyện với quản lý và vài bạn tù,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 219,
+      "text_zh": "谎称我要去医务室检查，还补充了一句，",
+      "draft": "Nói dối rằng mình phải đi khám ở phòng y tế, và còn thêm một câu,",
+      "translation": "Nói dối rằng mình phải đi khám ở phòng y tế, và còn thêm một câu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 220,
+      "text_zh": "监狱长，交代过这一批货架，必须随下一个班车一并运出。",
+      "draft": "Giám đốc nhà tù đã chỉ đạo rằng lô hàng này phải được vận chuyển cùng với chuyến xe tiếp theo.",
+      "translation": "Giám đốc nhà tù đã chỉ đạo rằng lô hàng này phải được vận chuyển cùng với chuyến xe tiếp theo.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 221,
+      "text_zh": "接着，我玩起了消失术，换上背心，",
+      "draft": "Sau đó, mình đã thực hiện màn biến mất, thay áo ba lỗ,",
+      "translation": "Sau đó, mình đã thực hiện màn biến mất, thay áo ba lỗ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 222,
+      "text_zh": "艰难的爬进了逃生舱，并将所有工具都绑在身上。",
+      "draft": "và khó khăn chui vào buồng thoát hiểm, buộc tất cả các công cụ vào người.",
+      "translation": "và khó khăn chui vào buồng thoát hiểm, buộc tất cả các công cụ vào người.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 223,
+      "text_zh": "考虑到数百条邮包加上我的重量，可能会引起怀疑，",
+      "draft": "Cân nhắc đến hàng trăm bưu kiện cộng với trọng lượng của mình, có thể gây nghi ngờ,",
+      "translation": "Cân nhắc đến hàng trăm bưu kiện cộng với trọng lượng của mình, có thể gây nghi ngờ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 224,
+      "text_zh": "我特意在邮包外贴了一张标签，FBI重要证据，不要触碰。",
+      "draft": "Mình đã đặc biệt dán một nhãn bên ngoài bưu kiện, chứng cứ quan trọng của FBI, không được chạm vào.",
+      "translation": "Mình đã đặc biệt dán một nhãn bên ngoài bưu kiện, chứng cứ quan trọng của FBI, không được chạm vào.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 225,
+      "text_zh": "做完这些，我已是尽其所能，后面的一切只能听天由命了。",
+      "draft": "Sau khi làm xong những việc này, mình đã làm hết sức có thể, mọi thứ còn lại chỉ có thể phó mặc cho số phận.",
+      "translation": "Sau khi làm xong những việc này, mình đã làm hết sức có thể, mọi thứ còn lại chỉ có thể phó mặc cho số phận.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 226,
+      "text_zh": "我蜷缩在逃生舱当中，膝盖贴着额头，",
+      "draft": "Mình cuộn tròn trong buồng thoát hiểm, đầu gối chạm vào trán,",
+      "translation": "Mình cuộn tròn trong buồng thoát hiểm, đầu gối chạm vào trán,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 227,
+      "text_zh": "嘴里咬着通向下方托架的小管子，用来呼吸几乎密封的空间。",
+      "draft": "miệng cắn ống nhỏ dẫn xuống khung dưới để thở trong không gian gần như kín.",
+      "translation": "miệng cắn ống nhỏ dẫn xuống khung dưới để thở trong không gian gần như kín.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 228,
+      "text_zh": "我感觉每分每一秒都是煎熬。",
+      "draft": "Mình cảm thấy từng giây từng phút đều là sự tra tấn.",
+      "translation": "Mình cảm thấy từng giây từng phút đều là sự tra tấn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 229,
+      "text_zh": "八点三十五分，我突然感觉到整个托架被叉车叉起，然后运来运去。",
+      "draft": "Vào lúc tám giờ ba mươi lăm, mình đột nhiên cảm thấy toàn bộ khung bị xe nâng nâng lên, rồi được vận chuyển đi.",
+      "translation": "Vào lúc tám giờ ba mươi lăm, mình đột nhiên cảm thấy toàn bộ khung bị xe nâng nâng lên, rồi được vận chuyển đi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 230,
+      "text_zh": "那一刻，我几乎抑制不住内心的狂喜。要不是怕发出声音暴露，我真想大声欢呼。",
+      "draft": "Khoảnh khắc đó, mình gần như không thể kiềm chế niềm vui sướng trong lòng. Nếu không sợ phát ra tiếng động sẽ bị lộ, mình thật sự muốn hét lên.",
+      "translation": "Khoảnh khắc đó, mình gần như không thể kiềm chế niềm vui sướng trong lòng. Nếu không sợ phát ra tiếng động sẽ bị lộ, mình thật sự muốn hét lên.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 231,
+      "text_zh": "但兴奋过后是痛苦。我转运到装卸平台后，整整半个小时，没有动静，",
+      "draft": "Nhưng sau sự phấn khích là nỗi đau đớn. Sau khi được chuyển đến bến bốc dỡ, mình đã chờ đợi suốt nửa giờ mà không có động tĩnh,",
+      "translation": "Nhưng sau sự phấn khích là nỗi đau đớn. Sau khi được chuyển đến bến bốc dỡ, mình đã chờ đợi suốt nửa giờ mà không có động tĩnh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 232,
+      "text_zh": "阳光暴晒，下舱内温度骤升，我感觉到无法呼气，每一次呼吸都是一场挣扎，",
+      "draft": "Ánh nắng chiếu rọi, nhiệt độ trong buồng tăng cao, mình cảm thấy không thể thở, mỗi lần hít thở đều là một cuộc chiến,",
+      "translation": "Ánh nắng chiếu rọi, nhiệt độ trong buồng tăng cao, mình cảm thấy không thể thở, mỗi lần hít thở đều là một cuộc chiến,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 233,
+      "text_zh": "甚至随时会晕倒死在其中。",
+      "draft": "thậm chí có thể ngất xỉu và chết trong đó bất cứ lúc nào.",
+      "translation": "thậm chí có thể ngất xỉu và chết trong đó bất cứ lúc nào.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 234,
+      "text_zh": "但直觉告诉我，这是黎明前的黑暗，我必须要坚持住。",
+      "draft": "Nhưng trực giác mách bảo mình, đây là bóng tối trước bình minh, mình phải kiên trì.",
+      "translation": "Nhưng trực giác mách bảo mình, đây là bóng tối trước bình minh, mình phải kiên trì.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 235,
+      "text_zh": "终于在九点多托架被顺利转运走，穿过了一道道铁门。最终抵达监狱外的中转舱，",
+      "draft": "Cuối cùng vào khoảng chín giờ, khung đã được vận chuyển thuận lợi, đi qua từng cánh cửa sắt. Cuối cùng đến được buồng chuyển bên ngoài nhà tù,",
+      "translation": "Cuối cùng vào khoảng chín giờ, khung đã được vận chuyển thuận lợi, đi qua từng cánh cửa sắt. Cuối cùng đến được buồng chuyển bên ngoài nhà tù,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 236,
+      "text_zh": "可惜舱惑工人一直在边上工作谈话，我不敢有任何行动，",
+      "draft": "Thật tiếc là công nhân ở bên cạnh vẫn đang làm việc và nói chuyện, mình không dám có bất kỳ hành động nào,",
+      "translation": "Thật tiếc là công nhân ở bên cạnh vẫn đang làm việc và nói chuyện, mình không dám có bất kỳ hành động nào,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 237,
+      "text_zh": "直到十一点左右，工人们都去吃饭了。我知道这是个好机会。",
+      "draft": "Cho đến khoảng mười một giờ, khi công nhân đều đi ăn trưa. Mình biết đây là cơ hội tốt.",
+      "translation": "Cho đến khoảng mười một giờ, khi công nhân đều đi ăn trưa. Mình biết đây là cơ hội tốt.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 238,
+      "text_zh": "考虑到监狱是下午四点钟例行点名，",
+      "draft": "Cân nhắc rằng nhà tù có cuộc điểm danh định kỳ vào lúc bốn giờ chiều,",
+      "translation": "Cân nhắc rằng nhà tù có cuộc điểm danh định kỳ vào lúc bốn giờ chiều,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 239,
+      "text_zh": "所以我必须要抓紧时间用小刀割开束缚艰难的爬出逃生舱。",
+      "draft": "vì vậy mình phải nhanh chóng dùng dao nhỏ cắt bỏ dây trói và khó khăn chui ra khỏi buồng thoát hiểm.",
+      "translation": "vì vậy mình phải nhanh chóng dùng dao nhỏ cắt bỏ dây trói và khó khăn chui ra khỏi buồng thoát hiểm.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 240,
+      "text_zh": "当适应了外面的光线之后，思绪飞快运转。肾上腺素激增的是如此强烈，",
+      "draft": "Khi đã thích nghi với ánh sáng bên ngoài, suy nghĩ của tôi nhanh chóng vận động.",
+      "translation": "Khi đã thích nghi với ánh sáng bên ngoài, suy nghĩ của tôi nhanh chóng vận động.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 241,
+      "text_zh": "让我的嗅觉、听觉、行觉借入前所未有的敏锐状态。",
+      "draft": "Khiến cho khứu giác, thính giác và xúc giác của tôi trở nên nhạy bén chưa từng có.",
+      "translation": "Khiến cho khứu giác, thính giác và xúc giác của tôi trở nên nhạy bén chưa từng có.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 242,
+      "text_zh": "借着树丛掩护，穿过了建筑群，却被一片正在施工的新区域截断了去路。",
+      "draft": "Dưới sự che chở của bụi cây, tôi đã vượt qua khu nhà, nhưng bị chặn lại bởi một khu vực đang thi công.",
+      "translation": "Dưới sự che chở của bụi cây, tôi đã vượt qua khu nhà, nhưng bị chặn lại bởi một khu vực đang thi công.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 243,
+      "text_zh": "考虑到目标太明显，我在这里被困了一个小时，最终决定冒险向西行进，",
+      "draft": "Xem xét mục tiêu quá rõ ràng, tôi đã bị mắc kẹt ở đây một giờ, cuối cùng quyết định mạo hiểm đi về phía tây.",
+      "translation": "Xem xét mục tiêu quá rõ ràng, tôi đã bị mắc kẹt ở đây một giờ, cuối cùng quyết định mạo hiểm đi về phía tây.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 244,
+      "text_zh": "穿过横贯监狱建筑群的狭窄柏油路，潜入一片林地。",
+      "draft": "Đi qua con đường nhựa hẹp xuyên qua khu nhà tù, tôi lén lút vào một khu rừng.",
+      "translation": "Đi qua con đường nhựa hẹp xuyên qua khu nhà tù, tôi lén lút vào một khu rừng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 245,
+      "text_zh": "为了迷惑警犬，我跪伏在地，以交错迂回的方式绕圈爬行，",
+      "draft": "Để đánh lừa chó cảnh sát, tôi quỳ xuống đất, bò vòng theo cách chéo.",
+      "translation": "Để đánh lừa chó cảnh sát, tôi quỳ xuống đất, bò vòng theo cách chéo.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 246,
+      "text_zh": "布下一条气味，迷踪在附近又发现了一个小池塘。",
+      "draft": "Để lại một dấu vết mùi, tôi phát hiện ra một cái ao nhỏ gần đó.",
+      "translation": "Để lại một dấu vết mùi, tôi phát hiện ra một cái ao nhỏ gần đó.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 247,
+      "text_zh": "为了进一步迷惑警犬，我又绕着小池塘绕了数圈，最后来到监狱南侧的空军基地路。",
+      "draft": "Để tiếp tục đánh lừa chó cảnh sát, tôi đã bò vòng quanh cái ao nhỏ vài vòng, cuối cùng đến đường căn cứ không quân phía nam nhà tù.",
+      "translation": "Để tiếp tục đánh lừa chó cảnh sát, tôi đã bò vòng quanh cái ao nhỏ vài vòng, cuối cùng đến đường căn cứ không quân phía nam nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 248,
+      "text_zh": "这里有一道一点五米高的铁丝围栏。",
+      "draft": "Ở đây có một hàng rào dây thép cao một mét rưỡi.",
+      "translation": "Ở đây có một hàng rào dây thép cao một mét rưỡi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 249,
+      "text_zh": "就在我翻阅之时，一名女子驾车刚好经过并看到了我。",
+      "draft": "Khi tôi đang trèo qua, một người phụ nữ lái xe vừa lúc đi qua và nhìn thấy tôi.",
+      "translation": "Khi tôi đang trèo qua, một người phụ nữ lái xe vừa lúc đi qua và nhìn thấy tôi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 250,
+      "text_zh": "我知道这是一个致命漏洞，但我无计可施，只能尽快逃离。",
+      "draft": "Tôi biết đây là một lỗ hổng chết người, nhưng không còn cách nào khác, chỉ có thể nhanh chóng chạy trốn.",
+      "translation": "Tôi biết đây là một lỗ hổng chết người, nhưng không còn cách nào khác, chỉ có thể nhanh chóng chạy trốn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 251,
+      "text_zh": "沿着监狱外侧的铁路向南狂奔。",
+      "draft": "Chạy điên cuồng về phía nam dọc theo đường ray bên ngoài nhà tù.",
+      "translation": "Chạy điên cuồng về phía nam dọc theo đường ray bên ngoài nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 252,
+      "text_zh": "我之前研究过路线，想先逃亡到路易斯安那州的亚历山大市，",
+      "draft": "Tôi đã nghiên cứu trước lộ trình, dự định chạy trốn đến thành phố Alexandria, tiểu bang Louisiana.",
+      "translation": "Tôi đã nghiên cứu trước lộ trình, dự định chạy trốn đến thành phố Alexandria, tiểu bang Louisiana.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 253,
+      "text_zh": "那里人多车多，我计划在那里，头辆车换装逃亡。",
+      "draft": "Nơi đó đông người và nhiều xe, tôi dự định ở đó, đổi xe để tiếp tục chạy trốn.",
+      "translation": "Nơi đó đông người và nhiều xe, tôi dự định ở đó, đổi xe để tiếp tục chạy trốn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 254,
+      "text_zh": "按照我的计划，鉴于在上午四点才会发现我的行踪，",
+      "draft": "Theo kế hoạch của tôi, vì đến bốn giờ sáng mới phát hiện ra dấu vết của tôi,",
+      "translation": "Theo kế hoạch của tôi, vì đến bốn giờ sáng mới phát hiện ra dấu vết của tôi,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 255,
+      "text_zh": "那时我早已跑远了让人出乎意料的是预防提前发生异场，",
+      "draft": "Lúc đó tôi đã chạy xa, điều bất ngờ là đã có cảnh báo vượt ngục xảy ra sớm.",
+      "translation": "Lúc đó tôi đã chạy xa, điều bất ngờ là đã có cảnh báo vượt ngục xảy ra sớm.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 256,
+      "text_zh": "并立即发出越狱警报。",
+      "draft": "Và ngay lập tức phát ra báo động vượt ngục.",
+      "translation": "Và ngay lập tức phát ra báo động vượt ngục.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 257,
+      "text_zh": "而那个目击我翻越铁丝网的女子，在看到新闻之后，也立即报了警。",
+      "draft": "Cô gái đã chứng kiến tôi trèo qua hàng rào dây thép, sau khi thấy tin tức, cũng lập tức báo cảnh sát.",
+      "translation": "Cô gái đã chứng kiến tôi trèo qua hàng rào dây thép, sau khi thấy tin tức, cũng lập tức báo cảnh sát.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 258,
+      "text_zh": "所以，当我好不容易沿着铁轨跑到路易斯安那州鲍尔镇附近，",
+      "draft": "Vì vậy, khi tôi khó khăn lắm mới chạy đến gần thị trấn Ball, tiểu bang Louisiana,",
+      "translation": "Vì vậy, khi tôi khó khăn lắm mới chạy đến gần thị trấn Ball, tiểu bang Louisiana,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 259,
+      "text_zh": "预方已经开始了全面搜索铁轨附近有巡逻的警察。",
+      "draft": "Lực lượng đã bắt đầu tìm kiếm toàn diện, có cảnh sát tuần tra gần đường ray.",
+      "translation": "Lực lượng đã bắt đầu tìm kiếm toàn diện, có cảnh sát tuần tra gần đường ray.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 260,
+      "text_zh": "四点左右，我沿着铁轨奔跑时，突然前面出现了一名警察，",
+      "draft": "Khoảng bốn giờ, khi tôi đang chạy dọc theo đường ray, đột nhiên xuất hiện một cảnh sát phía trước.",
+      "translation": "Khoảng bốn giờ, khi tôi đang chạy dọc theo đường ray, đột nhiên xuất hiện một cảnh sát phía trước.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 261,
+      "text_zh": "我知道那是抓我的，但对方可能已经看到了，我我不能跑，只能硬着头皮继续前进。",
+      "draft": "Tôi biết đó là để bắt tôi, nhưng có thể đối phương đã nhìn thấy, tôi không thể chạy, chỉ có thể cắn răng tiếp tục tiến về phía trước.",
+      "translation": "Tôi biết đó là để bắt tôi, nhưng có thể đối phương đã nhìn thấy, tôi không thể chạy, chỉ có thể cắn răng tiếp tục tiến về phía trước.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 262,
+      "text_zh": "此时，我的大脑飞速运转，思考各种应变方式。",
+      "draft": "Lúc này, não tôi hoạt động nhanh chóng, suy nghĩ về các cách ứng phó.",
+      "translation": "Lúc này, não tôi hoạt động nhanh chóng, suy nghĩ về các cách ứng phó.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 263,
+      "text_zh": "如果对方直接上来就扣我，那我只能反抗逃脱。",
+      "draft": "Nếu đối phương trực tiếp đến bắt tôi, tôi chỉ có thể chống cự để thoát thân.",
+      "translation": "Nếu đối phương trực tiếp đến bắt tôi, tôi chỉ có thể chống cự để thoát thân.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 264,
+      "text_zh": "如果对方只是询问，那或许还有一线生机。",
+      "draft": "Nếu đối phương chỉ hỏi, có lẽ vẫn còn một tia hy vọng.",
+      "translation": "Nếu đối phương chỉ hỏi, có lẽ vẫn còn một tia hy vọng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 265,
+      "text_zh": "幸运呢是对方是询问，接下来就是我和警方周旋的十分钟名场面，请大家欣赏。",
+      "draft": "May mắn thay, đối phương chỉ hỏi, tiếp theo là cảnh tượng tôi đấu trí với cảnh sát trong mười phút, xin mời mọi người thưởng thức.",
+      "translation": "May mắn thay, đối phương chỉ hỏi, tiếp theo là cảnh tượng tôi đấu trí với cảnh sát trong mười phút, xin mời mọi người thưởng thức.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 266,
+      "text_zh": "Isheit?你你能不让天帮弄我赢了呗，这样的肉包呀。",
+      "draft": "Isheit? Bạn có thể không để trời giúp tôi thắng không, cái bánh thịt như vậy.",
+      "translation": "Isheit? Bạn có thể không để trời giúp tôi thắng không, cái bánh thịt như vậy.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 267,
+      "text_zh": "黄彦彪爬步啊哈。",
+      "draft": "Hoàng Diễn Bảo bò bước ah ha.",
+      "translation": "Hoàng Diễn Bảo bò bước ah ha.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 268,
+      "text_zh": "Ok,doyouhavevingformdevcationonknow,watchname,robberones,",
+      "draft": "Ok, bạn có thông tin nào về tên cướp không, tên gì, tên cướp nào,",
+      "translation": "Ok, bạn có thông tin nào về tên cướp không, tên gì, tên cướp nào,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 269,
+      "text_zh": "robberjones,h.Hi,i'mnicetofumethetrick.No,that'snottheproblemrightnow.Whatwhatyouaddress?",
+      "draft": "tên cướp Jones, h. Chào, tôi rất vui được gặp bạn. Không, đó không phải là vấn đề ngay bây giờ. Bạn đang ở đâu?",
+      "translation": "tên cướp Jones, h. Chào, tôi rất vui được gặp bạn. Không, đó không phải là vấn đề ngay bây giờ. Bạn đang ở đâu?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 270,
+      "text_zh": "Idon'thaveabreatimelikeahotel.We'reworkingona还要出是小巴该讹回哦。",
+      "draft": "Tôi không có thời gian như ở khách sạn. Chúng tôi đang làm việc, còn phải ra ngoài là xe buýt nhỏ.",
+      "translation": "Tôi không có thời gian như ở khách sạn. Chúng tôi đang làm việc, còn phải ra ngoài là xe buýt nhỏ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 271,
+      "text_zh": "Whatisregartherescaping?哦，",
+      "draft": "Chuyện gì đang xảy ra với việc chạy trốn? Ồ,",
+      "translation": "Chuyện gì đang xảy ra với việc chạy trốn? Ồ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 272,
+      "text_zh": "是嗯哼哼",
+      "draft": "là ừm hừm hừm",
+      "translation": "là ừm hừm hừm",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 273,
+      "text_zh": "prisonprisonhere.Yeah,takeyougloball",
+      "draft": "nhà tù nhà tù ở đây. Vâng, đưa bạn ra toàn cầu.",
+      "translation": "nhà tù nhà tù ở đây. Vâng, đưa bạn ra toàn cầu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 274,
+      "text_zh": "ittttousesureanythingliftover.No,no,no,",
+      "draft": "nó sẽ chắc chắn có gì đó xảy ra. Không, không, không,",
+      "translation": "nó sẽ chắc chắn có gì đó xảy ra. Không, không, không,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 275,
+      "text_zh": "that'sjustnow.It'splayingusual.Hello,didyouguysyou",
+      "draft": "đó chỉ là bây giờ. Nó vẫn diễn ra như thường lệ. Xin chào, các bạn có thấy không?",
+      "translation": "đó chỉ là bây giờ. Nó vẫn diễn ra như thường lệ. Xin chào, các bạn có thấy không?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 276,
+      "text_zh": "haveyoutypointitsix,我在在不在",
+      "draft": "bạn đã điểm danh chưa, tôi có ở đây không?",
+      "translation": "bạn đã điểm danh chưa, tôi có ở đây không?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 277,
+      "text_zh": "嗯，我等会，我",
+      "draft": "Ừ, tôi sẽ đợi một chút, tôi",
+      "translation": "Ừ, tôi sẽ đợi một chút, tôi",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 278,
+      "text_zh": "right.Letletmeletmejustverify.Hesayshisbrotherstainedatthemoteile.Letmeverifythatifsoaswascuttingttinglose,",
+      "draft": "đúng rồi. Để tôi xác minh. Anh ấy nói anh trai của mình đã ở khách sạn. Để tôi xác minh nếu vậy thì tôi sẽ cắt đứt.",
+      "translation": "đúng rồi. Để tôi xác minh. Anh ấy nói anh trai của mình đã ở khách sạn. Để tôi xác minh nếu vậy thì tôi sẽ cắt đứt.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 279,
+      "text_zh": "ithanks,",
+      "draft": "Cảm ơn,",
+      "translation": "Cảm ơn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 280,
+      "text_zh": "你倒子bad,don'tmatchupwin.Yeah.嗯，",
+      "draft": "Bạn không phù hợp, không thắng được. Ừm,",
+      "translation": "Bạn không tốt, không phù hợp để thắng. Ừm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 281,
+      "text_zh": "我一生呢thatatidespeillortidesinging,他的声音不有的话，",
+      "draft": "Cuộc đời mình có những giai điệu, giọng hát của anh ấy không có gì đặc biệt,",
+      "translation": "Cuộc đời mình có những giai điệu, giọng hát của anh ấy không có gì đặc biệt,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 282,
+      "text_zh": "我也没有whatisthat的？",
+      "draft": "Mình cũng không biết đó là gì?",
+      "translation": "Mình cũng không biết đó là gì?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 283,
+      "text_zh": "Noletters.Wejustgetindetailonaboutaweekago.嗯，鸡爪没有",
+      "draft": "Không có thư. Chúng tôi chỉ đi vào chi tiết cách đây khoảng một tuần. Ừm, không có chân gà.",
+      "translation": "Không có thư. Chúng tôi chỉ đi vào chi tiết cách đây khoảng một tuần. Ừm, không có chân gà.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 284,
+      "text_zh": "然后我需要个个wellouthtodayworkingjobPFMaphirommanrollbya这是什么？要去隆珑的飞，",
+      "draft": "Rồi mình cần một công việc tốt hôm nay, cái gì đây? Phải đi bay đến Long Long,",
+      "translation": "Rồi mình cần một công việc tốt hôm nay, cái gì đây? Phải đi bay đến Long Long,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 285,
+      "text_zh": "加油啊，你嘉宾啊，你好你好，",
+      "draft": "Cố lên nhé, bạn khách mời, chào bạn,",
+      "translation": "Cố lên nhé, bạn khách mời, chào bạn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 286,
+      "text_zh": "you'llbebacktocleareaboutaboutabproblem.Two,manytes,threethreeminuteswithyourworkkar,itis属于接出来，",
+      "draft": "Bạn sẽ quay lại để giải quyết vấn đề. Hai, nhiều lần, ba phút với công việc của bạn, nó thuộc về việc ra ngoài,",
+      "translation": "Bạn sẽ quay lại để giải quyết vấn đề. Hai, nhiều lần, ba phút với công việc của bạn, nó thuộc về việc ra ngoài,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 287,
+      "text_zh": "andiwhat'snamedthecompanyfeelsbroken.Ok嗯，六六五，你这个队友不爱拍，就说",
+      "draft": "Và công ty đó cảm thấy bị hỏng. Ừm, sáu sáu năm, bạn không thích chụp ảnh, chỉ cần nói.",
+      "translation": "Và công ty đó cảm thấy bị hỏng. Ừm, sáu sáu năm, bạn không thích chụp ảnh, chỉ cần nói.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 288,
+      "text_zh": "我也不是alwayswroteinshots",
+      "draft": "Mình cũng không phải lúc nào cũng viết trong những bức ảnh.",
+      "translation": "Mình cũng không phải lúc nào cũng viết trong những bức ảnh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 289,
+      "text_zh": "干妈的呃，scratchedphone.是的，",
+      "draft": "Trời ạ, điện thoại bị xước. Đúng vậy,",
+      "translation": "Trời ạ, điện thoại bị xước. Đúng vậy,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 290,
+      "text_zh": "我要不要拍下去啊，要我拍下去，",
+      "draft": "Mình có nên tiếp tục quay không, có cần mình quay không,",
+      "translation": "Mình có nên tiếp tục quay không, có cần mình quay không,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 291,
+      "text_zh": "我toohigh,不要去去IIroveyoulikeyoulove行。",
+      "draft": "Mình quá cao, không nên đi, mình yêu bạn như bạn yêu.",
+      "translation": "Mình quá cao, không nên đi, mình yêu bạn như bạn yêu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 292,
+      "text_zh": "嗯，",
+      "draft": "Ừm,",
+      "translation": "Ừm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 293,
+      "text_zh": "whereyoufrom啊，不是areason两些机识。",
+      "draft": "Bạn đến từ đâu, không phải là lý do cho một số máy nhận diện.",
+      "translation": "Bạn đến từ đâu, không phải là lý do cho một số máy nhận diện.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 294,
+      "text_zh": "Thewatchnameagain玉米丘，",
+      "draft": "Tên đồng hồ là gì nhỉ, Đồi Ngô,",
+      "translation": "Tên đồng hồ là gì nhỉ, Đồi Ngô,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 295,
+      "text_zh": "哎，whichselfffmyposition,你要不能不能？",
+      "draft": "Trời ạ, vị trí của mình, bạn không thể không?",
+      "translation": "Trời ạ, vị trí của mình, bạn không thể không?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 296,
+      "text_zh": "Iknowi'mnoti'mnot阿妈，等会就给说干预杯",
+      "draft": "Mình biết mình không phải, đợi một chút sẽ nói về cái cốc can thiệp.",
+      "translation": "Mình biết mình không phải, đợi một chút sẽ nói về cái cốc can thiệp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 297,
+      "text_zh": "he'werebelievewiththemgysdo",
+      "draft": "Anh ấy sẽ tin với họ.",
+      "translation": "Anh ấy sẽ tin với họ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 298,
+      "text_zh": "没得敢也是也是这敢把他都跟我对稳。",
+      "draft": "Không dám cũng là điều này, dám làm thì phải ổn định với mình.",
+      "translation": "Không dám cũng là điều này, dám làm thì phải ổn định với mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 299,
+      "text_zh": "Nowch,whaticsssstricks,andi'llsawyou",
+      "draft": "Bây giờ, cái gì đó, và mình sẽ gặp bạn.",
+      "translation": "Bây giờ, cái gì đó, và mình sẽ gặp bạn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 300,
+      "text_zh": "whatdidisay?Well,",
+      "draft": "Mình đã nói gì? Ừm,",
+      "translation": "Mình đã nói gì? Ừm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 301,
+      "text_zh": "还lucky垫了背，",
+      "draft": "Vẫn may mắn có đệm,",
+      "translation": "Vẫn may mắn có đệm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 302,
+      "text_zh": "nono,no,no,butiknowprisonescapeme.呃，伊朗的委员",
+      "draft": "Không, không, không, nhưng mình biết vượt ngục. Ừm, Ủy viên Iran.",
+      "translation": "Không, không, không, nhưng mình biết vượt ngục. Ừm, Ủy viên Iran.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 303,
+      "text_zh": "不啥买包noti'lltopaboutyoudon'tknowwhereyouaddisforce",
+      "draft": "Không mua gì cả, mình sẽ không nói về bạn, không biết bạn ở đâu.",
+      "translation": "Không mua gì cả, mình sẽ không nói về bạn, không biết bạn ở đâu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 304,
+      "text_zh": "wereapplewhereyouarefrompalmer.Well,wouldtakeaplaymous.哦，",
+      "draft": "Chúng ta là táo, bạn đến từ đâu, Palmer. Ừm, sẽ mất thời gian.",
+      "translation": "Chúng ta là táo, bạn đến từ đâu, Palmer. Ừm, sẽ mất thời gian.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 305,
+      "text_zh": "itelltheycouldyougoing我headoutit",
+      "draft": "Mình sẽ bảo họ có thể đi, mình ra ngoài.",
+      "translation": "Mình sẽ bảo họ có thể đi, mình ra ngoài.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 306,
+      "text_zh": "哦，",
+      "draft": "Ừm,",
+      "translation": "Ừm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 307,
+      "text_zh": "有",
+      "draft": "Có,",
+      "translation": "Có,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 308,
+      "text_zh": "watchgame按钮来听。",
+      "draft": "Nhấn nút xem trò chơi để nghe.",
+      "translation": "Nhấn nút xem trò chơi để nghe.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 309,
+      "text_zh": "Youcanberightthere.Apropagamo",
+      "draft": "Bạn có thể ở ngay đó. Một cái gì đó.",
+      "translation": "Bạn có thể ở ngay đó. Một cái gì đó.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 310,
+      "text_zh": "forway.Theoragehaswasmotelandokonlythinganditloolikelikesaying,",
+      "draft": "Về cách. Cơn giận đã là một khách sạn và chỉ có một điều, và nó giống như đang nói,",
+      "translation": "Về cách. Cơn giận đã là một khách sạn và chỉ có một điều, và nó giống như đang nói,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 311,
+      "text_zh": "呃，又要为dress,okay,warmerthreattergorightwalmart,嗯，",
+      "draft": "Ừm, lại phải chuẩn bị cho trang phục, được rồi, ấm hơn, đe dọa đúng Walmart, ừm,",
+      "translation": "Ừm, lại phải chuẩn bị cho trang phục, được rồi, ấm hơn, đe dọa đúng Walmart, ừm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 312,
+      "text_zh": "就是不low.",
+      "draft": "Chỉ là không thấp.",
+      "translation": "Chỉ là không thấp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 313,
+      "text_zh": "对，也是oneCP八，",
+      "draft": "Đúng vậy, cũng là một CP tám,",
+      "translation": "Đúng vậy, cũng là một CP tám,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 314,
+      "text_zh": "right,onesixtyfive.Itgoessalound,andwe'reabouttwoblocks.我",
+      "draft": "Đúng rồi, một sáu mươi lăm. Nó đi vòng quanh, và chúng ta cách hai dãy nhà. Mình",
+      "translation": "Đúng rồi, một sáu mươi lăm. Nó đi vòng quanh, và chúng ta cách hai dãy nhà. Mình",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 315,
+      "text_zh": "哦",
+      "draft": "Ừm,",
+      "translation": "Ừm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 316,
+      "text_zh": "ipromiseyouamnotthethingoninthiscase,youdon'trun,butnow",
+      "draft": "Mình hứa với bạn là mình không phải là điều gì trong trường hợp này, bạn không chạy, nhưng bây giờ,",
+      "translation": "Mình hứa với bạn là mình không phải là điều gì trong trường hợp này, bạn không chạy, nhưng bây giờ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 317,
+      "text_zh": "你know的GCL",
+      "draft": "Bạn biết GCL,",
+      "translation": "Bạn biết GCL,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 318,
+      "text_zh": "一直这样说，把那样，",
+      "draft": "Mình luôn nói như vậy, hãy làm như vậy,",
+      "translation": "Mình luôn nói như vậy, hãy làm như vậy,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 319,
+      "text_zh": "我今天也没人发，没要逼。Didyouseeanybodyanything?There'ssomekidsofyourplin?Isawyousawyeah,",
+      "draft": "Hôm nay mình cũng không có ai gửi, không cần phải ép. Bạn có thấy ai không? Có một số đứa trẻ của bạn ở đây? Mình đã thấy bạn.",
+      "translation": "Hôm nay mình cũng không có ai gửi, không cần phải ép. Bạn có thấy ai không? Có một số đứa trẻ của bạn ở đây? Mình đã thấy bạn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 320,
+      "text_zh": "hello,right?Downdownuphphonenumbercellphonenumbers.Icanworkrecording,justcall.Yougotacellphonewithyou",
+      "draft": "xin chào, đúng không? Số điện thoại di động. Mình có thể làm việc ghi âm, chỉ cần gọi. Bạn có điện thoại di động không?",
+      "translation": "xin chào, đúng không? Số điện thoại di động. Mình có thể làm việc ghi âm, chỉ cần gọi. Bạn có điện thoại di động không?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 321,
+      "text_zh": "callalljustcallanyoneonsohowyougottodothethey'regnahopetous.哦，那上了可以穿",
+      "draft": "gọi tất cả chỉ cần gọi bất kỳ ai để cho thấy bạn phải làm gì.",
+      "translation": "gọi tất cả chỉ cần gọi bất kỳ ai để cho thấy bạn phải làm gì.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 322,
+      "text_zh": "那个makeeverybody.",
+      "draft": "làm cho mọi người.",
+      "translation": "làm cho mọi người.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 323,
+      "text_zh": "哎，",
+      "draft": "Ê,",
+      "translation": "Ê,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 324,
+      "text_zh": "看完视频，不知道各位对我的表现打多少分呢？",
+      "draft": "Xem xong video, không biết mọi người chấm điểm mình bao nhiêu nhỉ?",
+      "translation": "Xem xong video, không biết mọi người chấm điểm mình bao nhiêu nhỉ?",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 325,
+      "text_zh": "反正我对自己的表现还算满意，可以打个九分。",
+      "draft": "Dù sao mình cũng khá hài lòng với màn trình diễn của mình, có thể cho điểm chín.",
+      "translation": "Dù sao mình cũng khá hài lòng với màn trình diễn của mình, có thể cho điểm chín.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 326,
+      "text_zh": "我用提前准备好的地形知识应对盘问，假装自己是父亲的慢跑者，",
+      "draft": "Mình đã sử dụng kiến thức địa hình chuẩn bị trước để đối phó với cuộc thẩm vấn, giả vờ là người chạy bộ của cha mình,",
+      "translation": "Mình đã sử dụng kiến thức địa hình chuẩn bị trước để đối phó với cuộc thẩm vấn, giả vờ là người chạy bộ của cha mình,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 327,
+      "text_zh": "还完美解释了膝盖上的伤，说是屋顶做工所致，",
+      "draft": "và còn hoàn hảo giải thích vết thương ở đầu gối, nói rằng đó là do làm việc trên mái nhà,",
+      "translation": "và còn hoàn hảo giải thích vết thương ở đầu gối, nói rằng đó là do làm việc trên mái nhà,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 328,
+      "text_zh": "整个过程冷静随和，",
+      "draft": "toàn bộ quá trình bình tĩnh và hòa nhã,",
+      "translation": "toàn bộ quá trình bình tĩnh và hòa nhã,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 329,
+      "text_zh": "甚至独自开玩笑。",
+      "draft": "thậm chí còn tự đùa.",
+      "translation": "thậm chí còn tự đùa.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 330,
+      "text_zh": "实际上大家可能也发现了，我犯了一些致命的错误。一开始呢，自己编了一个名字，",
+      "draft": "Thực ra mọi người có thể cũng nhận ra, mình đã mắc một số lỗi chết người. Ban đầu, mình đã tự đặt một cái tên,",
+      "translation": "Thực ra mọi người có thể cũng nhận ra, mình đã mắc một số lỗi chết người. Ban đầu, mình đã tự đặt một cái tên,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 331,
+      "text_zh": "叫做罗伯特琼斯，但聊着聊着居然给忘了，",
+      "draft": "gọi là Robert Jones, nhưng trong lúc nói chuyện lại quên mất,",
+      "translation": "gọi là Robert Jones, nhưng trong lúc nói chuyện lại quên mất,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 332,
+      "text_zh": "又说自己叫吉米琼斯。但那名警员或许也是跟我聊了太久，竟然也忘了这一点，",
+      "draft": "lại nói mình tên là Jimmy Jones. Nhưng có lẽ viên cảnh sát cũng đã nói chuyện với mình quá lâu, nên cũng quên mất điều này,",
+      "translation": "lại nói mình tên là Jimmy Jones. Nhưng có lẽ viên cảnh sát cũng đã nói chuyện với mình quá lâu, nên cũng quên mất điều này,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 333,
+      "text_zh": "这才蒙混过关。",
+      "draft": "vì vậy mới qua mặt được.",
+      "translation": "vì vậy mới qua mặt được.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 334,
+      "text_zh": "再有就是预方发给警方的黑白照片，分辨率极低，太过模糊，",
+      "draft": "Thêm vào đó là bức ảnh đen trắng mà bên điều tra gửi cho cảnh sát, độ phân giải cực thấp, quá mờ,",
+      "translation": "Thêm vào đó là bức ảnh đen trắng mà bên điều tra gửi cho cảnh sát, độ phân giải cực thấp, quá mờ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 335,
+      "text_zh": "且是六个月之前拍摄的，让对方无法看清细节。",
+      "draft": "và được chụp cách đây sáu tháng, khiến đối phương không thể nhìn rõ chi tiết.",
+      "translation": "và được chụp cách đây sáu tháng, khiến đối phương không thể nhìn rõ chi tiết.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 336,
+      "text_zh": "因此，警员无法确定越狱者的样貌，",
+      "draft": "Do đó, viên cảnh sát không thể xác định được diện mạo của kẻ vượt ngục,",
+      "translation": "Do đó, viên cảnh sát không thể xác định được diện mạo của kẻ vượt ngục,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 337,
+      "text_zh": "就这样，凭借我临危不乱的表演和多年对心理细节的研究，",
+      "draft": "Chỉ như vậy, nhờ vào màn trình diễn bình tĩnh của mình và nhiều năm nghiên cứu về tâm lý,",
+      "translation": "Chỉ như vậy, nhờ vào màn trình diễn bình tĩnh của mình và nhiều năm nghiên cứu về tâm lý,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 338,
+      "text_zh": "竟然成功忽悠了这名警察，堂而皇之的走出了包围圈，",
+      "draft": "mình đã thành công lừa được viên cảnh sát này, một cách đường hoàng bước ra khỏi vòng vây,",
+      "translation": "mình đã thành công lừa được viên cảnh sát này, một cách đường hoàng bước ra khỏi vòng vây,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 339,
+      "text_zh": "最终在警方的眼皮子底下成功消失，重获自由。",
+      "draft": "cuối cùng thành công biến mất ngay trước mắt cảnh sát, giành lại tự do.",
+      "translation": "cuối cùng thành công biến mất ngay trước mắt cảnh sát, giành lại tự do.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 340,
+      "text_zh": "二零零六年四月八日，越狱三天后，全美通缉令节目紧急播出了理查德的越狱专题，",
+      "draft": "Ngày 8 tháng 4 năm 2006, ba ngày sau khi vượt ngục, chương trình truy nã toàn quốc khẩn cấp phát sóng chuyên đề về vụ vượt ngục của Richard,",
+      "translation": "Ngày 8 tháng 4 năm 2006, ba ngày sau khi vượt ngục, chương trình truy nã toàn quốc khẩn cấp phát sóng chuyên đề về vụ vượt ngục của Richard,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 341,
+      "text_zh": "并呼吁全国民众积极提供线索，将这位狡猾之徒缉拿归案。",
+      "draft": "và kêu gọi toàn thể người dân tích cực cung cấp manh mối, bắt giữ tên tội phạm xảo quyệt này.",
+      "translation": "và kêu gọi toàn thể người dân tích cực cung cấp manh mối, bắt giữ tên tội phạm xảo quyệt này.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 342,
+      "text_zh": "五天之后，美国法警局正式将理查德列入十五名头号通缉犯名单，",
+      "draft": "Năm ngày sau, Cục Cảnh sát Liên bang Mỹ chính thức đưa Richard vào danh sách mười lăm tên tội phạm bị truy nã hàng đầu,",
+      "translation": "Năm ngày sau, Cục Cảnh sát Liên bang Mỹ chính thức đưa Richard vào danh sách mười lăm tên tội phạm bị truy nã hàng đầu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 343,
+      "text_zh": "并悬赏两万五千美金。",
+      "draft": "và treo thưởng 25.000 đô la.",
+      "translation": "và treo thưởng 25.000 đô la.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 344,
+      "text_zh": "同时指出，他是自一九九一年以来第一位从联邦监狱越狱的囚犯，",
+      "draft": "Cùng lúc chỉ ra, anh ta là tù nhân đầu tiên vượt ngục từ nhà tù liên bang kể từ năm 1991,",
+      "translation": "Cùng lúc chỉ ra, anh ta là tù nhân đầu tiên vượt ngục từ nhà tù liên bang kể từ năm 1991,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 345,
+      "text_zh": "全美警力迅速介入，追查，各州布下了天罗地网，",
+      "draft": "Lực lượng cảnh sát toàn quốc nhanh chóng vào cuộc, truy tìm, các bang đã bố trí lưới bắt chặt chẽ,",
+      "translation": "Lực lượng cảnh sát toàn quốc nhanh chóng vào cuộc, truy tìm, các bang đã bố trí lưới bắt chặt chẽ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 346,
+      "text_zh": "眼看形势越来越严峻。",
+      "draft": "thấy tình hình ngày càng nghiêm trọng.",
+      "translation": "thấy tình hình ngày càng nghiêm trọng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 347,
+      "text_zh": "两周之后，理查德从华盛顿州逃到了加拿大的不列颠哥伦比亚省在",
+      "draft": "Hai tuần sau, Richard đã trốn từ tiểu bang Washington sang tỉnh British Columbia của Canada,",
+      "translation": "Hai tuần sau, Richard đã trốn từ tiểu bang Washington sang tỉnh British Columbia của Canada,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 348,
+      "text_zh": "这里，他决定故技重施，偷车，然后到处流浪。",
+      "draft": "Tại đây, anh quyết định áp dụng lại chiêu cũ, ăn cắp xe, rồi lang thang khắp nơi.",
+      "translation": "Tại đây, anh quyết định áp dụng lại chiêu cũ, ăn cắp xe, rồi lang thang khắp nơi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 349,
+      "text_zh": "可没想到，在异国他乡的第一次屠车就被警方给盯上了。",
+      "draft": "Nhưng không ngờ, lần đầu tiên ăn cắp xe ở xứ người đã bị cảnh sát theo dõi.",
+      "translation": "Nhưng không ngờ, lần đầu tiên ăn cắp xe ở xứ người đã bị cảnh sát theo dõi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 350,
+      "text_zh": "尽管他成功逃走，但两天之后，加拿大警方凭借全美通缉令的报道，",
+      "draft": "Dù anh đã thành công trốn thoát, nhưng hai ngày sau, cảnh sát Canada dựa vào thông tin từ chương trình truy nã toàn quốc,",
+      "translation": "Dù anh đã thành công trốn thoát, nhưng hai ngày sau, cảnh sát Canada dựa vào thông tin từ chương trình truy nã toàn quốc,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 351,
+      "text_zh": "确定美国来的偷车贼正是通缉榜上的理查德。",
+      "draft": "xác định tên trộm xe từ Mỹ chính là Richard trong danh sách truy nã.",
+      "translation": "xác định tên trộm xe từ Mỹ chính là Richard trong danh sách truy nã.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 352,
+      "text_zh": "此后，加拿大警方重点关注他的动向，",
+      "draft": "Sau đó, cảnh sát Canada đã đặc biệt chú ý theo dõi động thái của anh,",
+      "translation": "Sau đó, cảnh sát Canada đã đặc biệt chú ý theo dõi động thái của anh,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 353,
+      "text_zh": "美国方面也派出警力跨境协助。眼看搜捕越来越紧，",
+      "draft": "phía Mỹ cũng cử lực lượng hỗ trợ qua biên giới. Thấy cuộc truy bắt ngày càng gắt gao,",
+      "translation": "phía Mỹ cũng cử lực lượng hỗ trợ qua biên giới. Thấy cuộc truy bắt ngày càng gắt gao,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 354,
+      "text_zh": "理查德觉得加拿大的日子也不好过，于是就玩起了声东击西。",
+      "draft": "Richard cảm thấy cuộc sống ở Canada cũng không dễ dàng, nên đã chơi trò kích tướng Đông đánh Tây.",
+      "translation": "Richard cảm thấy cuộc sống ở Canada cũng không dễ dàng, nên đã chơi trò kích tướng Đông đánh Tây.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 355,
+      "text_zh": "反向操作又偷偷潜回了美国继续执行灯下黑的策略。",
+      "draft": "Thực hiện chiến thuật ngược lại và lén lút quay lại Mỹ tiếp tục thực hiện chiến lược tối tăm dưới đèn.",
+      "translation": "Thực hiện chiến thuật ngược lại và lén lút quay lại Mỹ tiếp tục thực hiện chiến lược tối tăm dưới đèn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 356,
+      "text_zh": "这还没完在美国各州留下数个线索之后，又溜回了加拿大。",
+      "draft": "Chưa dừng lại ở đó, sau khi để lại nhiều manh mối ở các bang Mỹ, anh lại lén lút trở về Canada.",
+      "translation": "Chưa dừng lại ở đó, sau khi để lại nhiều manh mối ở các bang Mỹ, anh lại lén lút trở về Canada.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 357,
+      "text_zh": "不得不说，这一招确实妙到了极点，",
+      "draft": "Không thể không nói, chiêu này thực sự tuyệt vời,",
+      "translation": "Không thể không nói, chiêu này thực sự tuyệt vời,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 358,
+      "text_zh": "可美方是铁了心要将其缉拿归案，",
+      "draft": "nhưng phía Mỹ đã quyết tâm bắt giữ anh.",
+      "translation": "nhưng phía Mỹ đã quyết tâm bắt giữ anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 359,
+      "text_zh": "不管你在哪里，",
+      "draft": "Dù bạn ở đâu,",
+      "translation": "Dù bạn ở đâu,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 360,
+      "text_zh": "全美通缉令以及各大广播新闻媒体反复报道此案深度追踪，",
+      "draft": "Lệnh truy nã toàn quốc và các phương tiện truyền thông lớn liên tục đưa tin sâu về vụ án này,",
+      "translation": "Lệnh truy nã toàn quốc và các phương tiện truyền thông lớn liên tục đưa tin sâu về vụ án này,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 361,
+      "text_zh": "这让理查德根本就不敢在一个地方长久的停留。",
+      "draft": "Điều này khiến Richard không dám ở lâu ở một nơi.",
+      "translation": "Điều này khiến Richard không dám ở lâu ở một nơi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 362,
+      "text_zh": "每当新一期节目播出时，他就会提前采购食物，并将油箱加满，",
+      "draft": "Mỗi khi chương trình mới phát sóng, anh sẽ chuẩn bị thực phẩm trước và đổ đầy bình xăng,",
+      "translation": "Mỗi khi chương trình mới phát sóng, anh sẽ chuẩn bị thực phẩm trước và đổ đầy bình xăng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 363,
+      "text_zh": "随时准备跑路。",
+      "draft": "sẵn sàng chạy trốn.",
+      "translation": "sẵn sàng chạy trốn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 364,
+      "text_zh": "他自己也表示，如果节目报道了我的案子，",
+      "draft": "Anh cũng cho biết, nếu chương trình đưa tin về vụ án của mình,",
+      "translation": "Anh cũng cho biết, nếu chương trình đưa tin về vụ án của mình,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 365,
+      "text_zh": "接下来几天就会极度的低调。",
+      "draft": "thì trong vài ngày tới sẽ cực kỳ khiêm tốn.",
+      "translation": "thì trong vài ngày tới sẽ cực kỳ khiêm tốn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 366,
+      "text_zh": "尽管他偷车技术了得。早年做过汽车销售的，他知道汽车经销商存放现金和钥匙的位置，",
+      "draft": "Dù anh có kỹ thuật ăn cắp xe rất giỏi. Trước đây từng làm bán xe, anh biết chỗ để tiền mặt và chìa khóa của các đại lý xe,",
+      "translation": "Dù anh có kỹ thuật ăn cắp xe rất giỏi. Trước đây từng làm bán xe, anh biết chỗ để tiền mặt và chìa khóa của các đại lý xe,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 367,
+      "text_zh": "因此他只投伪装GPS定位的新车，且颜色是满大街的摆色，",
+      "draft": "nên anh chỉ chọn những chiếc xe mới có GPS ngụy trang, và màu sắc thì rất phổ biến,",
+      "translation": "nên anh chỉ chọn những chiếc xe mới có GPS ngụy trang, và màu sắc thì rất phổ biến,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 368,
+      "text_zh": "他还善于伪装自己制作假证件。",
+      "draft": "Anh còn giỏi ngụy trang để làm giấy tờ giả.",
+      "translation": "Anh còn giỏi ngụy trang để làm giấy tờ giả.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 369,
+      "text_zh": "但步行的流浪总归不是个事儿啊，他也想过用假身份。",
+      "draft": "Nhưng đi bộ lang thang không phải là cách hay, anh cũng đã nghĩ đến việc dùng danh tính giả.",
+      "translation": "Nhưng đi bộ lang thang không phải là cách hay, anh cũng đã nghĩ đến việc dùng danh tính giả.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 370,
+      "text_zh": "在布列颠哥伦比亚省的威利斯顿湖附近买一处偏僻的土地定居，",
+      "draft": "Mua một mảnh đất hẻo lánh gần hồ Williston ở British Columbia để định cư,",
+      "translation": "Mua một mảnh đất hẻo lánh gần hồ Williston ở British Columbia để định cư,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 371,
+      "text_zh": "但该地进出只有一条路，且比较干旱。还有甲虫侵扰，",
+      "draft": "nhưng nơi đó chỉ có một con đường ra vào và khá khô cằn. Còn bị côn trùng quấy rối,",
+      "translation": "nhưng nơi đó chỉ có một con đường ra vào và khá khô cằn. Còn bị côn trùng quấy rối,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 372,
+      "text_zh": "加上重重搜查之下，他不敢冒险，只能继续流浪。",
+      "draft": "thêm vào đó là sự kiểm tra gắt gao, anh không dám mạo hiểm, chỉ có thể tiếp tục lang thang.",
+      "translation": "thêm vào đó là sự kiểm tra gắt gao, anh không dám mạo hiểm, chỉ có thể tiếp tục lang thang.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 373,
+      "text_zh": "最终，他开着偷来的车从加拿大西部横穿至东部，一路换车，横跨五千公里，",
+      "draft": "Cuối cùng, anh lái xe ăn cắp từ phía tây Canada sang phía đông, đổi xe liên tục, vượt qua năm ngàn km,",
+      "translation": "Cuối cùng, anh lái xe ăn cắp từ phía tây Canada sang phía đông, đổi xe liên tục, vượt qua năm ngàn km,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 374,
+      "text_zh": "最终来到了新布伦瑞克省。",
+      "draft": "cuối cùng đến tỉnh New Brunswick.",
+      "translation": "cuối cùng đến tỉnh New Brunswick.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 375,
+      "text_zh": "或许是跑累了他在这里休息了两个月，这次他没有住酒店，",
+      "draft": "Có lẽ do chạy mệt, anh đã nghỉ ngơi ở đây hai tháng, lần này anh không ở khách sạn,",
+      "translation": "Có lẽ do chạy mệt, anh đã nghỉ ngơi ở đây hai tháng, lần này anh không ở khách sạn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 376,
+      "text_zh": "而是偷了一辆比较新的白色厢式火车，平时呢就住在车里，有空就骑骑自行车。",
+      "draft": "mà ăn cắp một chiếc xe tải trắng mới hơn, thường thì sống trong xe, có thời gian thì đạp xe.",
+      "translation": "mà ăn cắp một chiếc xe tải trắng mới hơn, thường thì sống trong xe, có thời gian thì đạp xe.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 377,
+      "text_zh": "他本以为这样更加隐蔽安全，",
+      "draft": "Anh nghĩ rằng như vậy sẽ an toàn hơn,",
+      "translation": "Anh nghĩ rằng như vậy sẽ an toàn hơn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 378,
+      "text_zh": "可没想到这辆车却成为了他的噩梦。",
+      "draft": "nhưng không ngờ chiếc xe này lại trở thành cơn ác mộng của anh.",
+      "translation": "nhưng không ngờ chiếc xe này lại trở thành cơn ác mộng của anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 379,
+      "text_zh": "转眼时间来到二零零七年十月二十四日，在新布伦瑞克省纳什克里克地区休班奇景。",
+      "draft": "Thời gian nhanh chóng trôi đến ngày 24 tháng 10 năm 2007, tại khu vực Nash Creek, tỉnh New Brunswick.",
+      "translation": "Thời gian nhanh chóng trôi đến ngày 24 tháng 10 năm 2007, tại khu vực Nash Creek, tỉnh New Brunswick.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 380,
+      "text_zh": "单柳鱼岛路边停着一辆高档的白色箱式货车，",
+      "draft": "Bên đường Đảo Cá Chép có một chiếc xe tải hạng sang màu trắng,",
+      "translation": "Bên đường Đảo Cá Chép có một chiếc xe tải hạng sang màu trắng,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 381,
+      "text_zh": "后窗胡乱贴着劣质的遮光膜。",
+      "draft": "có kính sau dán phim cách nhiệt kém chất lượng.",
+      "translation": "có kính sau dán phim cách nhiệt kém chất lượng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 382,
+      "text_zh": "这让他心生疑惑，怀疑车辆是偷的，且是用来走私酒精或者香烟，",
+      "draft": "Điều này khiến anh nghi ngờ, cho rằng chiếc xe là ăn cắp và được dùng để buôn lậu rượu hoặc thuốc lá,",
+      "translation": "Điều này khiến anh nghi ngờ, cho rằng chiếc xe là ăn cắp và được dùng để buôn lậu rượu hoặc thuốc lá,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 383,
+      "text_zh": "所以记下车牌号，并提醒其他骑警。",
+      "draft": "nên đã ghi lại biển số và nhắc nhở các cảnh sát khác.",
+      "translation": "nên đã ghi lại biển số và nhắc nhở các cảnh sát khác.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 384,
+      "text_zh": "第二天，行人骑警斯蒂芬在坎布尔顿市中心留意到了这辆车。",
+      "draft": "Ngày hôm sau, cảnh sát đi bộ Stephen đã chú ý đến chiếc xe này ở trung tâm thành phố Campbellton.",
+      "translation": "Ngày hôm sau, cảnh sát đi bộ Stephen đã chú ý đến chiếc xe này ở trung tâm thành phố Campbellton.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 385,
+      "text_zh": "初生牛犊不怕苦的他立马展开了追捕，最终在其他警力的帮助下，成功逼停车辆，",
+      "draft": "Là người trẻ tuổi không sợ khổ, anh lập tức bắt đầu truy đuổi, cuối cùng với sự giúp đỡ của các cảnh sát khác, đã thành công chặn chiếc xe lại,",
+      "translation": "Là người trẻ tuổi không sợ khổ, anh lập tức bắt đầu truy đuổi, cuối cùng với sự giúp đỡ của các cảnh sát khác, đã thành công chặn chiếc xe lại,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 386,
+      "text_zh": "顺利逮捕了理查德。",
+      "draft": "và bắt giữ Richard.",
+      "translation": "và bắt giữ Richard.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 387,
+      "text_zh": "值得一提的是，他被抓时没有负隅顽抗，心态还不错，只觉得是自己运气不好，",
+      "draft": "Đáng chú ý là, khi bị bắt, anh không kháng cự, tâm trạng cũng khá tốt, chỉ cảm thấy mình không gặp may,",
+      "translation": "Đáng chú ý là, khi bị bắt, anh không kháng cự, tâm trạng cũng khá tốt, chỉ cảm thấy mình không gặp may,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 388,
+      "text_zh": "甚至夸奖发现他的警察工作认真，眼光毒辣，到此潜逃，",
+      "draft": "thậm chí còn khen ngợi cảnh sát phát hiện ra anh làm việc nghiêm túc, có con mắt tinh tường, đến đây để trốn thoát,",
+      "translation": "thậm chí còn khen ngợi cảnh sát phát hiện ra anh làm việc nghiêm túc, có con mắt tinh tường, đến đây để trốn thoát,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 389,
+      "text_zh": "一年半的理查德终于落网。美国方面在得知消息后，",
+      "draft": "Sau một năm rưỡi, Richard cuối cùng cũng bị bắt. Mỹ sau khi biết tin,",
+      "translation": "Sau một năm rưỡi, Richard cuối cùng cũng bị bắt. Mỹ sau khi biết tin,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 390,
+      "text_zh": "那是激动万分的，",
+      "draft": "thì vô cùng phấn khích,",
+      "translation": "thì vô cùng phấn khích,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 391,
+      "text_zh": "立马和加拿大方面沟通引渡事宜。",
+      "draft": "ngay lập tức liên lạc với phía Canada để bàn về việc dẫn độ.",
+      "translation": "ngay lập tức liên lạc với phía Canada để bàn về việc dẫn độ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 392,
+      "text_zh": "由于理查德在加拿大最多时偷偷车偷偷东西并没有犯什么命啊。",
+      "draft": "Do Richard ở Canada chủ yếu chỉ ăn cắp xe và đồ vật mà không phạm tội gì nghiêm trọng.",
+      "translation": "Do Richard ở Canada chủ yếu chỉ ăn cắp xe và đồ vật mà không phạm tội gì nghiêm trọng.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 393,
+      "text_zh": "因此，加拿大方面以最快的速度将其引渡到了美国，",
+      "draft": "Vì vậy, phía Canada đã nhanh chóng dẫn độ anh về Mỹ,",
+      "translation": "Vì vậy, phía Canada đã nhanh chóng dẫn độ anh về Mỹ,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 394,
+      "text_zh": "理查德本身就",
+      "draft": "Richard vốn đã",
+      "translation": "Richard vốn đã",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 395,
+      "text_zh": "已经背负了两个终身监禁，外加三次越狱的战机刑期在他身上也没有太大意义。",
+      "draft": "gánh chịu hai án chung thân, thêm vào ba lần vượt ngục cũng không có ý nghĩa gì lớn với anh.",
+      "translation": "gánh chịu hai án chung thân, thêm vào ba lần vượt ngục cũng không có ý nghĩa gì lớn với anh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 396,
+      "text_zh": "这一次被抓后，也只是象征性的加了几年。",
+      "draft": "Lần này bị bắt, chỉ bị tăng thêm vài năm.",
+      "translation": "Lần này bị bắt, chỉ bị tăng thêm vài năm.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 397,
+      "text_zh": "二零零八年四月十八日，他被转移至佛罗伦斯超级监狱。",
+      "draft": "Ngày 18 tháng 4 năm 2008, anh được chuyển đến Nhà tù siêu cấp Florence.",
+      "translation": "Ngày 18 tháng 4 năm 2008, anh được chuyển đến Nhà tù siêu cấp Florence.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 398,
+      "text_zh": "这一座被称为超级监狱洛基山脉恶魔岛的设施，",
+      "draft": "Cơ sở này được gọi là Nhà tù siêu cấp Đảo Quỷ dãy núi Rocky,",
+      "translation": "Cơ sở này được gọi là Nhà tù siêu cấp Đảo Quỷ dãy núi Rocky,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 399,
+      "text_zh": "是全美安全级别最高的监狱之一，",
+      "draft": "là một trong những nhà tù có mức độ an toàn cao nhất ở Mỹ.",
+      "translation": "là một trong những nhà tù có mức độ an toàn cao nhất ở Mỹ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 400,
+      "text_zh": "专门关押着一些最不可控、最危险的罪犯。至今从未有人成功从这里逃脱。",
+      "draft": "Chuyên giam giữ những tội phạm không thể kiểm soát và nguy hiểm nhất. Đến nay chưa có ai thành công trốn thoát từ đây.",
+      "translation": "Chuyên giam giữ những tội phạm không thể kiểm soát và nguy hiểm nhất. Đến nay chưa có ai thành công trốn thoát từ đây.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 401,
+      "text_zh": "考虑到理查德的越狱前科，",
+      "draft": "Xét đến tiền án vượt ngục của Richard,",
+      "translation": "Xét đến tiền án vượt ngục của Richard,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 402,
+      "text_zh": "狱方对他格外关照，将其关押在一个极其高端的单人牢房。",
+      "draft": "nhà tù đặc biệt chăm sóc anh ta, giam giữ trong một phòng giam đơn cực kỳ cao cấp.",
+      "translation": "nhà tù đặc biệt chăm sóc anh ta, giam giữ trong một phòng giam đơn cực kỳ cao cấp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 403,
+      "text_zh": "该牢房的窗户只有一个十厘米宽的狭缝，",
+      "draft": "Cửa sổ của phòng giam chỉ có một khe hẹp rộng mười centimet,",
+      "translation": "Cửa sổ của phòng giam chỉ có một khe hẹp rộng mười centimet,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 404,
+      "text_zh": "即使是大晴天，一天也只能有几分钟的阳光照射进来。",
+      "draft": "ngay cả vào những ngày nắng, cũng chỉ có vài phút ánh sáng chiếu vào.",
+      "translation": "ngay cả vào những ngày nắng, cũng chỉ có vài phút ánh sáng chiếu vào.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 405,
+      "text_zh": "每天他只有一个小时的放风时间，",
+      "draft": "Mỗi ngày anh chỉ có một giờ ra ngoài,",
+      "translation": "Mỗi ngày anh chỉ có một giờ ra ngoài,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 406,
+      "text_zh": "其余二十三个小时全部被严格锁在单独牢房里，",
+      "draft": "hai mươi ba giờ còn lại đều bị khóa chặt trong phòng giam đơn.",
+      "translation": "hai mươi ba giờ còn lại đều bị khóa chặt trong phòng giam đơn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 407,
+      "text_zh": "连三餐都是由狱警送到门口径止，和其他囚犯交流，也彻底杜绝了一切越狱",
+      "draft": "Ba bữa ăn đều do cảnh sát nhà tù mang đến cửa, không thể giao tiếp với các tù nhân khác, hoàn toàn ngăn chặn mọi khả năng vượt ngục.",
+      "translation": "Ba bữa ăn đều do cảnh sát nhà tù mang đến cửa, không thể giao tiếp với các tù nhân khác, hoàn toàn ngăn chặn mọi khả năng vượt ngục.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 408,
+      "text_zh": "监狱。",
+      "draft": "Nhà tù.",
+      "translation": "Nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 409,
+      "text_zh": "或许理查德还有越狱的想法，但面对地狱级别的难度，估计他也无可奈何吧。",
+      "draft": "Có thể Richard vẫn có ý định vượt ngục, nhưng đối mặt với độ khó như địa ngục, chắc hẳn anh cũng không còn cách nào.",
+      "translation": "Có thể Richard vẫn có ý định vượt ngục, nhưng đối mặt với độ khó như địa ngục, chắc hẳn anh cũng không còn cách nào.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 410,
+      "text_zh": "对于这种极端关押，理查德曾表示，这也太可怕了。",
+      "draft": "Về việc giam giữ cực đoan này, Richard từng nói rằng, thật quá đáng sợ.",
+      "translation": "Về việc giam giữ cực đoan này, Richard từng nói rằng, thật quá đáng sợ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 411,
+      "text_zh": "我曾亲眼目睹其中一名囚犯精神逐渐崩溃，",
+      "draft": "Mình từng chứng kiến một tù nhân trong số đó dần dần suy sụp tinh thần,",
+      "translation": "Mình từng chứng kiến một tù nhân trong số đó dần dần suy sụp tinh thần,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 412,
+      "text_zh": "他从勉强能够正常活动，发展到出现幻听被害妄想。",
+      "draft": "anh ta từ việc có thể hoạt động bình thường, phát triển đến việc nghe thấy tiếng nói và có ý nghĩ bị hại.",
+      "translation": "anh ta từ việc có thể hoạt động bình thường, phát triển đến việc nghe thấy tiếng nói và có ý nghĩ bị hại.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 413,
+      "text_zh": "二零零八年犯罪记者拜伦尝试和狱中的理查德通信。本来他也没有抱太大的希望，",
+      "draft": "Vào năm 2008, nhà báo tội phạm Byron đã thử liên lạc với Richard trong tù. Ban đầu ông cũng không hy vọng quá nhiều,",
+      "translation": "Vào năm 2008, nhà báo tội phạm Byron đã thử liên lạc với Richard trong tù. Ban đầu ông cũng không hy vọng quá nhiều,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 414,
+      "text_zh": "但没想到理查德回信了，而且非常的积极。",
+      "draft": "nhưng không ngờ Richard đã trả lời, và rất tích cực.",
+      "translation": "nhưng không ngờ Richard đã trả lời, và rất tích cực.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 415,
+      "text_zh": "他不仅毫无保留的讲述了自己三次越狱的全过程，",
+      "draft": "Anh không chỉ kể lại toàn bộ quá trình ba lần vượt ngục mà không giấu diếm,",
+      "translation": "Anh không chỉ kể lại toàn bộ quá trình ba lần vượt ngục mà không giấu diếm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 416,
+      "text_zh": "还将当时的心理活动和计划细节一一摊开。",
+      "draft": "mà còn bày tỏ tâm tư và chi tiết kế hoạch lúc đó.",
+      "translation": "mà còn bày tỏ tâm tư và chi tiết kế hoạch lúc đó.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 417,
+      "text_zh": "经过长达五年的通信，",
+      "draft": "Sau năm năm liên lạc,",
+      "translation": "Sau năm năm liên lạc,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 418,
+      "text_zh": "拜伦总共收到了理查德寄来的三百四十多封信件超过三千页。",
+      "draft": "Byron đã nhận được tổng cộng hơn ba trăm bốn mươi bức thư từ Richard, hơn ba nghìn trang.",
+      "translation": "Byron đã nhận được tổng cộng hơn ba trăm bốn mươi bức thư từ Richard, hơn ba nghìn trang.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 419,
+      "text_zh": "最终，这些信件被整理成一本电子书，于二零一三年正式出版。",
+      "draft": "Cuối cùng, những bức thư này được biên soạn thành một cuốn sách điện tử, chính thức phát hành vào năm 2013.",
+      "translation": "Cuối cùng, những bức thư này được biên soạn thành một cuốn sách điện tử, chính thức phát hành vào năm 2013.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 420,
+      "text_zh": "书名就是广为流传的将自己游出监狱的人。",
+      "draft": "Tên sách chính là \"Người tự bơi ra khỏi nhà tù\".",
+      "translation": "Tên sách chính là \"Người tự bơi ra khỏi nhà tù\".",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 421,
+      "text_zh": "而在这五年的时间里，理查德一直被单独关押，无法与人交流，",
+      "draft": "Trong suốt năm năm này, Richard luôn bị giam giữ một mình, không thể giao tiếp với ai,",
+      "translation": "Trong suốt năm năm này, Richard luôn bị giam giữ một mình, không thể giao tiếp với ai,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 422,
+      "text_zh": "这或许也是他愿意和拜伦通信并讲述自己故事的原因。",
+      "draft": "có lẽ đây cũng là lý do anh sẵn lòng liên lạc với Byron và kể câu chuyện của mình.",
+      "translation": "có lẽ đây cũng là lý do anh sẵn lòng liên lạc với Byron và kể câu chuyện của mình.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 423,
+      "text_zh": "毕竟人是群体，动物长期不交流，憋死都有可能啊。",
+      "draft": "Dù sao con người là động vật xã hội, không giao tiếp lâu dài, có thể chết ngạt.",
+      "translation": "Dù sao con người là động vật xã hội, không giao tiếp lâu dài, có thể chết ngạt.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 424,
+      "text_zh": "电子书将自己游出监狱的人发布后，引发了巨大的反响。",
+      "draft": "Cuốn sách điện tử \"Người tự bơi ra khỏi nhà tù\" phát hành đã gây ra phản ứng lớn.",
+      "translation": "Cuốn sách điện tử \"Người tự bơi ra khỏi nhà tù\" phát hành đã gây ra phản ứng lớn.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 425,
+      "text_zh": "甚至在监狱内部都传开了，",
+      "draft": "Thậm chí trong nội bộ nhà tù cũng lan truyền,",
+      "translation": "Thậm chí trong nội bộ nhà tù cũng lan truyền,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 426,
+      "text_zh": "不知道预防是出于压力还是理查德确实表现的规规矩矩。",
+      "draft": "không biết việc phòng ngừa là do áp lực hay Richard thực sự cư xử rất đúng mực.",
+      "translation": "không biết việc phòng ngừa là do áp lực hay Richard thực sự cư xử rất đúng mực.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 427,
+      "text_zh": "二零一三年九月，他终于被从极端隔离状态中解禁，",
+      "draft": "Vào tháng 9 năm 2013, cuối cùng anh cũng được giải phóng khỏi trạng thái cách ly cực đoan,",
+      "translation": "Vào tháng 9 năm 2013, cuối cùng anh cũng được giải phóng khỏi trạng thái cách ly cực đoan,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 428,
+      "text_zh": "转到了普通牢房，能够和其他狱友正常交流。他说，那一刻，感觉自己重生了。",
+      "draft": "chuyển đến phòng giam bình thường, có thể giao tiếp với các bạn tù khác. Anh nói, khoảnh khắc đó, cảm giác như mình được tái sinh.",
+      "translation": "chuyển đến phòng giam bình thường, có thể giao tiếp với các bạn tù khác. Anh nói, khoảnh khắc đó, cảm giác như mình được tái sinh.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 429,
+      "text_zh": "随着书籍爆红，他的故事开始在纪录片媒体中广为流传。",
+      "draft": "Khi cuốn sách trở nên nổi tiếng, câu chuyện của anh bắt đầu được lan truyền rộng rãi trong các phương tiện tài liệu.",
+      "translation": "Khi cuốn sách trở nên nổi tiếng, câu chuyện của anh bắt đầu được lan truyền rộng rãi trong các phương tiện tài liệu.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 430,
+      "text_zh": "所以说，他本人人在铁窗之下，",
+      "draft": "Vì vậy, anh ta ở trong tù,",
+      "translation": "Vì vậy, anh ta ở trong tù,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 431,
+      "text_zh": "但却被誉为美国最伟大的狱狱，犯成了监狱里的网红。",
+      "draft": "nhưng lại được ca ngợi là tù nhân vĩ đại nhất nước Mỹ, trở thành người nổi tiếng trong nhà tù.",
+      "translation": "nhưng lại được ca ngợi là tù nhân vĩ đại nhất nước Mỹ, trở thành người nổi tiếng trong nhà tù.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 432,
+      "text_zh": "二零二零年，这本书的纸质版发行再一次热销，这也让他在狱外的名气更进一步。",
+      "draft": "Năm 2020, phiên bản giấy của cuốn sách này lại một lần nữa bán chạy, điều này cũng khiến danh tiếng của anh bên ngoài nhà tù tăng lên.",
+      "translation": "Năm 2020, phiên bản giấy của cuốn sách này lại một lần nữa bán chạy, điều này cũng khiến danh tiếng của anh bên ngoài nhà tù tăng lên.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 433,
+      "text_zh": "尽管落基山脉恶魔岛监管森严，",
+      "draft": "Mặc dù nhà tù Rocky Mountain Demon Island quản lý rất nghiêm ngặt,",
+      "translation": "Mặc dù nhà tù Rocky Mountain Demon Island quản lý rất nghiêm ngặt,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 434,
+      "text_zh": "甚至有点把人不当人，但狱中的理查德形态还不错，",
+      "draft": "thậm chí có phần không coi người ra gì, nhưng Richard trong tù vẫn khá ổn,",
+      "translation": "thậm chí có phần không coi người ra gì, nhưng Richard trong tù vẫn khá ổn,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 435,
+      "text_zh": "他还感慨道，感谢有这个监狱的存在。",
+      "draft": "anh còn cảm thán rằng, cảm ơn vì có sự tồn tại của nhà tù này.",
+      "translation": "anh còn cảm thán rằng, cảm ơn vì có sự tồn tại của nhà tù này.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 436,
+      "text_zh": "这里关着太多极度危险的家伙，",
+      "draft": "Nơi đây giam giữ quá nhiều kẻ cực kỳ nguy hiểm,",
+      "translation": "Nơi đây giam giữ quá nhiều kẻ cực kỳ nguy hiểm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 437,
+      "text_zh": "尽是些你绝不愿意让其靠近家人或接触社会的禽兽。",
+      "draft": "toàn là những con thú mà bạn tuyệt đối không muốn cho tiếp cận gia đình hay xã hội.",
+      "translation": "toàn là những con thú mà bạn tuyệt đối không muốn cho tiếp cận gia đình hay xã hội.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 438,
+      "text_zh": "二零二二年十一月，鉴于理查德近十四年来的良好表现，",
+      "draft": "Vào tháng 11 năm 2022, xét thấy Richard đã có thành tích tốt trong gần mười bốn năm,",
+      "translation": "Vào tháng 11 năm 2022, xét thấy Richard đã có thành tích tốt trong gần mười bốn năm,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 439,
+      "text_zh": "已经六十四岁的他被转移出佛罗伦斯超级监狱，",
+      "draft": "anh đã sáu mươi bốn tuổi được chuyển ra khỏi nhà tù siêu cấp Florence.",
+      "translation": "anh đã sáu mươi bốn tuổi được chuyển ra khỏi nhà tù siêu cấp Florence.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 440,
+      "text_zh": "安排到旁边安全级别略低的联邦检狱，一年之后又被两度转移。",
+      "draft": "Được chuyển đến nhà tù liên bang có mức độ an toàn thấp hơn một chút, một năm sau lại bị chuyển hai lần.",
+      "translation": "Được chuyển đến nhà tù liên bang có mức độ an toàn thấp hơn một chút, một năm sau lại bị chuyển hai lần.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 441,
+      "text_zh": "目前，被关在肯塔基州的麦克雷里，联邦监狱这一座监狱虽然仍属于中高安全等级，",
+      "draft": "Hiện tại, anh ta đang bị giam ở McCreary, Kentucky, nhà tù liên bang này mặc dù vẫn thuộc mức độ an toàn trung cao,",
+      "translation": "Hiện tại, anh ta đang bị giam ở McCreary, Kentucky, nhà tù liên bang này mặc dù vẫn thuộc mức độ an toàn trung cao,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 442,
+      "text_zh": "但远比超级监狱更加自由。",
+      "draft": "nhưng tự do hơn nhiều so với nhà tù siêu cấp.",
+      "translation": "nhưng tự do hơn nhiều so với nhà tù siêu cấp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 443,
+      "text_zh": "此时，六十七岁的理查德年事已高，大概率也没有爬窗钻带的冲动。",
+      "draft": "Lúc này, Richard đã 67 tuổi, có lẽ cũng không còn động lực để trèo cửa sổ.",
+      "translation": "Lúc này, Richard đã 67 tuổi, có lẽ cũng không còn động lực để trèo cửa sổ.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 444,
+      "text_zh": "他的下次假释机会将是在二零二八年，",
+      "draft": "Cơ hội được tạm tha tiếp theo của anh ta sẽ vào năm 2028,",
+      "translation": "Cơ hội được tạm tha tiếp theo của anh ta sẽ vào năm 2028,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 445,
+      "text_zh": "也不知道那时已满七十岁的他能否可以合法的走出监狱。",
+      "draft": "không biết lúc đó, khi đã 70 tuổi, anh có thể hợp pháp rời khỏi nhà tù hay không.",
+      "translation": "không biết lúc đó, khi đã 70 tuổi, anh có thể hợp pháp rời khỏi nhà tù hay không.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 446,
+      "text_zh": "最后我们再来看一下这段广为流传的名场面。",
+      "draft": "Cuối cùng, chúng ta hãy cùng nhìn lại một cảnh nổi tiếng đã được lan truyền rộng rãi.",
+      "translation": "Cuối cùng, chúng ta hãy cùng nhìn lại một cảnh nổi tiếng đã được lan truyền rộng rãi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 447,
+      "text_zh": "当初在铁道附近拦截到理查德的警官名叫卡尔伯德龙，",
+      "draft": "Cảnh sát đã chặn Richard gần đường ray tên là Carl Burdron,",
+      "translation": "Cảnh sát đã chặn Richard gần đường ray tên là Carl Burdron,",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 448,
+      "text_zh": "虽然他放走了理查德，但从整个问询过程来看，他其实算是尽心尽责、表现专业。",
+      "draft": "mặc dù ông đã thả Richard, nhưng từ toàn bộ quá trình thẩm vấn, ông thực sự đã làm việc tận tâm và chuyên nghiệp.",
+      "translation": "mặc dù ông đã thả Richard, nhưng từ toàn bộ quá trình thẩm vấn, ông thực sự đã làm việc tận tâm và chuyên nghiệp.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 449,
+      "text_zh": "因此事后他并没有被追责，反而因为表现良好，勤勤恳恳升任助理警察局长。",
+      "draft": "Vì vậy, sau đó ông không bị truy cứu trách nhiệm, mà còn được thăng chức lên phó trưởng cảnh sát vì đã làm tốt.",
+      "translation": "Vì vậy, sau đó ông không bị truy cứu trách nhiệm, mà còn được thăng chức lên phó trưởng cảnh sát vì đã làm tốt.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 450,
+      "text_zh": "不过在二零一五年一月十日，他在执勤时因心脏病去世，终年仅五十二岁。",
+      "draft": "Tuy nhiên, vào ngày 10 tháng 1 năm 2015, ông đã qua đời vì bệnh tim khi đang thi hành nhiệm vụ, chỉ mới 52 tuổi.",
+      "translation": "Tuy nhiên, vào ngày 10 tháng 1 năm 2015, ông đã qua đời vì bệnh tim khi đang thi hành nhiệm vụ, chỉ mới 52 tuổi.",
+      "reviewed": true,
+      "cache_hit": false
+    },
+    {
+      "id": 451,
+      "text_zh": "那以上就经的故事帮忙给个三连支持一下。你动动手指，就是对我莫大的鼓励，我是东峰，我们下期见。",
+      "draft": "Vậy là câu chuyện trên đây mong mọi người ủng hộ một chút. Chỉ cần bạn động tay một cái, đó là động lực lớn cho mình, mình là Đông Phong, hẹn gặp lại ở số tiếp theo.",
+      "translation": "Vậy là câu chuyện trên đây mong mọi người ủng hộ một chút. Chỉ cần bạn động tay một cái, đó là động lực lớn cho mình, mình là Đông Phong, hẹn gặp lại ở số tiếp theo.",
+      "reviewed": true,
+      "cache_hit": false
+    }
+  ]
+}
