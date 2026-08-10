@@ -48,6 +48,12 @@ everyday vocabulary. Forcing one fixed rendering on them makes the translation
 WORSE, because the natural wording differs by sentence. A specific named prison
 passes. A generic "prison" does not.
 
+NEVER extract an idiom or chengyu (灯下黑, 脑洞大开, 心服口服, 神不知鬼不觉 ...).
+An idiom has to be re-rendered to fit each sentence, and pinning it to one literal
+gloss is worse than leaving it out entirely: 灯下黑 locked into "tối tăm dưới đèn"
+produced that dead literal phrase on every single occurrence, in every model tested.
+Idioms are the translator's job, not the glossary's.
+
 Aim for a short, high-value list. Twenty precise entries beat eighty padded ones.
 
 OTHER RULES:

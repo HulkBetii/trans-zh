@@ -154,10 +154,21 @@ ABSOLUTE RULES:
    on every line.
 4. Translate the meaning naturally, the way a subtitle is written. Do not
    translate word by word, and do not add information that is not in the source.
-5. Respect each entry's "max_chars" budget. Subtitles are condensed: drop filler
+5. Carry the FORCE of idioms, chengyu and slang, not their dictionary gloss. These
+   words are where the writer's voice lives, and a flat paraphrase drains the line:
+     扛把子   = the top dog / the kingpin — NOT "a notable figure"
+     脑洞大开 = a wild, out-of-nowhere idea — NOT "creative"
+     离谱     = ridiculous, off the rails — NOT "unusual"
+     心服口服 = won over completely, no argument left
+   Prefer a Vietnamese expression with the same punch. If none fits, write plain
+   Vietnamese that lands as hard — never a limp encyclopedia phrasing.
+6. Match the register of the source. This is spoken commentary: when the Chinese is
+   colloquial, the translation is colloquial. Formal wording on casual narration
+   reads as stiff and wrong.
+7. Respect each entry's "max_chars" budget. Subtitles are condensed: drop filler
    words and redundant connectives rather than exceed it. Never drop actual
    meaning to fit.
-6. Do not wrap the result in quotes and do not add notes or explanations.
+8. Do not wrap the result in quotes and do not add notes or explanations.
 
 {_glossary_block(glossary, lang)}
 

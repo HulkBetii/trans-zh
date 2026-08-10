@@ -92,7 +92,12 @@ class TranslateConfig(BaseModel):
     #       flipped narration into the first person.
     #   v6: preserving grammatical person promoted to a top-level rule; inside the
     #       address-terms block it only applied when a glossary happened to have one.
-    prompt_version: int = 6
+    #   v7: idiom-force and register rules. Measured on 15 idiom-bearing lines: on
+    #       gpt-4o-mini these rules changed almost nothing (mean length 94.5 -> 95.5,
+    #       same 4/15 over budget). The same prompt on gpt-5 gave 81.5 chars and real
+    #       idiomatic renderings. The binding constraint here is the model, not the
+    #       prompt — worth remembering before writing more prompt text.
+    prompt_version: int = 7
 
 
 class LangLimits(BaseModel):
