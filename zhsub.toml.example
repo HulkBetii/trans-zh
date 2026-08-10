@@ -137,8 +137,8 @@ timeout_sec = 180
 # Đăng nhập một lần: zhsub chatgpt-login
 #
 # Chi phí tính bằng SỐ LẦN GỌI chứ không phải token — mỗi lần ~10-15s phí cố định.
-# Bật provider này thì nên tăng translate.batch_size (60) và cân nhắc tắt
-# translate.review_pass: riêng lượt rà soát chiếm đúng một nửa số lần gọi của S4.
+# Bật provider này thì nên tăng translate.batch_size (60). review_pass gấp đôi số
+# lần gọi S4 — đo được là đáng: sửa 7% số câu, và sửa nghĩa chứ không nống chữ.
 # Mọi lần gọi nối đuôi nhau qua một cửa sổ trình duyệt, nên `batch -j N` không làm
 # phần LLM nhanh hơn. Chạm hạn mức tin nhắn thì job dừng ngay, resume được.
 #

@@ -148,9 +148,13 @@ profile_dir = "data/chrome_profile"
 Chi phí ở đây tính bằng **số lần gọi**, không phải token: mỗi lần tốn ~10–15s phí
 cố định cho điều hướng, gõ prompt và poll, dài ngắn không quan trọng lắm. Ngược
 hẳn với API, nơi prompt caching hấp thụ phần input lặp lại nên batch nhỏ gần như
-miễn phí. Vì thế khi bật `chatgpt_web` thì nên tăng `translate.batch_size` và cân
-nhắc tắt `translate.review_pass` — riêng lượt rà soát đã chiếm đúng một nửa số
-lần gọi của S4.
+miễn phí. Vì thế khi bật `chatgpt_web` thì nên tăng `translate.batch_size`.
+
+`translate.review_pass` gấp đôi số lần gọi của S4, nên nó là cần gạt to nhất. Đo
+trên clip 35 phút: lượt rà soát sửa 35/472 câu (7%) và sửa nghĩa chứ không nống
+chữ — độ dài trung bình 68,8 → 69,0 ký tự, câu dài nhất không đổi. Loại lỗi nó bắt
+được là loại đọc một câu riêng lẻ không thấy, ví dụ 他 trỏ vào một nguyên tắc bị
+dịch thành "Nó" mơ hồ. Giá: S4 từ 7,4 lên 14,1 phút. Mặc định để bật.
 
 Đo trên clip 35 phút (452 câu, dịch cả `vi` lẫn `en`): 60 lần gọi với
 `batch_size = 40` + `review_pass = true`, xuống 28 lần với `batch_size = 60` +
