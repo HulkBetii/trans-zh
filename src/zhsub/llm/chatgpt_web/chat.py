@@ -19,9 +19,12 @@ from .login import NAVIGATION_TIMEOUT_MS
 
 log = logging.getLogger(__name__)
 
-# Temporary chat: one throwaway conversation per call. Without it a job leaves
-# hundreds of one-shot conversations in the account's history.
-NEW_CHAT_URL = "https://chatgpt.com/?temporary-chat=true"
+NEW_CHAT_URL = "https://chatgpt.com/"
+# A saved conversation gets this prefix once its first message lands. Temporary
+# chats never do — which is why they are not used here: without a durable URL a
+# thread cannot be resumed, and resuming is what keeps one stage's turns together
+# when several jobs interleave on the single tab.
+CONVERSATION_URL_PREFIX = "https://chatgpt.com/c/"
 
 PROMPT_INPUT_SEL = "#prompt-textarea"
 SEND_BUTTON_SELS = (
@@ -220,13 +223,21 @@ async def send_prompt(prompt: str, page, timeout_s: int) -> str:
     return text
 
 
-async def ask(page, prompt: str, timeout_s: int) -> str:
-    """Ask one question in a brand-new conversation.
+async def ask(page, prompt: str, timeout_s: int, conversation_url: str | None) -> tuple[str, str | None]:
+    """Send one turn and return ``(answer, conversation_url)``.
 
-    A fresh chat per call is not optional. The pipeline sends independent batches
-    that share a system prompt; kept in one thread, ChatGPT starts answering with
-    ids from the previous batch, which JSON parsing accepts and the pipeline then
-    happily writes into the wrong cues.
+    Passing back the URL is what lets a caller keep every turn of one stage in a
+    single thread: S4's later batches can then see the wording the model already
+    chose, so pronouns and register stay consistent across the whole video instead
+    of being re-decided from scratch every 60 lines.
+
+    The tab is shared, so the conversation is re-opened by URL on every turn rather
+    than assumed to still be on screen — with ``batch -j 4`` another job's stage
+    will have navigated away in between.
     """
-    await page.goto(NEW_CHAT_URL, wait_until="domcontentloaded", timeout=NAVIGATION_TIMEOUT_MS)
-    return await send_prompt(prompt, page, timeout_s)
+    await page.goto(
+        conversation_url or NEW_CHAT_URL, wait_until="domcontentloaded", timeout=NAVIGATION_TIMEOUT_MS
+    )
+    text = await send_prompt(prompt, page, timeout_s)
+    url = page.url if page.url.startswith(CONVERSATION_URL_PREFIX) else conversation_url
+    return text, url

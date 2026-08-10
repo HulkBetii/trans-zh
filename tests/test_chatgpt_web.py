@@ -104,7 +104,7 @@ class FakeLocator:
             self.page.send()
 
     async def fill(self, value: str) -> None:
-        self.page.filled = value
+        self.page.prompts.append(value)
 
     async def wait_for(self, **kwargs) -> None: ...
     async def press(self, key: str) -> None: ...
@@ -116,22 +116,34 @@ class FakeLocator:
         return True
 
 
+FAKE_CONVERSATION_URL = chat.CONVERSATION_URL_PREFIX + "abc-123"
+
+
 class FakePage:
     def __init__(self, reply: str | None) -> None:
         self.reply = reply
         self.messages: list[str] = []
-        self.filled = ""
+        self.prompts: list[str] = []
         self.visited: list[str] = []
+        self.url = chat.NEW_CHAT_URL
+
+    @property
+    def filled(self) -> str:
+        return self.prompts[-1] if self.prompts else ""
 
     def send(self) -> None:
-        if self.reply is not None:
-            self.messages.append(self.reply)
+        if self.reply is None:
+            return
+        self.messages.append(self.reply)
+        # Như thật: chat mới chỉ có URL hội thoại sau khi tin nhắn đầu tiên gửi đi.
+        self.url = FAKE_CONVERSATION_URL
 
     def locator(self, selector: str) -> FakeLocator:
         return FakeLocator(self, selector)
 
     async def goto(self, url: str, **kwargs) -> None:
         self.visited.append(url)
+        self.url = url
 
     async def evaluate(self, script: str) -> None: ...
 
@@ -151,13 +163,24 @@ def test_send_prompt_types_the_prompt_and_returns_the_reply(instant_polling):
     assert page.filled == "DỊCH ĐI"
 
 
-def test_ask_opens_a_fresh_conversation_before_sending(instant_polling):
-    """Dùng lại một thread thì batch sau bị nhiễm id của batch trước."""
+def test_ask_opens_a_new_chat_and_reports_the_conversation_url(instant_polling):
     page = FakePage(reply="xong")
 
-    asyncio.run(chat.ask(page, "prompt", timeout_s=5))
+    text, url = asyncio.run(chat.ask(page, "prompt", timeout_s=5, conversation_url=None))
 
+    assert text == "xong"
     assert page.visited == [chat.NEW_CHAT_URL]
+    assert url == FAKE_CONVERSATION_URL
+
+
+def test_ask_reopens_the_conversation_it_is_given(instant_polling):
+    """Tab dùng chung, nên phải mở lại hội thoại theo URL chứ không giả định nó
+    vẫn còn trên màn hình — `batch -j 4` có job khác chen vào giữa."""
+    page = FakePage(reply="xong")
+
+    asyncio.run(chat.ask(page, "prompt", timeout_s=5, conversation_url=FAKE_CONVERSATION_URL))
+
+    assert page.visited == [FAKE_CONVERSATION_URL]
 
 
 def test_no_answer_within_the_timeout_is_an_error(instant_polling):
@@ -199,6 +222,60 @@ def test_rate_limit_is_not_swallowed_by_the_retry_loop(instant_polling, monkeypa
     assert not issubclass(chat.ChatGPTRateLimitError, chat.ChatGPTResponseError)
     # Một lần gửi duy nhất: retry sẽ đâm vào đúng bức tường đó.
     assert len(page.messages) == 1
+
+
+def _provider_on(page: FakePage, monkeypatch) -> ChatGPTWebProvider:
+    monkeypatch.setattr("zhsub.llm.chatgpt_web.provider.get_session", lambda web: FakeSession(page))
+    # timeout_sec=1: nhánh "không có câu trả lời" quay đúng chừng đó giây thật.
+    return ChatGPTWebProvider(model="chatgpt-web", web=ChatGPTWebConfig(), max_retries=0, timeout_sec=1)
+
+
+def test_same_system_prompt_stays_in_one_conversation(instant_polling, monkeypatch):
+    """Một stage = một thread, để S4 thấy được cách nó đã dịch ở batch trước.
+
+    Ranh giới thread lấy theo system prompt: S2 dùng chung một prompt suốt, S4 sinh
+    prompt riêng cho mỗi ngôn ngữ, nên không stage nào phải biết provider này tồn tại.
+    """
+    page = FakePage(reply="ok")
+    provider = _provider_on(page, monkeypatch)
+
+    provider.complete("RULES", "batch 1")
+    provider.complete("RULES", "batch 2")
+    provider.complete("RULES", "batch 3")
+
+    # Mở chat mới đúng một lần, hai lượt sau quay lại đúng hội thoại đó.
+    assert page.visited == [chat.NEW_CHAT_URL, FAKE_CONVERSATION_URL, FAKE_CONVERSATION_URL]
+    # Luật lặp lại mọi lượt: đo trên clip 472 câu, nói một lần rồi tin vào thread
+    # thì model trôi khỏi rule 3 và bắt đầu lẫn lộn "anh ta" với "ông ấy".
+    assert all("RULES" in p for p in page.prompts)
+
+
+def test_a_different_system_prompt_starts_a_new_conversation(instant_polling, monkeypatch):
+    """S4 đổi ngôn ngữ là đổi system prompt — bản dịch tiếng Việt không được
+    rò sang thread tiếng Anh."""
+    page = FakePage(reply="ok")
+    provider = _provider_on(page, monkeypatch)
+
+    provider.complete("RULES vi", "batch 1")
+    provider.complete("RULES en", "batch 1")
+
+    assert page.visited == [chat.NEW_CHAT_URL, chat.NEW_CHAT_URL]
+    assert "RULES en" in page.prompts[1]
+
+
+def test_a_failed_opening_turn_does_not_claim_the_thread(instant_polling, monkeypatch):
+    """Lượt mở màn hỏng mà vẫn ghi nhận thread thì lượt sau gửi vào một hội thoại
+    chưa bao giờ nhận được luật."""
+    page = FakePage(reply=None)  # không bao giờ trả lời
+    provider = _provider_on(page, monkeypatch)
+
+    with pytest.raises(LLMError):
+        provider.complete("RULES", "batch 1")
+
+    page.reply = "ok"
+    provider.complete("RULES", "batch 2")
+
+    assert "RULES" in page.prompts[-1]
 
 
 def test_upgrade_link_in_the_sidebar_is_not_a_rate_limit():

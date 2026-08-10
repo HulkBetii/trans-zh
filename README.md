@@ -154,7 +154,35 @@ lần gọi của S4.
 
 Đo trên clip 35 phút (452 câu, dịch cả `vi` lẫn `en`): 60 lần gọi với
 `batch_size = 40` + `review_pass = true`, xuống 28 lần với `batch_size = 60` +
-`review_pass = false`.
+`review_pass = false`. Chạy thật với `--target vi`: 19 lần gọi, 8,4 phút
+(S2 17,9s/lần, S3 14,3s/lần, S4 35,1s/lần).
+
+### Một stage, một hội thoại
+
+Mỗi stage giữ riêng một hội thoại ChatGPT thay vì mở chat mới cho từng lần gọi,
+nên các batch sau của S4 nhìn thấy cách model đã dịch ở batch trước. Ranh giới lấy
+theo system prompt: S2 dùng chung một prompt suốt, S3 có prompt riêng cho việc rút
+thuật ngữ và cho việc phân tích văn phong, S4 sinh prompt riêng theo ngôn ngữ đích
+— nên `vi` và `en` không bao giờ nằm chung thread, và không stage nào phải biết
+provider này tồn tại.
+
+Luật vẫn được gửi lại ở **mọi** lượt dù thread đã chứa chúng. Đo trên clip 472 câu,
+so ba cách chạy bằng tỉ lệ dạng xưng hô trội trong toàn bộ bản dịch:
+
+| | Đồng bộ | Thời gian S4 |
+|---|---:|---:|
+| Chat mới mỗi lần | 77% | 4,7 phút |
+| Thread chung, luật nói một lần | 74% | 6,2 phút |
+| **Thread chung, luật mọi lượt** | **90%** | 7,4 phút |
+
+Nói luật một lần rồi tin vào thread là tệ nhất: đến batch 5 rule 3 đã trôi quá xa
+phía trên và model bắt đầu lẫn `anh ta` với `ông ấy`.
+
+Cần biết trước một tính chất: **thread chung không sửa lựa chọn, nó khuếch đại
+lựa chọn.** Batch 1 chọn xưng hô nào thì cả video theo nấy — kể cả khi đó là dạng
+nằm ngoài danh sách rule 3 đề xuất. Cách ghim đúng đắn là `address_terms` trong
+`glossary.json`; khi nó rỗng thì model tự do chọn, và thiết kế thread chỉ quyết
+định model có nhất quán với lựa chọn của chính nó hay không.
 
 Mọi lần gọi nối đuôi nhau qua **một** cửa sổ trình duyệt, kể cả khi chạy
 `zhsub batch -j 4` — nhiều tab cùng gõ vào một tài khoản chỉ làm chạm hạn mức

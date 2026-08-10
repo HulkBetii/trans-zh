@@ -42,16 +42,40 @@ class ChatGPTWebProvider(LLMProvider):
         # only so every provider reports the same fields.
         super().__init__(model, temperature, max_retries, timeout_sec)
         self._web = web
+        self._system: str | None = None
+        self._conversation_url: str | None = None
 
     def _call(self, system: str, user: str, cache_system: bool, json_mode: bool = False) -> str:
-        # cache_system is meaningless here: there is no prompt cache behind the web
-        # UI, and each call opens a fresh conversation regardless.
+        # cache_system is meaningless here: there is no prompt cache behind the web UI.
+        #
+        # The system prompt doubles as the conversation key. It is constant for the
+        # whole of S2, for S3's term blocks, and for S4 within one target language,
+        # but differs between them — so keying on it puts each stage in its own
+        # thread without any stage having to know this provider exists. The threads
+        # are per instance, and `build_provider` runs once per stage per job, so two
+        # jobs in a `batch` run never share one.
+        new_thread = system != self._system
+        conversation = None if new_thread else self._conversation_url
+
+        # The rules are restated on every turn even though the thread already holds
+        # them. Measured on the 472-line clip: stating them once and relying on the
+        # thread let the model drift — "ông ấy" appeared 10 times against 0 for the
+        # one-shot-chat run, because by batch 5 rule 3's list of accepted pronouns
+        # had scrolled far up the conversation. Re-sending costs no tokens here.
+        prompt = compose_prompt(system, user, json_mode)
+
         session = get_session(self._web)
         with session.page() as page:
             try:
-                return session.run(ask(page, compose_prompt(system, user, json_mode), int(self.timeout_sec)))
+                text, url = session.run(ask(page, prompt, int(self.timeout_sec), conversation))
             except ChatGPTResponseError as exc:
                 # Retryable: a slow or truncated answer usually comes back fine on the
-                # next attempt. Login and Playwright errors deliberately propagate as
-                # they are, so a dead browser fails fast instead of retrying blind.
+                # next attempt. Login and rate-limit errors deliberately propagate as
+                # they are, so the job fails fast instead of retrying blind.
                 raise LLMError(f"ChatGPT web: {exc}") from exc
+
+        # Committed only on success. Recording the thread after a failed opening turn
+        # would send the next attempt in without ever having stated the rules.
+        self._system = system
+        self._conversation_url = url
+        return text
