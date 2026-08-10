@@ -126,6 +126,10 @@ class FakePage:
         self.prompts: list[str] = []
         self.visited: list[str] = []
         self.url = chat.NEW_CHAT_URL
+        self.closed = False
+
+    def is_closed(self) -> bool:
+        return self.closed
 
     @property
     def filled(self) -> str:
@@ -285,10 +289,41 @@ def test_upgrade_link_in_the_sidebar_is_not_a_rate_limit():
     assert chat.find_limit_fragment("You've reached your limit of GPT-5 messages") is not None
 
 
+def test_a_slow_answer_does_not_discard_a_live_tab():
+    """Chromium tắt hẳn khi page cuối cùng của persistent context đóng lại.
+
+    Đo được trên job thật: một lần trả lời treo 300s khiến tab bị đóng, browser tắt
+    theo, và cả ba job song song chết với "browser has been closed". Trả lời chậm
+    không có nghĩa là tab hỏng.
+    """
+    sess = session_mod.BrowserSession(Path("profile"), Path("account.json"), 1.0)
+    page = FakePage(reply="ok")
+    sess._page = page
+
+    with pytest.raises(RuntimeError):
+        with sess.page():
+            raise RuntimeError("trả lời chậm")
+
+    assert sess._page is page
+
+
+def test_a_dead_tab_is_replaced():
+    sess = session_mod.BrowserSession(Path("profile"), Path("account.json"), 1.0)
+    page = FakePage(reply="ok")
+    sess._page = page
+
+    with pytest.raises(RuntimeError):
+        with sess.page():
+            page.closed = True
+            raise RuntimeError("renderer chết")
+
+    assert sess._page is None
+
+
 def test_page_serialises_concurrent_callers():
     """batch -j 4 không được cho 4 luồng cùng gõ vào một ô nhập."""
     sess = session_mod.BrowserSession(Path("profile"), Path("account.json"), 1.0)
-    sess._page = object()  # bỏ qua bước mở trình duyệt
+    sess._page = FakePage(reply="ok")  # bỏ qua bước mở trình duyệt
 
     inside: list[int] = []
     peak: list[int] = []

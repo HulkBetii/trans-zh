@@ -147,8 +147,13 @@ async def _scroll_last_assistant_into_view(page) -> None:
         return
 
 
-async def _wait_text_stable(page, timeout_s: int) -> str:
-    """Poll the last answer until it stops changing across consecutive samples."""
+async def _wait_text_stable(page, timeout_s: int, require_stable: bool = False) -> str:
+    """Poll the last answer until it stops changing across consecutive samples.
+
+    ``require_stable`` refuses to hand back a still-moving answer. Normally the
+    latest text is good enough, but when the caller already suspects the UI is
+    stuck it must not be handed a half-written reply.
+    """
     settle_timeout = min(TEXT_SETTLE_TIMEOUT_S, max(12, timeout_s // 4))
     deadline = asyncio.get_event_loop().time() + settle_timeout
     last_text = ""
@@ -174,6 +179,10 @@ async def _wait_text_stable(page, timeout_s: int) -> str:
 
     if not last_text:
         raise ChatGPTResponseError("Có câu trả lời mới nhưng nội dung rỗng.")
+    if require_stable:
+        raise ChatGPTResponseError(
+            f"Nút dừng không tắt và câu trả lời cũng chưa ổn định sau {settle_timeout}s."
+        )
 
     log.warning("Câu trả lời chưa ổn định sau %ss, lấy bản mới nhất (%d ký tự)", settle_timeout, len(last_text))
     return last_text
@@ -209,8 +218,18 @@ async def send_prompt(prompt: str, page, timeout_s: int) -> str:
         await _raise_if_rate_limited(page)
         raise ChatGPTResponseError(f"Không có câu trả lời nào trong {timeout_s}s.")
 
-    await _wait_streaming_done(page, timeout_s)
-    text = await _wait_text_stable(page, timeout_s)
+    # A stop button that never goes away is usually a stuck UI, not a still-running
+    # answer — observed once as a 300s hang on a prompt that normally takes 15s.
+    # Throwing the turn away costs a full re-send, so check whether the text settled
+    # regardless before giving up on it.
+    stuck = False
+    try:
+        await _wait_streaming_done(page, timeout_s)
+    except ChatGPTResponseError:
+        log.warning("Nút dừng chưa tắt sau %ss — kiểm tra xem câu trả lời có ổn định không", timeout_s)
+        stuck = True
+
+    text = await _wait_text_stable(page, timeout_s, require_stable=stuck)
 
     # The quota message also arrives as an ordinary assistant turn. Left alone it
     # would be handed to the caller as the answer, and S2 would quietly fall back

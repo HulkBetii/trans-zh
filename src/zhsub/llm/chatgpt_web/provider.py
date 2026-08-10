@@ -78,4 +78,8 @@ class ChatGPTWebProvider(LLMProvider):
         # would send the next attempt in without ever having stated the rules.
         self._system = system
         self._conversation_url = url
+        if new_thread and url:
+            # Logged so a run can be audited afterwards: open the URL to see exactly
+            # what the model was told and answered, which no log line can reproduce.
+            log.info("ChatGPT: hội thoại mới %s", url)
         return text

@@ -124,15 +124,18 @@ class BrowserSession:
         each other.
         """
         with self._lock:
-            if self._page is None:
+            if self._page is None or self._page.is_closed():
                 self._page = self.run(self._new_page())
             try:
                 yield self._page
             except Exception:
-                # A dead tab (browser closed, renderer crashed) must not be reused, or
-                # every later call inherits the same failure.
-                self.run(_close_quietly(self._page))
-                self._page = None
+                # Only a genuinely closed tab is discarded. Closing it on *any* failure
+                # was catastrophic: launch_persistent_context shuts Chromium down when
+                # its last page closes, so one slow answer killed the browser and every
+                # later call in every parallel job died with "browser has been closed".
+                # A slow or malformed reply leaves a perfectly usable tab behind.
+                if self._page.is_closed():
+                    self._page = None
                 raise
 
 
