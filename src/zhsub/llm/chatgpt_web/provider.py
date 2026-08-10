@@ -42,8 +42,12 @@ class ChatGPTWebProvider(LLMProvider):
         # only so every provider reports the same fields.
         super().__init__(model, temperature, max_retries, timeout_sec)
         self._web = web
-        self._system: str | None = None
-        self._conversation_url: str | None = None
+        # One conversation per system prompt, not one per provider. S4 with
+        # review_pass alternates between the plain rules and the rules plus review
+        # suffix on every single call; remembering only the latest meant each turn
+        # saw a different system prompt, opened a new chat, and the shared thread
+        # degenerated into a fresh chat per call — 16 conversations for 16 calls.
+        self._conversations: dict[str, str] = {}
 
     def _call(self, system: str, user: str, cache_system: bool, json_mode: bool = False) -> str:
         # cache_system is meaningless here: there is no prompt cache behind the web UI.
@@ -54,8 +58,7 @@ class ChatGPTWebProvider(LLMProvider):
         # thread without any stage having to know this provider exists. The threads
         # are per instance, and `build_provider` runs once per stage per job, so two
         # jobs in a `batch` run never share one.
-        new_thread = system != self._system
-        conversation = None if new_thread else self._conversation_url
+        conversation = self._conversations.get(system)
 
         # The rules are restated on every turn even though the thread already holds
         # them. Measured on the 472-line clip: stating them once and relying on the
@@ -74,12 +77,10 @@ class ChatGPTWebProvider(LLMProvider):
                 # they are, so the job fails fast instead of retrying blind.
                 raise LLMError(f"ChatGPT web: {exc}") from exc
 
-        # Committed only on success. Recording the thread after a failed opening turn
-        # would send the next attempt in without ever having stated the rules.
-        self._system = system
-        self._conversation_url = url
-        if new_thread and url:
-            # Logged so a run can be audited afterwards: open the URL to see exactly
-            # what the model was told and answered, which no log line can reproduce.
-            log.info("ChatGPT: hội thoại mới %s", url)
+        if url:
+            if conversation is None:
+                # Logged so a run can be audited afterwards: open the URL to see exactly
+                # what the model was told and answered, which no log line can reproduce.
+                log.info("ChatGPT: hội thoại mới %s", url)
+            self._conversations[system] = url
         return text

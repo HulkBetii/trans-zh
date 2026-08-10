@@ -127,6 +127,7 @@ class FakePage:
         self.visited: list[str] = []
         self.url = chat.NEW_CHAT_URL
         self.closed = False
+        self.conversation_urls = iter(())
 
     def is_closed(self) -> bool:
         return self.closed
@@ -140,7 +141,8 @@ class FakePage:
             return
         self.messages.append(self.reply)
         # Như thật: chat mới chỉ có URL hội thoại sau khi tin nhắn đầu tiên gửi đi.
-        self.url = FAKE_CONVERSATION_URL
+        if self.url == chat.NEW_CHAT_URL:
+            self.url = next(self.conversation_urls, FAKE_CONVERSATION_URL)
 
     def locator(self, selector: str) -> FakeLocator:
         return FakeLocator(self, selector)
@@ -265,6 +267,30 @@ def test_a_different_system_prompt_starts_a_new_conversation(instant_polling, mo
 
     assert page.visited == [chat.NEW_CHAT_URL, chat.NEW_CHAT_URL]
     assert "RULES en" in page.prompts[1]
+
+
+def test_alternating_system_prompts_keep_two_conversations(instant_polling, monkeypatch):
+    """S4 với review_pass đổi qua lại giữa luật thường và luật + phần rà soát ở mọi
+    lần gọi. Nhớ mỗi một hội thoại gần nhất thì lượt nào cũng thành chat mới — đo
+    được trên job thật: 16 lần gọi ra đúng 16 hội thoại, mất sạch continuity.
+    """
+    page = FakePage(reply="ok")
+    provider = _provider_on(page, monkeypatch)
+    page.conversation_urls = iter(
+        [chat.CONVERSATION_URL_PREFIX + "nhap", chat.CONVERSATION_URL_PREFIX + "rasoat"]
+    )
+
+    provider.complete("RULES", "batch 1")           # nháp
+    provider.complete("RULES + REVIEW", "batch 1")  # rà soát
+    provider.complete("RULES", "batch 2")           # nháp, phải quay lại thread nháp
+    provider.complete("RULES + REVIEW", "batch 2")
+
+    assert page.visited == [
+        chat.NEW_CHAT_URL,
+        chat.NEW_CHAT_URL,
+        chat.CONVERSATION_URL_PREFIX + "nhap",
+        chat.CONVERSATION_URL_PREFIX + "rasoat",
+    ]
 
 
 def test_a_failed_opening_turn_does_not_claim_the_thread(instant_polling, monkeypatch):
