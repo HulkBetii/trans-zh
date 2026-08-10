@@ -40,9 +40,39 @@ TEXT_SETTLE_TIMEOUT_S = 45
 # "Thought for 12s" ticks up on its own while the answer below it is already final.
 _THINKING_TIMER_RE = re.compile(r"\bthought for \d+\s*(?:s|sec|seconds)\b", re.I)
 
+# Full phrases only. A bare "upgrade to" would match the permanent "Upgrade plan"
+# link in the sidebar and declare every single call rate-limited.
+_LIMIT_FRAGMENTS = (
+    "you've reached your limit",
+    "you have reached your limit",
+    "reached the current usage cap",
+    "reached your daily limit",
+    "you've hit your limit",
+    "limit resets",
+    "you're sending messages too quickly",
+    "too many requests",
+    "usage limit",
+)
+
 
 class ChatGPTResponseError(RuntimeError):
     """Sending the prompt or reading the answer failed. Retryable."""
+
+
+class ChatGPTRateLimitError(RuntimeError):
+    """The account is out of messages.
+
+    Deliberately NOT a :class:`ChatGPTResponseError`: the provider only wraps that
+    one into a retryable ``LLMError``, so this propagates untouched through every
+    retry loop and every ``except LLMError`` in the stages, and stops the job on
+    the spot. Retrying would only burn minutes against a wall that will not move
+    until the quota resets.
+    """
+
+
+def find_limit_fragment(text: str) -> str | None:
+    lowered = text.lower()
+    return next((f for f in _LIMIT_FRAGMENTS if f in lowered), None)
 
 
 async def _wait_streaming_done(page, timeout_s: int) -> None:
@@ -83,6 +113,22 @@ async def _last_assistant_text(page) -> str:
         return str(text).strip()
     except Exception:  # noqa: BLE001 - mid-render DOM swap
         return ""
+
+
+async def _raise_if_rate_limited(page) -> None:
+    """Name the real cause when no answer arrives.
+
+    A hit quota can appear as a banner or modal instead of an assistant message, in
+    which case the message counter never moves and the only other explanation on
+    offer is a timeout — which would send the caller looking for a slow network.
+    """
+    try:
+        body = await page.locator("body").first.inner_text(timeout=2_000)
+    except Exception:  # noqa: BLE001 - page busy; fall through to the timeout error
+        return
+    fragment = find_limit_fragment(body)
+    if fragment:
+        raise ChatGPTRateLimitError(f"ChatGPT hết hạn mức tin nhắn ({fragment!r}).")
 
 
 async def _scroll_last_assistant_into_view(page) -> None:
@@ -157,10 +203,19 @@ async def send_prompt(prompt: str, page, timeout_s: int) -> str:
             break
         await asyncio.sleep(POLL_INTERVAL_S)
     else:
+        await _raise_if_rate_limited(page)
         raise ChatGPTResponseError(f"Không có câu trả lời nào trong {timeout_s}s.")
 
     await _wait_streaming_done(page, timeout_s)
     text = await _wait_text_stable(page, timeout_s)
+
+    # The quota message also arrives as an ordinary assistant turn. Left alone it
+    # would be handed to the caller as the answer, and S2 would quietly fall back
+    # to rule-based breaks with only a warning in the log to show for it.
+    fragment = find_limit_fragment(text)
+    if fragment:
+        raise ChatGPTRateLimitError(f"ChatGPT hết hạn mức tin nhắn ({fragment!r}): {text[:200]}")
+
     log.info("Nhận câu trả lời (%d ký tự)", len(text))
     return text
 

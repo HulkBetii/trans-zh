@@ -131,14 +131,38 @@ uv run zhsub chatgpt-login      # đăng nhập tay một lần, profile nhớ p
 Rồi trong `zhsub.toml`:
 
 ```toml
-[llm.translate]
+[llm.segment]
 provider = "chatgpt_web"
 model = "chatgpt-web"     # chỉ là nhãn cho khoá cache, không phải model thật
 timeout_sec = 300
 
+[llm.translate]
+provider = "chatgpt_web"
+model = "chatgpt-web"
+timeout_sec = 900
+
 [llm.chatgpt_web]
 profile_dir = "data/chrome_profile"
 ```
+
+Chi phí ở đây tính bằng **số lần gọi**, không phải token: mỗi lần tốn ~10–15s phí
+cố định cho điều hướng, gõ prompt và poll, dài ngắn không quan trọng lắm. Ngược
+hẳn với API, nơi prompt caching hấp thụ phần input lặp lại nên batch nhỏ gần như
+miễn phí. Vì thế khi bật `chatgpt_web` thì nên tăng `translate.batch_size` và cân
+nhắc tắt `translate.review_pass` — riêng lượt rà soát đã chiếm đúng một nửa số
+lần gọi của S4.
+
+Đo trên clip 35 phút (452 câu, dịch cả `vi` lẫn `en`): 60 lần gọi với
+`batch_size = 40` + `review_pass = true`, xuống 28 lần với `batch_size = 60` +
+`review_pass = false`.
+
+Mọi lần gọi nối đuôi nhau qua **một** cửa sổ trình duyệt, kể cả khi chạy
+`zhsub batch -j 4` — nhiều tab cùng gõ vào một tài khoản chỉ làm chạm hạn mức
+nhanh hơn. `-j` vẫn tăng tốc phần ASR và render.
+
+Chạm hạn mức tin nhắn thì job **dừng ngay** với lỗi nói rõ nguyên nhân, không thử
+lại. Những câu đã dịch xong nằm trong `.cache/`, nên khi hạn mức reset thì
+`zhsub resume <job_id> --from translate` chạy tiếp, không mất gì.
 
 Chạy `zhsub chatgpt-login` trước khi dịch. Bỏ qua bước này thì pipeline vẫn tự mở
 trình duyệt, nhưng là ở giữa chừng — sau khi ASR đã chạy xong — rồi đứng chờ bạn

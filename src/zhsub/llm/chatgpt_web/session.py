@@ -8,8 +8,10 @@ Two constraints force this shape:
 * Playwright's async API must stay on one event loop, and the pipeline is
   synchronous throughout. Hence a dedicated loop thread and a blocking bridge.
 
-Tabs are pooled rather than shared: two threads typing into the same composer
-interleave into one garbled prompt.
+Calls are serialised behind one lock and one tab. Parallel tabs would interleave
+into a single garbled composer, and even done correctly they only make one
+account hit its message quota faster — so ``zhsub batch -j 4`` still runs its ASR
+and render work in parallel while the ChatGPT calls queue up.
 """
 
 from __future__ import annotations
@@ -60,8 +62,8 @@ class BrowserSession:
         self.account_file = account_file
         self.manual_login_timeout_sec = manual_login_timeout_sec
         self._loop = asyncio.new_event_loop()
-        self._idle: list = []
         self._lock = threading.Lock()
+        self._page = None
         self._ctx = None
         self._pw = None
 
@@ -101,10 +103,11 @@ class BrowserSession:
         )
         page = self._ctx.pages[0] if self._ctx.pages else await self._ctx.new_page()
         await ensure_logged_in(page, _load_account(self.account_file), self.manual_login_timeout_sec)
-        self._idle.append(page)
+        self._page = page
 
     async def _new_page(self):
-        """Extra tabs inherit the context's cookies, so they only need a sanity check."""
+        """Reopen the tab after it died. Cookies live in the context, so it only
+        needs a sanity check rather than another login."""
         page = await self._ctx.new_page()
         await page.goto(NEW_CHAT_URL, wait_until="domcontentloaded", timeout=NAVIGATION_TIMEOUT_MS)
         if not (await verify_logged_in(page))["logged_in"]:
@@ -114,21 +117,23 @@ class BrowserSession:
 
     @contextmanager
     def page(self):
-        """Lend a tab for one exchange, then take it back."""
+        """Hold the one tab for the whole exchange.
+
+        The lock spans the entire conversation turn, not just handing the tab over:
+        that is what serialises concurrent callers instead of letting them type over
+        each other.
+        """
         with self._lock:
-            page = self._idle.pop() if self._idle else None
-        if page is None:
-            page = self.run(self._new_page())
-        try:
-            yield page
-        except Exception:
-            # A dead tab (browser closed, renderer crashed) must not go back into the
-            # pool, or every later call inherits the same failure.
-            self.run(_close_quietly(page))
-            raise
-        else:
-            with self._lock:
-                self._idle.append(page)
+            if self._page is None:
+                self._page = self.run(self._new_page())
+            try:
+                yield self._page
+            except Exception:
+                # A dead tab (browser closed, renderer crashed) must not be reused, or
+                # every later call inherits the same failure.
+                self.run(_close_quietly(self._page))
+                self._page = None
+                raise
 
 
 def get_session(cfg: ChatGPTWebConfig) -> BrowserSession:

@@ -136,11 +136,24 @@ timeout_sec = 180
 # Cài: uv sync --extra chatgpt-web && playwright install chromium
 # Đăng nhập một lần: zhsub chatgpt-login
 #
-# [llm.translate]
+# Chi phí tính bằng SỐ LẦN GỌI chứ không phải token — mỗi lần ~10-15s phí cố định.
+# Bật provider này thì nên tăng translate.batch_size (60) và cân nhắc tắt
+# translate.review_pass: riêng lượt rà soát chiếm đúng một nửa số lần gọi của S4.
+# Mọi lần gọi nối đuôi nhau qua một cửa sổ trình duyệt, nên `batch -j N` không làm
+# phần LLM nhanh hơn. Chạm hạn mức tin nhắn thì job dừng ngay, resume được.
+#
+# [llm.segment]
 # provider = "chatgpt_web"
 # model = "chatgpt-web"     # chỉ là nhãn cho khoá cache, không phải model thật
+# max_retries = 2
+# timeout_sec = 300
+#
+# [llm.translate]
+# provider = "chatgpt_web"
+# model = "chatgpt-web"
+# temperature = 0.3
 # max_retries = 3
-# timeout_sec = 300         # UI chậm hơn API; batch 40 câu dễ vượt 180s
+# timeout_sec = 900         # UI chậm hơn API nhiều; batch 60 câu dễ vượt 300s
 #
 # [llm.chatgpt_web]
 # profile_dir = "data/chrome_profile"

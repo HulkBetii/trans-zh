@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import asyncio
+import threading
+import time
 import tomllib
+from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
-from zhsub.config import Config
+from zhsub.config import ChatGPTWebConfig, Config
+from zhsub.llm.base import LLMError
 from zhsub.llm.chatgpt_web import ChatGPTWebProvider, compose_prompt
-from zhsub.llm.chatgpt_web import chat
+from zhsub.llm.chatgpt_web import chat, session as session_mod
 from zhsub.llm.factory import build_provider
 
 CONFIG_TOML = """
@@ -91,6 +96,9 @@ class FakeLocator:
     async def evaluate(self, script: str, **kwargs) -> str:
         return self.page.messages[self.index]
 
+    async def inner_text(self, **kwargs) -> str:
+        return "\n".join(self.page.messages)
+
     async def click(self, **kwargs) -> None:
         if self.selector in chat.SEND_BUTTON_SELS:
             self.page.send()
@@ -157,3 +165,69 @@ def test_no_answer_within_the_timeout_is_an_error(instant_polling):
 
     with pytest.raises(chat.ChatGPTResponseError, match="Không có câu trả lời"):
         asyncio.run(chat.send_prompt("prompt", page, timeout_s=1))
+
+
+class FakeSession:
+    """Đủ để chạy provider._call mà không cần trình duyệt."""
+
+    def __init__(self, page: FakePage) -> None:
+        self._page = page
+
+    def run(self, coro):
+        return asyncio.run(coro)
+
+    @contextmanager
+    def page(self):
+        yield self._page
+
+
+def test_rate_limit_is_not_swallowed_by_the_retry_loop(instant_polling, monkeypatch):
+    """Hết hạn mức phải dừng job ngay, không retry — thử lại chỉ tốn thêm phút.
+
+    Điều đó chỉ đúng nếu ChatGPTRateLimitError KHÔNG bị bọc thành LLMError:
+    provider._call chỉ bắt ChatGPTResponseError, còn vòng retry ở base.complete
+    và mọi `except LLMError` trong các stage đều chỉ bắt LLMError.
+    """
+    page = FakePage(reply="You've reached your limit of messages until 3:00 PM.")
+    monkeypatch.setattr("zhsub.llm.chatgpt_web.provider.get_session", lambda web: FakeSession(page))
+    provider = ChatGPTWebProvider(model="chatgpt-web", web=ChatGPTWebConfig(), max_retries=3)
+
+    with pytest.raises(chat.ChatGPTRateLimitError):
+        provider.complete("system", "user")
+
+    assert not issubclass(chat.ChatGPTRateLimitError, LLMError)
+    assert not issubclass(chat.ChatGPTRateLimitError, chat.ChatGPTResponseError)
+    # Một lần gửi duy nhất: retry sẽ đâm vào đúng bức tường đó.
+    assert len(page.messages) == 1
+
+
+def test_upgrade_link_in_the_sidebar_is_not_a_rate_limit():
+    """Nút "Upgrade plan" nằm thường trực ở sidebar — bắt theo từ khoá cụt sẽ
+    tuyên bố mọi lần gọi đều hết hạn mức."""
+    assert chat.find_limit_fragment("Upgrade plan\nUpgrade to Go\nNew chat") is None
+    assert chat.find_limit_fragment("You've reached your limit of GPT-5 messages") is not None
+
+
+def test_page_serialises_concurrent_callers():
+    """batch -j 4 không được cho 4 luồng cùng gõ vào một ô nhập."""
+    sess = session_mod.BrowserSession(Path("profile"), Path("account.json"), 1.0)
+    sess._page = object()  # bỏ qua bước mở trình duyệt
+
+    inside: list[int] = []
+    peak: list[int] = []
+
+    def worker() -> None:
+        with sess.page():
+            inside.append(1)
+            peak.append(len(inside))
+            time.sleep(0.05)
+            inside.pop()
+
+    threads = [threading.Thread(target=worker) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert len(peak) == 4
+    assert max(peak) == 1
