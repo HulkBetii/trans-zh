@@ -219,6 +219,10 @@ thực sự bị ảnh hưởng.
 
 ### Giới hạn đã biết
 
+- **Thanh tiến độ đứng yên trong lúc chạy ASR.** FunASR không báo tiến độ ra
+  ngoài, và file ngắn hơn ngưỡng chunk (mặc định 90 phút) chỉ là một lượt gọi duy
+  nhất, nên không có gì để báo ở giữa. Với video 35 phút, bar nằm ở ~2% khoảng 60
+  giây. App nên hiện chữ "Đang nhận dạng giọng nói..." thay vì trông vào con số.
 - **Hai tiến trình `batch` chạy song song sẽ giẫm chân nhau.** Việc chọn job chỉ
   loại các job `done`, nên tiến trình thứ hai sẽ nhận luôn job mà tiến trình thứ
   nhất đang làm. Dùng `--concurrency` trong MỘT tiến trình, đừng mở hai cửa sổ.
