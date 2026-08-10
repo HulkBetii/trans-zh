@@ -97,11 +97,16 @@ class TranslateConfig(BaseModel):
     #       same 4/15 over budget). The same prompt on gpt-5 gave 81.5 chars and real
     #       idiomatic renderings. The binding constraint here is the model, not the
     #       prompt — worth remembering before writing more prompt text.
+    #   v9: "max_chars" stated as a hard limit with a self-check, the review pass
+    #       told not to lengthen a draft, and the advertised budget cut to 90% of the
+    #       real ceiling. Sending the ceiling itself left no slack — S5 warns at the
+    #       same CPS the budget comes from — and the over-budget share had climbed
+    #       from 6% to 15% as translation quality work went in.
     #   v8: the glossary block now pins one third-person form for the main subject.
     #       Rule 3 only ever offered a menu, so each batch chose again: measured on a
     #       472-line video, the dominant form covered 77-90% of occurrences and one
     #       run settled on "anh", which rule 3 does not even list.
-    prompt_version: int = 8
+    prompt_version: int = 9
 
 
 class LangLimits(BaseModel):

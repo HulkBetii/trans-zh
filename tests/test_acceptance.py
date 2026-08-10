@@ -312,13 +312,20 @@ def test_char_budget_takes_the_tighter_of_the_two_limits():
     A 7s cue allows 147 characters at 21 CPS but only 84 in two 42-character lines.
     Measured on a real clip, 24 of 35 Vietnamese translations overflowed because
     only the CPS limit was applied.
+
+    Both figures are then scaled by the safety margin, so the assertions compare
+    against the ceilings rather than hard-coding the result: which limit binds is
+    what this test protects, and pinning the exact number made it fail the moment
+    the margin was introduced.
     """
     cfg = Config()
+    limits = cfg.render.for_lang("vi")
     long_cue = Segment(id=0, start=0.0, end=7.0, text_zh="x", token_range=(0, 1))
     short_cue = Segment(id=1, start=0.0, end=2.0, text_zh="x", token_range=(0, 1))
 
-    assert s4_translate.char_budget(long_cue, cfg, "vi") == 84  # line-limited
-    assert s4_translate.char_budget(short_cue, cfg, "vi") == 42  # rate-limited
+    by_lines = limits.max_chars_per_line * cfg.render.max_lines  # 84 at max_lines=2
+    assert s4_translate.char_budget(long_cue, cfg, "vi") == int(by_lines * s4_translate._BUDGET_SAFETY)
+    assert s4_translate.char_budget(short_cue, cfg, "vi") == int(2.0 * limits.max_cps * s4_translate._BUDGET_SAFETY)
 
 
 def test_budget_reaches_the_model():

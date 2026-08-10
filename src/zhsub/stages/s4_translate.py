@@ -178,9 +178,10 @@ ABSOLUTE RULES:
 6. Match the register of the source. This is spoken commentary: when the Chinese is
    colloquial, the translation is colloquial. Formal wording on casual narration
    reads as stiff and wrong.
-7. Respect each entry's "max_chars" budget. Subtitles are condensed: drop filler
-   words and redundant connectives rather than exceed it. Never drop actual
-   meaning to fit.
+7. "max_chars" is a hard limit, not a suggestion. Count the characters of each
+   translation before returning it; if it is over, cut filler words and redundant
+   connectives and count again. Subtitles are condensed. Never drop actual meaning
+   to fit — rephrase shorter instead.
 8. Do not wrap the result in quotes and do not add notes or explanations.
 
 {_glossary_block(glossary, lang)}
@@ -198,9 +199,19 @@ attempt. Inspect it and fix:
 - pronouns or forms of address that are wrong or inconsistent with nearby lines
 - meaning that does not match the Chinese source
 
-Rewrite only what needs it; keep a good draft as it is. Every rule above still
+- any line longer than its own "max_chars"
+
+Rewrite only what needs it; keep a good draft as it is. A revision must never be
+longer than the draft it replaces unless the draft was missing meaning: measured,
+this pass is where "max_chars" violations grow fastest. Every rule above still
 applies, especially: the output must be in the target language, never Chinese,
 and exactly one object per input object with the same id."""
+
+
+# Fraction of the real display limit advertised to the model. 0.9 covers the
+# measured ~8% average overshoot; going tighter would start costing meaning, which
+# rule 7 forbids trading away.
+_BUDGET_SAFETY = 0.9
 
 
 def char_budget(segment: Segment, cfg: Config, lang: str) -> int:
@@ -212,11 +223,19 @@ def char_budget(segment: Segment, cfg: Config, lang: str) -> int:
     limit was being considered. Budgeting at generation time is the honest fix —
     trimming afterwards would mean deleting meaning, and splitting the cue would
     break the one-segment-one-cue rule.
+
+    The number handed to the model is deliberately below the real ceiling. Sending
+    the ceiling itself leaves no slack at all — S5 warns at the same CPS the budget
+    is derived from, so overshooting by one character is already a warning. Measured
+    on the 472-line clip: translations ran 7.1 characters over on budgets around 86,
+    roughly 8%, and the share of over-budget lines climbed 6% -> 15% as the
+    translation quality work went in. A margin absorbs that drift without asking the
+    model to hit an exact ceiling, which no amount of prompt wording achieved.
     """
     limits = cfg.render.for_lang(lang)
     by_lines = limits.max_chars_per_line * cfg.render.max_lines
     by_rate = int((segment.end - segment.start) * limits.max_cps)
-    return max(20, min(by_lines, by_rate))
+    return max(20, int(min(by_lines, by_rate) * _BUDGET_SAFETY))
 
 
 def _build_user_message(
