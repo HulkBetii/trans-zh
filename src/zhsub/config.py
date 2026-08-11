@@ -228,11 +228,12 @@ class DubConfig(BaseModel):
     # xử lý gì ở đây, nên tăng luồng gần như tỉ lệ thuận (4 luồng: 7 phút xuống 2:54
     # trên clip 9 cue).
     #
-    # 8 chứ không cao hơn: hạn mức đo được là 10 request/giây, burst 20, cho cả
-    # scope `read` lẫn `poll`. 8 luồng poll mỗi 4 giây chỉ dùng 2 request/giây — dư
-    # 5 lần, đủ chừa chỗ cho app web của chính bạn, vì hạn mức tính theo NGƯỜI DÙNG
-    # chứ không theo credential.
-    concurrency: int = 8
+    # 4, không phải 8. Thử 8 thì job 184 cue chết ở cue thứ 82 vì `server_busy` liên
+    # tục. Lý do chọn 8 lúc đầu là sai: header rate-limit (10 request/giây, burst
+    # 20) nói về TỐC ĐỘ REQUEST, còn thứ bị quá tải là NĂNG LỰC TỔNG HỢP của
+    # backend — hai tài nguyên khác nhau, và `server_busy` là tín hiệu của cái thứ
+    # hai. 4 luồng đã chạy sạch trên clip thử.
+    concurrency: int = 4
 
     def api_key(self) -> str:
         key = os.environ.get(self.api_key_env, "").strip()

@@ -19,13 +19,32 @@ log = logging.getLogger(__name__)
 
 POLL_INTERVAL_SEC = 4.0
 POLL_MAX_ATTEMPTS = 90
-RETRY_MAX_ATTEMPTS = 8
+# 12 chứ không phải 8: một job lồng tiếng là 184 lần gọi kéo dài nửa tiếng, và một
+# đợt `server_busy` dài hơn 4 phút rưỡi từng giết cả job ở cue thứ 82. Kiên nhẫn
+# thêm rẻ hơn nhiều so với dừng giữa chừng, kể cả khi cue đã xong được lưu lại.
+RETRY_MAX_ATTEMPTS = 12
 RETRY_BASE_SEC = 3.0
 RETRY_CAP_SEC = 60.0
+# Vài lần đầu là chuyện thường, im lặng. Quá ngưỡng này thì có gì đó không ổn và
+# người chạy cần biết trước khi job đứng im hàng phút.
+RETRY_NOISY_AFTER = 3
 
 
 class DubError(RuntimeError):
     pass
+
+
+def _log_retry(reason: str, wait_sec: float, attempt: int) -> None:
+    """Im lặng vài lần đầu, kêu to khi bắt đầu bất thường.
+
+    Không có dòng này thì một đợt bị chặn dài chỉ hiện ra dưới dạng job đứng im
+    hàng phút không rõ lý do — đúng cảnh đã gặp khi chạy 8 luồng.
+    """
+    if attempt + 1 >= RETRY_NOISY_AFTER:
+        log.warning("S6: %s, chờ %.0fs rồi thử lại (lần %d/%d)",
+                    reason, wait_sec, attempt + 1, RETRY_MAX_ATTEMPTS)
+    else:
+        log.debug("S6: %s, chờ %.1fs (lần %d)", reason, wait_sec, attempt + 1)
 
 
 class SpeechClient:
@@ -45,7 +64,7 @@ class SpeechClient:
                 # Retry-After là con số nhà cung cấp đưa ra; jitter để nhiều luồng
                 # không cùng thức dậy một lúc rồi lại đâm vào nhau.
                 wait = float(resp.headers.get("Retry-After", delay)) + random.random()
-                log.info("S6: chạm hạn mức, chờ %.1fs (lần %d)", wait, attempt + 1)
+                _log_retry("chạm hạn mức", wait, attempt)
                 time.sleep(wait)
                 delay = min(delay * 2, RETRY_CAP_SEC)
                 continue
@@ -57,7 +76,9 @@ class SpeechClient:
 
             # server_busy là áp lực dung lượng tạm thời, không phải lỗi của người gọi.
             if resp.status_code == 503 or body.get("code") == "server_busy":
-                time.sleep(delay + random.random())
+                wait = delay + random.random()
+                _log_retry("server bận", wait, attempt)
+                time.sleep(wait)
                 delay = min(delay * 2, RETRY_CAP_SEC)
                 continue
 
