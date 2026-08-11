@@ -198,10 +198,21 @@ class DubConfig(BaseModel):
     api_key_env: str = "AI33_API_KEY"
     voice_id: str = _PLACEHOLDER
 
-    # Trần tăng tốc khi câu đọc dài hơn chỗ trống. Đo trên một video thật: sau khi
-    # cắt lặng, 183/184 cue đã dư chỗ và cue chật nhất chỉ cần x1.11 — nên 1.15 vừa
-    # đủ mà không ai nghe ra. Nới rộng hơn chỉ đổi lấy giọng đọc hớt hải.
-    max_speed: float = 1.15
+    # Tốc độ đọc cho MỌI cue. Nghe thử thì 1.0 vừa tai — cảm giác "gấp" của bản đầu
+    # không đến từ tốc độ đọc mà từ chỗ giao giữa các câu bị dán sát (xem min_gap_sec).
+    base_speed: float = 1.0
+
+    # Trần khi câu dài hơn chỗ trống. Bằng base_speed nghĩa là KHÔNG BAO GIỜ tăng
+    # tốc — nghe thử bản có tăng tốc (tới 1.15x) thì rõ là gấp gáp. Câu dài giờ lấn
+    # sang khoảng lặng phía sau, và hàm ghép đẩy lùi rồi canh lại ở cue kế tiếp nên
+    # sai số không tích luỹ. Nới lên nếu chấp nhận đánh đổi ngược lại.
+    max_speed: float = 1.0
+
+    # Nhịp thở tối thiểu giữa hai câu. Cắt lặng bỏ mất đuôi im lặng của nhà cung
+    # cấp, nên câu bị đẩy lùi sẽ dán khít vào đuôi câu trước và nghe rất gấp ở chỗ
+    # giao. 0.25s xấp xỉ nhịp của chính video gốc: 50 giây khoảng lặng chia cho 184
+    # cue là 0.27s. Tổng thời lượng đọc dư 25% nên thừa chỗ cho khoản này.
+    min_gap_sec: float = 0.25
 
     # Hiệu chuẩn của giọng đang dùng: thời lượng = overhead + số_âm_tiết x hệ_số.
     # Đo bằng cách TTS 8 câu dài ngắn khác nhau rồi khớp tuyến tính, SAU khi đã cắt

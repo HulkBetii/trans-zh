@@ -34,17 +34,22 @@ log = logging.getLogger(__name__)
 
 
 def plan_speed(syllables: int, room_sec: float, cfg: Config) -> float:
-    """Tốc độ đọc để câu vừa khít chỗ trống, chặn trần theo cấu hình.
+    """Tốc độ đọc cho một cue, kẹp trong khoảng [base_speed, max_speed].
+
+    Mặc định hai đầu bằng nhau nên mọi cue đọc cùng một tốc độ và không bao giờ bị
+    đẩy nhanh — nghe thử bản có tăng tốc tới 1.15x thì rõ là gấp gáp. Câu dài hơn
+    chỗ trống sẽ lấn sang khoảng lặng phía sau thay vì bị nén lại.
 
     ``room_sec`` là khoảng tới lúc cue kế tiếp bắt đầu, không phải độ dài cue: cue
     tràn 0.4 giây mà sau nó có 0.8 giây im lặng thì không lấn vào đâu cả. Đo trên
     một video thật, dùng đúng ràng buộc này thay vì độ dài cue đã kéo số cue chật
     từ 26% xuống 17%.
     """
-    predicted = cfg.dub.overhead_sec + syllables * cfg.dub.sec_per_syllable
-    if predicted <= room_sec or room_sec <= 0:
-        return 1.0
-    return min(cfg.dub.max_speed, predicted / room_sec)
+    natural = cfg.dub.overhead_sec + syllables * cfg.dub.sec_per_syllable
+    speed = cfg.dub.base_speed
+    if room_sec > 0 and natural / speed > room_sec:
+        speed = min(cfg.dub.max_speed, natural / room_sec)
+    return max(speed, cfg.dub.base_speed)
 
 
 def _rooms(segments: list, total_sec: float) -> list[float]:
@@ -81,7 +86,7 @@ def run(
             ctx.report(index / max(len(segments), 1), f"{lang}: {index}/{len(segments)} cue")
             text = items[seg.id].translation
             speed = plan_speed(len(text.split()), room, cfg)
-            if speed > 1.0:
+            if speed > cfg.dub.base_speed:
                 sped_up += 1
 
             clip = clips_dir / f"{seg.id:05d}.mp3"
@@ -106,6 +111,6 @@ def run(
         client.close()
 
     dst = Path(out_dir) / f"{work_dir.name}.{lang}.mp3"
-    assemble(clips, cfg.dub.sample_rate, dst, total_sec)
+    assemble(clips, cfg.dub.sample_rate, dst, total_sec, cfg.dub.min_gap_sec)
     log.info("S6[%s] xong: %s (%d/%d cue phải tăng tốc)", lang, dst.name, sped_up, len(segments))
     return dst

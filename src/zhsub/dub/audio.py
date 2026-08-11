@@ -70,28 +70,36 @@ def decode_pcm(path: Path, sample_rate: int, start_sec: float, end_sec: float) -
 
 
 def assemble(
-    clips: list[tuple[float, bytes]], sample_rate: int, dst: Path, total_sec: float
+    clips: list[tuple[float, bytes]], sample_rate: int, dst: Path, total_sec: float,
+    min_gap_sec: float = 0.25,
 ) -> Path:
     """Đặt từng đoạn tiếng vào đúng mốc thời gian, phần trống để im lặng.
 
     Ghép theo mốc chứ không nối đuôi nhau, vì tổng thời lượng đọc ngắn hơn timeline
     khoảng 25% — nối đuôi thì tiếng chạy trước hình mỗi lúc một xa, tới cuối video
     lệch tới vài phút.
+
+    ``min_gap_sec`` là nhịp thở tối thiểu giữa hai câu. Bắt buộc phải có: cắt lặng
+    đã bỏ đuôi im lặng của nhà cung cấp, nên khi một đoạn lấn giờ và bị đẩy lùi thì
+    nó dán khít vào đuôi đoạn trước — nghe thử thì chỗ giao giữa các câu gấp gáp
+    hẳn. Không dựa vào padding sẵn có vì nó dao động 0.27-0.46s tuỳ câu.
     """
     bytes_per_sample = 2
     buf = bytearray(int(total_sec * sample_rate) * bytes_per_sample)
-    overlaps = 0
-    prev_end = 0
+    gap_bytes = int(min_gap_sec * sample_rate) * bytes_per_sample
+    pushed = 0
+    prev_end = -gap_bytes  # câu đầu tiên không bị đẩy khỏi mốc của nó
 
     for start_sec, pcm in clips:
         offset = int(start_sec * sample_rate) * bytes_per_sample
-        if offset < prev_end:
-            overlaps += 1
-            offset = prev_end  # đẩy sang sau thay vì ghi đè lên tiếng đã có
+        if offset < prev_end + gap_bytes:
+            pushed += 1
+            offset = prev_end + gap_bytes
         if offset + len(pcm) > len(buf):
             buf.extend(b"\x00" * (offset + len(pcm) - len(buf)))
         buf[offset : offset + len(pcm)] = pcm
         prev_end = offset + len(pcm)
+    overlaps = pushed
 
     if overlaps:
         log.warning("S6: %d đoạn chồng lên nhau, đã đẩy lùi thay vì ghi đè", overlaps)
