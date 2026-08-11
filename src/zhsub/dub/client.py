@@ -17,14 +17,17 @@ import httpx
 
 log = logging.getLogger(__name__)
 
-POLL_INTERVAL_SEC = 4.0
-POLL_MAX_ATTEMPTS = 90
-# 12 chứ không phải 8: một job lồng tiếng là 184 lần gọi kéo dài nửa tiếng, và một
-# đợt `server_busy` dài hơn 4 phút rưỡi từng giết cả job ở cue thứ 82. Kiên nhẫn
-# thêm rẻ hơn nhiều so với dừng giữa chừng, kể cả khi cue đã xong được lưu lại.
-RETRY_MAX_ATTEMPTS = 12
+# 8 giây, không phải 4: mỗi lần poll là một request vào đúng endpoint hay quá tải
+# nhất. Câu ngắn tổng hợp xong trong 2-5 giây nên poll thưa chỉ thêm vài giây chờ
+# mỗi cue, đổi lại giảm một nửa tải lên chỗ đang yếu.
+POLL_INTERVAL_SEC = 8.0
+POLL_MAX_ATTEMPTS = 60
+# Endpoint /v1/task/{id} của nhà cung cấp có lúc trả 503 kéo dài hàng chục phút —
+# kiểm bằng một request thủ công đơn lẻ cũng 503, tức là hỏng thật chứ không phải
+# do gọi quá tay. Một job lồng tiếng chạy cả tiếng, nên chờ lâu vẫn rẻ hơn chết.
+RETRY_MAX_ATTEMPTS = 20
 RETRY_BASE_SEC = 3.0
-RETRY_CAP_SEC = 60.0
+RETRY_CAP_SEC = 120.0
 # Vài lần đầu là chuyện thường, im lặng. Quá ngưỡng này thì có gì đó không ổn và
 # người chạy cần biết trước khi job đứng im hàng phút.
 RETRY_NOISY_AFTER = 3

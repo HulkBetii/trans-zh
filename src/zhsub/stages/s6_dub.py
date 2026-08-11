@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from ..config import Config
@@ -115,14 +115,36 @@ def run(
 
     # Chạy song song vì mỗi cue gần như chỉ là chờ poll. Giải mã và ghép vẫn tuần tự
     # theo đúng thứ tự cue, nên kết quả không phụ thuộc luồng nào xong trước.
+    #
+    # Một cue hỏng KHÔNG dừng những cue còn lại. Endpoint poll của nhà cung cấp có
+    # lúc 503 kéo dài; để nó kéo cả run xuống thì một lần trục trặc vứt luôn phần
+    # việc của 200 cue phía sau. Chạy hết rồi báo danh sách hỏng, lần sau resume chỉ
+    # tổng hợp đúng những cue đó.
     done = 0
+    failed: list[tuple[int, str]] = []
     try:
         with ThreadPoolExecutor(max_workers=max(1, cfg.dub.concurrency)) as pool:
-            for _ in pool.map(fetch, jobs):
+            futures = {pool.submit(fetch, job): job for job in jobs}
+            for future in as_completed(futures):
                 done += 1
                 ctx.report(done / max(len(jobs), 1), f"{lang}: {done}/{len(jobs)} cue")
+                try:
+                    future.result()
+                except Exception as exc:  # noqa: BLE001 - gom lại, báo một thể ở cuối
+                    seg_id = futures[future][1].id
+                    failed.append((seg_id, f"{type(exc).__name__}: {exc}"))
+                    log.warning("S6[%s]: cue %d hỏng — %s", lang, seg_id, exc)
     finally:
         client.close()
+
+    if failed:
+        # Không ghép khi còn thiếu: một cue trống là một khoảng lặng câm giữa video,
+        # tệ hơn hẳn so với báo lỗi rõ ràng rồi chạy lại.
+        ids = ", ".join(str(i) for i, _ in failed[:10])
+        raise RuntimeError(
+            f"S6[{lang}]: {len(failed)}/{len(jobs)} cue chưa tổng hợp được (id: {ids}). "
+            f"Chạy lại lệnh này để làm tiếp — {len(jobs) - len(failed)} cue đã xong được giữ lại."
+        )
 
     clips: list[tuple[float, bytes]] = []
     for seg, room in zip(segments, rooms):
