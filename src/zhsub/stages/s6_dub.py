@@ -20,12 +20,14 @@ lần gọi thay vì gọi rồi đo rồi gọi lại.
 
 from __future__ import annotations
 
+import hashlib
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from ..config import Config
 from ..dub import SpeechClient, assemble, decode_pcm, speech_bounds
+from ..dub.text import normalize_for_speech
 from ..jsonio import read_doc
 from ..media import probe_duration
 from ..models import SegmentsDoc, TranslationsDoc
@@ -80,16 +82,27 @@ def run(
     rooms = _rooms(segments, total_sec)
     log.info("S6[%s]: %d cue, giọng %s, còn %d credit", lang, len(segments), voice_id, client.credits())
 
+    def clip_path(seg, room: float) -> tuple[Path, str, float]:
+        """Đường dẫn clip mang theo dấu vân tay của thứ sinh ra nó.
+
+        Tên file chứa hash của (chữ đã chuẩn hoá + tốc độ + giọng), nên đổi bất kỳ
+        thứ nào trong đó là clip cũ không còn được tìm thấy và cue được tổng hợp
+        lại. Đặt tên theo mỗi id cue thì sửa luật chuẩn hoá xong chạy lại sẽ lặng lẽ
+        dùng lại audio cũ — đúng loại bẫy mà prompt_version sinh ra ở khâu dịch.
+        """
+        text = normalize_for_speech(items[seg.id].translation)
+        speed = plan_speed(len(text.split()), room, cfg)
+        digest = hashlib.sha256(f"{text}|{speed:.2f}|{voice_id}".encode()).hexdigest()[:8]
+        return clips_dir / f"{seg.id:05d}-{digest}.mp3", text, speed
+
     def fetch(job: tuple[int, object, float]) -> Path:
         """Tổng hợp một cue. Chạy trong luồng riêng, chỉ đụng tới file của chính nó."""
         _, seg, room = job
-        clip = clips_dir / f"{seg.id:05d}.mp3"
+        clip, text, speed = clip_path(seg, room)
         # Đã có thì dùng lại: một lần chạy hỏng giữa chừng không phải trả tiền lại
         # cho những cue đã tổng hợp xong.
         if clip.is_file() and not force:
             return clip
-        text = items[seg.id].translation
-        speed = plan_speed(len(text.split()), room, cfg)
         task_id = client.synthesize(text, voice_id, speed)
         url = client.wait(task_id).get("audio_url")
         if not url:
@@ -98,11 +111,7 @@ def run(
         return clip
 
     jobs = [(i, seg, room) for i, (seg, room) in enumerate(zip(segments, rooms))]
-    sped_up = sum(
-        1
-        for _, seg, room in jobs
-        if plan_speed(len(items[seg.id].translation.split()), room, cfg) > cfg.dub.base_speed
-    )
+    sped_up = sum(1 for _, seg, room in jobs if clip_path(seg, room)[2] > cfg.dub.base_speed)
 
     # Chạy song song vì mỗi cue gần như chỉ là chờ poll. Giải mã và ghép vẫn tuần tự
     # theo đúng thứ tự cue, nên kết quả không phụ thuộc luồng nào xong trước.
@@ -117,7 +126,7 @@ def run(
 
     clips: list[tuple[float, bytes]] = []
     for seg, room in zip(segments, rooms):
-        clip = clips_dir / f"{seg.id:05d}.mp3"
+        clip = clip_path(seg, room)[0]
         begin, finish = speech_bounds(clip, probe_duration(clip))
         clips.append((seg.start, decode_pcm(clip, cfg.dub.sample_rate, begin, finish)))
         if finish - begin > room + 0.05:

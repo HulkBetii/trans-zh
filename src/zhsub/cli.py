@@ -246,6 +246,42 @@ def cmd_dub(
     typer.echo(f"xong -> {dst}")
 
 
+@app.command("dub-names")
+def cmd_dub_names(
+    job_id: str = typer.Argument(..., help="job_id đã dịch xong"),
+    lang: str = typer.Option("vi", "--lang", "-l"),
+    config: Path | None = typer.Option(None, "--config", "-c"),
+) -> None:
+    """Liệt kê tên riêng nước ngoài và viết tắt trong bản dịch.
+
+    Dùng để lập Pronunciation Dictionary trên ai33.pro trước khi lồng tiếng — máy
+    đọc tên nước ngoài theo kiểu gì thì không đoán được, phải nghe rồi tự quyết.
+    """
+    from .dub.text import foreign_names
+    from .jsonio import read_doc
+    from .models import TranslationsDoc
+
+    cfg = Config.load(config)
+    path = Path(cfg.paths.work_dir) / job_id / f"translations.{lang}.json"
+    if not path.is_file():
+        raise typer.BadParameter(f"Không tìm thấy {path}")
+
+    doc = read_doc(path, TranslationsDoc)
+    names, acronyms = foreign_names([i.translation for i in doc.items])
+
+    typer.echo(f"{len(names)} tên riêng chữ Latin:")
+    for name in names:
+        typer.echo(f"  {name}")
+    if acronyms:
+        typer.echo(f"\n{len(acronyms)} viết tắt:")
+        for acronym in acronyms:
+            typer.echo(f"  {acronym}")
+    typer.echo(
+        "\nLập từ điển phát âm tại ai33.pro rồi đặt pronunciation_dictionary_id."
+        "\nDanh sách có thể lọt vài từ tiếng Việt viết không dấu — bỏ qua chúng."
+    )
+
+
 @app.command("dub-calibrate")
 def cmd_dub_calibrate(
     job_id: str = typer.Argument(..., help="job_id đã dịch xong, dùng làm câu mẫu"),
