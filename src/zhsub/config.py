@@ -187,6 +187,48 @@ class LLMConfig(BaseModel):
     chatgpt_web: ChatGPTWebConfig = Field(default_factory=ChatGPTWebConfig)
 
 
+class DubConfig(BaseModel):
+    """Sinh audio lồng tiếng từ bản dịch (S6, không nằm trong `zhsub run`).
+
+    Tách khỏi pipeline mặc định vì mỗi lần chạy tốn tiền thật: một cue là một lần
+    gọi API, video 17 phút hết 184 lần.
+    """
+
+    base_url: str = "https://api.ai33.pro"
+    api_key_env: str = "AI33_API_KEY"
+    voice_id: str = _PLACEHOLDER
+
+    # Trần tăng tốc khi câu đọc dài hơn chỗ trống. Đo trên một video thật: sau khi
+    # cắt lặng, 183/184 cue đã dư chỗ và cue chật nhất chỉ cần x1.11 — nên 1.15 vừa
+    # đủ mà không ai nghe ra. Nới rộng hơn chỉ đổi lấy giọng đọc hớt hải.
+    max_speed: float = 1.15
+
+    # Hiệu chuẩn của giọng đang dùng: thời lượng = overhead + số_âm_tiết x hệ_số.
+    # Đo bằng cách TTS 8 câu dài ngắn khác nhau rồi khớp tuyến tính, SAU khi đã cắt
+    # lặng hai đầu. Số mặc định lấy từ vbee_n_hn_male_duyonyx_oaistable_vc ở speed 1;
+    # đổi giọng thì phải đo lại, nếu không phần chỉnh tốc độ sẽ sai.
+    overhead_sec: float = 0.15
+    sec_per_syllable: float = 0.217
+
+    sample_rate: int = 24000
+
+    def api_key(self) -> str:
+        key = os.environ.get(self.api_key_env, "").strip()
+        if not key:
+            raise RuntimeError(
+                f"Chưa có API key: biến môi trường {self.api_key_env} trống."
+            )
+        return key
+
+    def require_voice(self) -> str:
+        if not self.voice_id or self.voice_id == _PLACEHOLDER:
+            raise RuntimeError(
+                f"Chưa đặt voice_id cho [dub] trong zhsub.toml (đang là {_PLACEHOLDER!r}). "
+                f"Xem danh sách: GET /v3/voices?provider=vbee"
+            )
+        return self.voice_id
+
+
 class Config(BaseModel):
     paths: PathsConfig = Field(default_factory=PathsConfig)
     ingest: IngestConfig = Field(default_factory=IngestConfig)
@@ -195,6 +237,7 @@ class Config(BaseModel):
     translate: TranslateConfig = Field(default_factory=TranslateConfig)
     render: RenderConfig = Field(default_factory=RenderConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
+    dub: DubConfig = Field(default_factory=DubConfig)
 
     @classmethod
     def load(cls, path: str | Path | None = None) -> Config:

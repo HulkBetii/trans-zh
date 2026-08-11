@@ -220,6 +220,32 @@ def cmd_batch(
         raise typer.Exit(code=1)
 
 
+@app.command("dub")
+def cmd_dub(
+    job_id: str = typer.Argument(..., help="job_id đã dịch xong"),
+    lang: str = typer.Option("vi", "--lang", "-l", help="Ngôn ngữ cần lồng tiếng"),
+    out: Path = typer.Option(Path("./output"), "--out", "-o"),
+    config: Path | None = typer.Option(None, "--config", "-c"),
+    force: bool = typer.Option(False, "--force", help="Tổng hợp lại cả những cue đã có"),
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+) -> None:
+    """Sinh audio lồng tiếng từ bản dịch (S6).
+
+    Tách khỏi `run` vì tốn tiền thật: mỗi cue một lần gọi API. Cue đã tổng hợp được
+    dùng lại, nên chạy lại sau khi hỏng giữa chừng không phải trả tiền hai lần.
+    """
+    _setup_logging(verbose)
+    from .stages import s6_dub
+
+    cfg = Config.load(config)
+    work_dir = Path(cfg.paths.work_dir) / job_id
+    if not work_dir.is_dir():
+        raise typer.BadParameter(f"Không tìm thấy {work_dir}")
+
+    dst = s6_dub.run(work_dir, cfg, lang, out, force=force)
+    typer.echo(f"xong -> {dst}")
+
+
 @app.command("chatgpt-login")
 def cmd_chatgpt_login(
     config: Path | None = typer.Option(None, "--config", "-c"),
