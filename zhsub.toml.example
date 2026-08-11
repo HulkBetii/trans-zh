@@ -120,6 +120,24 @@ timeout_sec = 180
 # Model local nhỏ hay phá vỡ ràng buộc tập id ở S4. Nếu thấy log báo chia đôi
 # batch liên tục thì giảm translate.batch_size xuống 10-15.
 
+# ---------------------------------------------------------------------------
+# S6 — lồng tiếng. Chạy riêng bằng `zhsub dub <job_id>`, KHÔNG nằm trong `run`
+# vì mỗi cue là một lần gọi API trả tiền (video 17 phút hết 184 lần).
+# Đặt API key qua biến môi trường AI33_API_KEY.
+# ---------------------------------------------------------------------------
+# [dub]
+# voice_id = "SET_ME"       # xem GET /v3/voices?provider=vbee
+# base_speed = 1.0          # tốc độ đọc mọi cue
+# max_speed = 1.0           # bằng base_speed = không bao giờ tăng tốc
+# min_gap_sec = 0.25        # nhịp thở tối thiểu giữa hai câu
+# concurrency = 4           # đừng nâng: 8 làm backend trả server_busy liên tục
+#
+# Hai hằng số dưới là SỐ ĐO của riêng voice_id ở trên. Đổi giọng thì chạy
+# `zhsub dub-calibrate <job_id>` để đo lại — dùng số của giọng khác thì S6 tính
+# sai tốc độ mà không báo lỗi gì.
+# overhead_sec = 0.15
+# sec_per_syllable = 0.217
+
 # --- Anthropic cho khâu dịch (cần đặt ANTHROPIC_API_KEY) -------------------
 # [llm.translate]
 # provider = "anthropic"

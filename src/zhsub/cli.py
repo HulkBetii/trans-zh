@@ -246,6 +246,33 @@ def cmd_dub(
     typer.echo(f"xong -> {dst}")
 
 
+@app.command("dub-calibrate")
+def cmd_dub_calibrate(
+    job_id: str = typer.Argument(..., help="job_id đã dịch xong, dùng làm câu mẫu"),
+    lang: str = typer.Option("vi", "--lang", "-l"),
+    samples: int = typer.Option(8, "--samples", min=3, max=20),
+    config: Path | None = typer.Option(None, "--config", "-c"),
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+) -> None:
+    """Đo tốc độ đọc của giọng đang cấu hình, in ra hai hằng số cho [dub].
+
+    Phải chạy lại mỗi khi đổi `voice_id`: hai con số đó là của đúng một giọng, dùng
+    nhầm thì S6 tính sai tốc độ mà không báo lỗi gì.
+    """
+    _setup_logging(verbose)
+    from .dub import calibrate
+
+    cfg = Config.load(config)
+    work_dir = Path(cfg.paths.work_dir) / job_id
+    if not work_dir.is_dir():
+        raise typer.BadParameter(f"Không tìm thấy {work_dir}")
+
+    overhead, per_syllable = calibrate.run(work_dir, cfg, lang, samples)
+    typer.echo("\nDán vào zhsub.toml, mục [dub]:")
+    typer.echo(f"  overhead_sec = {overhead:.2f}")
+    typer.echo(f"  sec_per_syllable = {per_syllable:.3f}")
+
+
 @app.command("chatgpt-login")
 def cmd_chatgpt_login(
     config: Path | None = typer.Option(None, "--config", "-c"),

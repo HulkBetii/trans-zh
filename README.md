@@ -262,6 +262,76 @@ bạn đang đăng nhập sẵn; pipeline không bao giờ tự nhập tài kho�
 Kết quả trung gian nằm ở `work/<job_id>/`. `job_id` sinh tất định theo nguồn nên
 chạy lại cùng một file là dùng lại kết quả cũ thay vì làm lại từ đầu.
 
+## Lồng tiếng (S6)
+
+Sinh audio tiếng Việt khớp timeline gốc, để ghép thẳng vào video. **Không nằm
+trong `zhsub run`** vì mỗi cue là một lần gọi API trả tiền — video 17 phút hết 184
+lần.
+
+```bash
+setx AI33_API_KEY sk_...          # mở lại terminal sau khi đặt
+uv run zhsub dub <job_id> --lang vi
+```
+
+```toml
+[dub]
+voice_id = "vbee_n_hn_male_duyonyx_oaistable_vc"
+base_speed = 1.0        # tốc độ đọc mọi cue
+max_speed = 1.0         # bằng base_speed = không bao giờ tăng tốc
+min_gap_sec = 0.25      # nhịp thở tối thiểu giữa hai câu
+overhead_sec = 0.15     # ĐO ĐƯỢC, của riêng voice_id ở trên
+sec_per_syllable = 0.217
+```
+
+Xem danh sách giọng: `GET /v3/voices?provider=vbee`. Clip đã tổng hợp lưu ở
+`work/<job_id>/dub/<lang>/`, nên chạy lại sau khi hỏng giữa chừng không trả tiền
+hai lần.
+
+### Đổi giọng thì phải đo lại
+
+`overhead_sec` và `sec_per_syllable` là số đo của **đúng một giọng**. Dùng số của
+giọng khác thì S6 tính sai tốc độ — âm thầm, không báo lỗi, chỉ hiện ra dưới dạng
+tiếng lệch khỏi hình.
+
+```bash
+uv run zhsub dub-calibrate <job_id> --lang vi
+```
+
+Nó tổng hợp 8 câu dài ngắn khác nhau, cắt lặng, rồi khớp tuyến tính
+`thời lượng = overhead + số_âm_tiết × hệ_số` và in ra hai dòng để dán vào
+`zhsub.toml`. Khớp hai tham số chứ không lấy một tỉ lệ, vì mỗi câu có phần
+đầu/cuối không tỉ lệ với độ dài — với cue 1.5 giây thì chính `overhead` quyết
+định, mà cue ngắn lại là nhóm dễ tràn nhất.
+
+### Ba điều đo được, đừng chỉnh mò
+
+**Cắt lặng hai đầu là bước có giá trị nhất.** Nhà cung cấp trả về 0.22s lặng đầu
+và 0.27–0.46s lặng cuối trên mọi mẫu — đó là padding, không phải giọng đọc. Bỏ nó
+thu lại ~0.55 giây mỗi câu, và riêng việc đó đưa 183/184 cue của một video thật từ
+chật thành dư chỗ. Chỉ cắt hai đầu; lặng ở giữa là nhịp ngắt câu.
+
+**Không tăng tốc.** Bản có tăng tốc tới 1.15× nghe rõ là gấp gáp. Câu dài giờ lấn
+sang khoảng lặng phía sau, và hàm ghép đẩy lùi rồi canh lại ở cue kế tiếp nên sai
+số không tích luỹ. Nới `max_speed` lên nếu gặp video có cue chật hơn.
+
+**`min_gap_sec` không phải trang trí.** Cắt lặng bỏ mất đuôi im lặng, nên câu bị
+đẩy lùi sẽ dán khít vào đuôi câu trước — nghe thử thì chỗ giao giữa các câu gấp
+hẳn, dù tốc độ đọc vẫn bình thường. 0.25s xấp xỉ nhịp của chính video gốc.
+
+Đo trên video 17 phút, 184 cue: 3 cue lấn giờ, 0 cue phải tăng tốc, audio 1006.8s
+so với timeline 1007s. Chạy 4 luồng hết ~22 phút.
+
+`concurrency` để 4, đừng nâng. Thử 8 thì job chết giữa chừng vì `server_busy`:
+header rate-limit nói về tốc độ request, còn thứ quá tải là năng lực tổng hợp của
+backend — hai tài nguyên khác nhau, và không header nào cho biết ngưỡng của cái
+thứ hai.
+
+Ghép audio vào video:
+
+```bash
+ffmpeg -i goc.mp4 -i output/<job_id>.vi.mp3 -map 0:v -map 1:a -c:v copy -shortest ra.mp4
+```
+
 ### Sửa glossary rồi dịch lại
 
 Đây là vòng lặp quan trọng nhất để bản dịch chuẩn:
