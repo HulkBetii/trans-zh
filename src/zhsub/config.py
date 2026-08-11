@@ -223,6 +223,17 @@ class DubConfig(BaseModel):
 
     sample_rate: int = 24000
 
+    # Số cue tổng hợp song song. Chạy tuần tự mất ~58 giây mỗi cue, tức hơn 2 tiếng
+    # cho video 184 cue — và gần như toàn bộ là chờ server tổng hợp chứ không phải
+    # xử lý gì ở đây, nên tăng luồng gần như tỉ lệ thuận (4 luồng: 7 phút xuống 2:54
+    # trên clip 9 cue).
+    #
+    # 8 chứ không cao hơn: hạn mức đo được là 10 request/giây, burst 20, cho cả
+    # scope `read` lẫn `poll`. 8 luồng poll mỗi 4 giây chỉ dùng 2 request/giây — dư
+    # 5 lần, đủ chừa chỗ cho app web của chính bạn, vì hạn mức tính theo NGƯỜI DÙNG
+    # chứ không theo credential.
+    concurrency: int = 8
+
     def api_key(self) -> str:
         key = os.environ.get(self.api_key_env, "").strip()
         if not key:

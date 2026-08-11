@@ -21,6 +21,7 @@ lần gọi thay vì gọi rồi đo rồi gọi lại.
 from __future__ import annotations
 
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from ..config import Config
@@ -79,36 +80,51 @@ def run(
     rooms = _rooms(segments, total_sec)
     log.info("S6[%s]: %d cue, giọng %s, còn %d credit", lang, len(segments), voice_id, client.credits())
 
-    clips: list[tuple[float, bytes]] = []
-    sped_up = 0
+    def fetch(job: tuple[int, object, float]) -> Path:
+        """Tổng hợp một cue. Chạy trong luồng riêng, chỉ đụng tới file của chính nó."""
+        _, seg, room = job
+        clip = clips_dir / f"{seg.id:05d}.mp3"
+        # Đã có thì dùng lại: một lần chạy hỏng giữa chừng không phải trả tiền lại
+        # cho những cue đã tổng hợp xong.
+        if clip.is_file() and not force:
+            return clip
+        text = items[seg.id].translation
+        speed = plan_speed(len(text.split()), room, cfg)
+        task_id = client.synthesize(text, voice_id, speed)
+        url = client.wait(task_id).get("audio_url")
+        if not url:
+            raise RuntimeError(f"cue {seg.id}: task xong nhưng không có audio_url")
+        client.download(url, clip)
+        return clip
+
+    jobs = [(i, seg, room) for i, (seg, room) in enumerate(zip(segments, rooms))]
+    sped_up = sum(
+        1
+        for _, seg, room in jobs
+        if plan_speed(len(items[seg.id].translation.split()), room, cfg) > cfg.dub.base_speed
+    )
+
+    # Chạy song song vì mỗi cue gần như chỉ là chờ poll. Giải mã và ghép vẫn tuần tự
+    # theo đúng thứ tự cue, nên kết quả không phụ thuộc luồng nào xong trước.
+    done = 0
     try:
-        for index, (seg, room) in enumerate(zip(segments, rooms)):
-            ctx.report(index / max(len(segments), 1), f"{lang}: {index}/{len(segments)} cue")
-            text = items[seg.id].translation
-            speed = plan_speed(len(text.split()), room, cfg)
-            if speed > cfg.dub.base_speed:
-                sped_up += 1
-
-            clip = clips_dir / f"{seg.id:05d}.mp3"
-            # Đã có thì dùng lại: một lần chạy hỏng giữa chừng không phải trả tiền
-            # lại cho những cue đã tổng hợp xong.
-            if not clip.is_file() or force:
-                task_id = client.synthesize(text, voice_id, speed)
-                url = client.wait(task_id).get("audio_url")
-                if not url:
-                    raise RuntimeError(f"cue {seg.id}: task xong nhưng không có audio_url")
-                client.download(url, clip)
-
-            duration = probe_duration(clip)
-            begin, finish = speech_bounds(clip, duration)
-            clips.append((seg.start, decode_pcm(clip, cfg.dub.sample_rate, begin, finish)))
-            if finish - begin > room + 0.05:
-                log.warning(
-                    "S6[%s]: cue %d đọc %.1fs nhưng chỉ có %.1fs — sẽ lấn sang cue sau",
-                    lang, seg.id, finish - begin, room,
-                )
+        with ThreadPoolExecutor(max_workers=max(1, cfg.dub.concurrency)) as pool:
+            for _ in pool.map(fetch, jobs):
+                done += 1
+                ctx.report(done / max(len(jobs), 1), f"{lang}: {done}/{len(jobs)} cue")
     finally:
         client.close()
+
+    clips: list[tuple[float, bytes]] = []
+    for seg, room in zip(segments, rooms):
+        clip = clips_dir / f"{seg.id:05d}.mp3"
+        begin, finish = speech_bounds(clip, probe_duration(clip))
+        clips.append((seg.start, decode_pcm(clip, cfg.dub.sample_rate, begin, finish)))
+        if finish - begin > room + 0.05:
+            log.warning(
+                "S6[%s]: cue %d đọc %.1fs nhưng chỉ có %.1fs — sẽ lấn sang cue sau",
+                lang, seg.id, finish - begin, room,
+            )
 
     dst = Path(out_dir) / f"{work_dir.name}.{lang}.mp3"
     assemble(clips, cfg.dub.sample_rate, dst, total_sec, cfg.dub.min_gap_sec)
