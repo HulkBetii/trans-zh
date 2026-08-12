@@ -51,6 +51,11 @@ _TRAILING_CONNECTORS = (
 
 _DIGIT_RUN = re.compile(r"[0-9]")
 
+# 1800 ký tự chia ba lần là còn ~225 — dưới mức đó thì ngắt theo rule cũng không tệ
+# hơn bao nhiêu, mà mỗi lần chia là thêm một lần gọi.
+_MAX_SPLIT_DEPTH = 3
+_MIN_SPLIT_TOKENS = 40
+
 
 def _chunk_at_silences(doc: AsrDoc, min_silence: float, max_chars: int) -> list[tuple[int, int]]:
     """Split the token stream into LLM-sized pieces at confident silences.
@@ -190,8 +195,14 @@ def _enforce_max_duration(
     return out
 
 
+def _worse(left: str, right: str) -> str:
+    """Nhãn phương pháp cho một chunk đã bị chia đôi: lấy cái tệ hơn."""
+    order = ("rule_fallback", "llm+repair", "llm")
+    return left if order.index(left) < order.index(right) else right
+
+
 def _segment_chunk(
-    doc: AsrDoc, lo: int, hi: int, provider: LLMProvider | None, cfg: Config
+    doc: AsrDoc, lo: int, hi: int, provider: LLMProvider | None, cfg: Config, depth: int = 0
 ) -> tuple[list[int], str]:
     """Break positions (token indices) for one chunk, plus the method that produced them."""
     stream = "".join(t.text for t in doc.tokens[lo:hi])
@@ -229,6 +240,22 @@ def _segment_chunk(
                 "S2: chunk [%d:%d] khớp %.3f < %.2f (lần %d) — thử lại",
                 lo, hi, ratio, cfg.segment.repair_min_ratio, attempt + 1,
             )
+
+    # Chia đôi rồi thử lại, giống hệt cách S4 xử lý batch hỏng. Bộ lọc nội dung của
+    # ChatGPT phản ứng với NỘI DUNG, nên nửa lành sẽ lọt và chỉ mẩu thật sự nhạy cảm
+    # bị chặn. Đo trên một video án mạng, trong cùng một lần chạy: S4 bị chặn ở batch
+    # 60 câu nhưng chia xuống 30 câu thì lọt, còn S2 vì chỉ biết thử lại nguyên xi nên
+    # mất trọn 36% video vào ngắt theo rule.
+    #
+    # Chia nhỏ không cần thành công hoàn toàn mới có ích: nó thu hẹp thiệt hại từ cả
+    # chunk 1800 ký tự xuống còn một mẩu nhỏ.
+    if depth < _MAX_SPLIT_DEPTH and hi - lo >= _MIN_SPLIT_TOKENS:
+        mid = _best_split_point(doc, lo, hi)
+        if lo < mid < hi:
+            log.warning("S2: chia đôi chunk [%d:%d] tại %d rồi thử lại", lo, hi, mid)
+            left, left_method = _segment_chunk(doc, lo, mid, provider, cfg, depth + 1)
+            right, right_method = _segment_chunk(doc, mid, hi, provider, cfg, depth + 1)
+            return sorted({*left, *right, mid}), _worse(left_method, right_method)
 
     # Report what actually produced the breaks. Carrying the LLM's method label
     # through a rule fallback makes segments.json claim a provenance it does not have.

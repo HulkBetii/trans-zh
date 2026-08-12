@@ -76,7 +76,12 @@ class ChatGPTWebProvider(LLMProvider):
                 # vòng thử lại bỏ qua — gửi lại đúng văn bản đó chỉ nhận đúng lời từ
                 # chối đó. Đo trên một video án mạng: mỗi lần bị chặn tốn 12 lần gọi
                 # trước khi tới được bước chia đôi batch, cả 12 đều gửi một nội dung.
-                log.warning("ChatGPT chặn nội dung — bỏ qua thử lại, để stage tự xử")
+                #
+                # Bỏ luôn hội thoại: một thread đã từ chối một lần có thể kéo theo
+                # các lượt sau, nên lượt kế tiếp mở chat mới thay vì nối vào đó. Đây
+                # là suy đoán chứ chưa đo được, nhưng mở chat mới không tốn gì.
+                self._conversations.pop(system, None)
+                log.warning("ChatGPT chặn nội dung — bỏ thread này, để stage tự xử")
                 raise NonRetryableLLMError(f"ChatGPT web: {exc}") from exc
             except ChatGPTResponseError as exc:
                 # Retryable: a slow or truncated answer usually comes back fine on the
