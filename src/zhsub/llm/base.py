@@ -28,6 +28,20 @@ class LLMError(RuntimeError):
     pass
 
 
+class NonRetryableLLMError(LLMError):
+    """Gửi lại y nguyên văn bản đó cũng nhận đúng kết quả đó.
+
+    Vẫn là :class:`LLMError` để các stage bắt được và chạy đường phục hồi của
+    mình — S2 rơi xuống ngắt theo rule, S4 chia đôi batch. Chỉ khác ở chỗ vòng
+    thử lại trong lớp này không đụng vào nó.
+
+    Ví dụ có thật: ChatGPT trả "This content can't be shown for safety reasons"
+    cho một video án mạng. Một lần bị chặn khi đó tốn 12 lần gọi (4 lượt trong
+    complete_json nhân 3 lượt trong _translate_batch) trước khi tới được bước
+    chia đôi — mà cả 12 lần đều gửi đúng một văn bản.
+    """
+
+
 class LLMProvider(ABC):
     """Base class. Subclasses only implement :meth:`_call`."""
 
@@ -49,6 +63,8 @@ class LLMProvider(ABC):
         for attempt in range(self.max_retries + 1):
             try:
                 return self._call(system, user, cache_system, json_mode)
+            except NonRetryableLLMError:
+                raise
             except LLMError as exc:
                 last = exc
                 if attempt == self.max_retries:

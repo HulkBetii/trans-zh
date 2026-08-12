@@ -12,8 +12,8 @@ from __future__ import annotations
 import logging
 
 from ...config import ChatGPTWebConfig
-from ..base import LLMError, LLMProvider
-from .chat import ChatGPTResponseError, ask
+from ..base import LLMError, LLMProvider, NonRetryableLLMError
+from .chat import ChatGPTContentRefusal, ChatGPTResponseError, ask
 from .session import get_session
 
 log = logging.getLogger(__name__)
@@ -71,6 +71,13 @@ class ChatGPTWebProvider(LLMProvider):
         with session.page() as page:
             try:
                 text, url = session.run(ask(page, prompt, int(self.timeout_sec), conversation))
+            except ChatGPTContentRefusal as exc:
+                # Vẫn là LLMError nên stage chạy được đường phục hồi của mình, nhưng
+                # vòng thử lại bỏ qua — gửi lại đúng văn bản đó chỉ nhận đúng lời từ
+                # chối đó. Đo trên một video án mạng: mỗi lần bị chặn tốn 12 lần gọi
+                # trước khi tới được bước chia đôi batch, cả 12 đều gửi một nội dung.
+                log.warning("ChatGPT chặn nội dung — bỏ qua thử lại, để stage tự xử")
+                raise NonRetryableLLMError(f"ChatGPT web: {exc}") from exc
             except ChatGPTResponseError as exc:
                 # Retryable: a slow or truncated answer usually comes back fine on the
                 # next attempt. Login and rate-limit errors deliberately propagate as

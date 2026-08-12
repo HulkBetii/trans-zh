@@ -73,9 +73,38 @@ class ChatGPTRateLimitError(RuntimeError):
     """
 
 
+# Bộ lọc nội dung của ChatGPT. Câu trả lời dài đúng 168 ký tự và lặp lại y hệt suốt
+# một video án mạng — đây là thông điệp cố định, không phải câu trả lời.
+_REFUSAL_FRAGMENTS = (
+    "can't be shown for safety reasons",
+    "can’t be shown for safety reasons",
+    "i can't help with that",
+    "i can’t help with that",
+    "i'm not able to help with that",
+    "violates our usage policies",
+    "against our content policy",
+)
+
+
+class ChatGPTContentRefusal(RuntimeError):
+    """Bộ lọc nội dung chặn. Gửi lại y hệt cũng bị chặn y hệt.
+
+    Không phải :class:`ChatGPTResponseError` để vòng thử lại không đụng vào, nhưng
+    provider sẽ bọc thành ``NonRetryableLLMError`` — vẫn là ``LLMError`` nên stage
+    gọi nó chạy được đường phục hồi riêng: S2 rơi xuống ngắt theo rule, S4 chia đôi
+    batch. Chia đôi thực sự cứu được: đo trên một video án mạng, batch 60 câu bị
+    chặn còn batch 30 câu lọt.
+    """
+
+
 def find_limit_fragment(text: str) -> str | None:
     lowered = text.lower()
     return next((f for f in _LIMIT_FRAGMENTS if f in lowered), None)
+
+
+def find_refusal_fragment(text: str) -> str | None:
+    lowered = text.lower()
+    return next((f for f in _REFUSAL_FRAGMENTS if f in lowered), None)
 
 
 async def _wait_streaming_done(page, timeout_s: int) -> None:
@@ -237,6 +266,10 @@ async def send_prompt(prompt: str, page, timeout_s: int) -> str:
     fragment = find_limit_fragment(text)
     if fragment:
         raise ChatGPTRateLimitError(f"ChatGPT hết hạn mức tin nhắn ({fragment!r}): {text[:200]}")
+
+    fragment = find_refusal_fragment(text)
+    if fragment:
+        raise ChatGPTContentRefusal(f"ChatGPT chặn nội dung ({fragment!r}): {text[:160]}")
 
     log.info("Nhận câu trả lời (%d ký tự)", len(text))
     return text
