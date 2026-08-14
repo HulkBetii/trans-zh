@@ -17,10 +17,11 @@ import httpx
 
 log = logging.getLogger(__name__)
 
-# 8 giây, không phải 4: mỗi lần poll là một request vào đúng endpoint hay quá tải
-# nhất. Câu ngắn tổng hợp xong trong 2-5 giây nên poll thưa chỉ thêm vài giây chờ
-# mỗi cue, đổi lại giảm một nửa tải lên chỗ đang yếu.
-POLL_INTERVAL_SEC = 8.0
+# Bậc thang thay vì một khoảng cố định. Phần lớn câu tổng hợp xong trong 2-5 giây,
+# nên chờ cứng 8 giây là mỗi cue mất vài giây vô ích — trên 342 cue thành cả chục
+# phút. Nhưng cũng không quay về 4 giây cố định: câu dài mà hỏi dồn thì lại dội vào
+# đúng endpoint hay quá tải nhất. Hỏi sớm rồi giãn dần lấy được cả hai.
+POLL_SCHEDULE_SEC = (2.0, 3.0, 4.0, 6.0, 8.0)
 POLL_MAX_ATTEMPTS = 60
 # Endpoint /v1/task/{id} của nhà cung cấp có lúc trả 503 kéo dài hàng chục phút —
 # kiểm bằng một request thủ công đơn lẻ cũng 503, tức là hỏng thật chứ không phải
@@ -104,8 +105,8 @@ class SpeechClient:
 
     def wait(self, task_id: str) -> dict:
         """Chờ task xong, trả về metadata."""
-        for _ in range(POLL_MAX_ATTEMPTS):
-            time.sleep(POLL_INTERVAL_SEC)
+        for attempt in range(POLL_MAX_ATTEMPTS):
+            time.sleep(POLL_SCHEDULE_SEC[min(attempt, len(POLL_SCHEDULE_SEC) - 1)])
             task = self._request("GET", f"/v1/task/{task_id}")
             status = task.get("status")
             if status == "done":
