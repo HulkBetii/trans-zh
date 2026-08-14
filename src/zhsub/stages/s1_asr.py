@@ -158,6 +158,20 @@ def run(work_dir: Path, cfg: Config, force: bool = False,
     engine = build_engine(cfg)
     out = transcribe_file(wav_path, ingest.media.duration_sec, engine, cfg, ctx=ctx)
     doc = build_asr_doc(out, engine, ingest.media.duration_sec)
+
+    # Dừng ở đây thay vì để pipeline chạy tiếp với tay không. Gặp thật: một file tải
+    # về có track audio đủ 32 phút nhưng bên trong toàn số 0 (-91 dB, sàn của 16-bit).
+    # ASR trả về 0 token, rồi S2 S3 S4 S5 đều "thành công" với 0 câu và in
+    # "xong -> output". File .srt rỗng suýt đi thẳng vào khâu dựng, và trên đường đó
+    # còn kịp mở trình duyệt gọi ChatGPT một lần.
+    if not doc.tokens:
+        raise RuntimeError(
+            f"ASR không nhận ra chữ nào trong {ingest.media.duration_sec / 60:.1f} phút audio. "
+            f"Nhiều khả năng file nguồn mất tiếng — kiểm bằng:\n"
+            f"  ffmpeg -i \"{wav_path}\" -af volumedetect -f null NUL\n"
+            f"Nếu mean_volume khoảng -91 dB thì audio là im lặng tuyệt đối, phải tải lại video."
+        )
+
     write_doc(out_json, doc)
     log.info("S1 xong: %d token, %d câu thô", len(doc.tokens), len(doc.raw_segments))
     return doc
