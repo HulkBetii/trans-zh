@@ -32,6 +32,11 @@ chatgpt-web = [
     "playwright>=1.40",
     "pyotp>=2.9",
 ]
+# Giao diện web local: `zhsub web`.
+web = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+]
 bench = [
     "faster-whisper>=1.2.1",
     "jiwer>=4.0",

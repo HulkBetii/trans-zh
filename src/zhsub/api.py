@@ -106,6 +106,51 @@ def _collect(work_dir: Path) -> JobResult:
     return result
 
 
+@dataclass(slots=True)
+class JobHealth:
+    """Bốn con số cần liếc sau mỗi lần chạy, cộng vài thứ đi kèm.
+
+    Gom lại ở đây vì host nào cũng cần đúng bốn thứ này và không nên phải biết
+    file JSON nào giữ cái gì. Chọn đúng bốn con số này sau khi chạy thật 7 video:
+    mỗi cái từng là dấu hiệu duy nhất của một lỗi âm thầm.
+    """
+
+    #: "llm" là tốt. "rule_fallback" nghĩa là model bị chặn và ranh giới câu do
+    #: rule sinh — vẫn chạy được nhưng ngắt kém tự nhiên hơn.
+    method: str = ""
+    #: Rỗng nghĩa là khối style không sinh được, đại từ không được ghim.
+    subject_pronoun: str = ""
+    cps_warnings: int = 0
+    address_terms: int = 0
+    segments: int = 0
+    terms: int = 0
+
+
+def job_health(work_dir: str | Path) -> JobHealth:
+    """Đọc các chỉ số sức khoẻ của một job. Thiếu file nghĩa là chạy dở, không phải lỗi."""
+    work_dir = Path(work_dir)
+    health = JobHealth()
+
+    segments_path = work_dir / "segments.json"
+    if segments_path.is_file():
+        doc = SegmentsDoc.model_validate(json.loads(segments_path.read_text(encoding="utf-8")))
+        health.method = doc.method
+        health.segments = len(doc.segments)
+
+    glossary_path = work_dir / "glossary.json"
+    if glossary_path.is_file():
+        gloss = GlossaryDoc.model_validate(json.loads(glossary_path.read_text(encoding="utf-8")))
+        health.subject_pronoun = gloss.style.subject_third_person_vi
+        health.address_terms = len(gloss.address_terms)
+        health.terms = len(gloss.terms)
+
+    report_path = work_dir / "render_report.json"
+    if report_path.is_file():
+        report = RenderReport.model_validate(json.loads(report_path.read_text(encoding="utf-8")))
+        health.cps_warnings = sum(1 for w in report.warnings if w.kind == "cps_over")
+    return health
+
+
 def load_glossary(work_dir: str | Path) -> GlossaryDoc:
     """Read a job's glossary so a host can present it for editing."""
     path = Path(work_dir) / "glossary.json"

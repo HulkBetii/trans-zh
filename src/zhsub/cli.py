@@ -246,6 +246,18 @@ def cmd_dub(
     typer.echo(f"xong -> {dst}")
 
 
+@app.command("web")
+def cmd_web(
+    port: int = typer.Option(8756, "--port", "-p"),
+    host: str = typer.Option("127.0.0.1", "--host"),
+) -> None:
+    """Mở giao diện web local: chạy pipeline, theo dõi tiến trình, xem kết quả."""
+    from .web import serve
+
+    typer.echo(f"Mở http://{host}:{port}")
+    serve(host, port)
+
+
 @app.command("dub-names")
 def cmd_dub_names(
     job_id: str = typer.Argument(..., help="job_id đã dịch xong"),
