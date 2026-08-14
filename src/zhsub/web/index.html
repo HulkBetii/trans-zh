@@ -88,8 +88,8 @@
 
   <div class="panel scroll">
     <table>
-      <thead><tr><th>Job</th><th>Ngắt câu</th><th>Đại từ</th><th>CPS</th><th>Câu</th><th>Trạng thái</th></tr></thead>
-      <tbody id="jobs"><tr><td colspan="6" style="color:var(--dim)">Đang tải…</td></tr></tbody>
+      <thead><tr><th>Job</th><th>Ngắt câu</th><th>Đại từ</th><th>CPS</th><th>Câu</th><th>Trạng thái</th><th>File</th></tr></thead>
+      <tbody id="jobs"><tr><td colspan="7" style="color:var(--dim)">Đang tải…</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -113,14 +113,25 @@ function healthCells(h) {
   return `<td>${method}</td><td>${pron}</td><td>${cps}</td><td>${h.segments || '—'}</td>`;
 }
 
+// Hậu tố là đủ để phân biệt: .srt / .ass là phụ đề, .mp3 là bản lồng tiếng.
+// Hiện cả tên đầy đủ thì cột này rộng gấp ba mà không thêm thông tin gì.
+function fileLinks(names) {
+  if (!names || !names.length) return '<span style="color:var(--dim)">—</span>';
+  return names.map(n => {
+    const ext = n.split('.').pop();
+    return `<a href="/api/output/${encodeURIComponent(n)}" download title="${n}">${ext}</a>`;
+  }).join(' · ');
+}
+
 async function loadJobs() {
   const rows = await (await fetch('/api/jobs')).json();
   $('jobs').innerHTML = rows.length ? rows.map(j => {
     const st = j.status === 'done' ? pill('xong', 'ok')
       : j.status === 'running' ? pill('đang chạy', 'warn')
       : j.status === 'failed' ? pill('lỗi', 'bad') : pill(j.status, 'dim');
-    return `<tr><td class="job">${j.job_id}</td>${healthCells(j.health)}<td>${st}</td></tr>`;
-  }).join('') : '<tr><td colspan="6" style="color:var(--dim)">Chưa có job nào</td></tr>';
+    return `<tr><td class="job">${j.job_id}</td>${healthCells(j.health)}`
+      + `<td>${st}</td><td style="white-space:nowrap">${fileLinks(j.outputs)}</td></tr>`;
+  }).join('') : '<tr><td colspan="7" style="color:var(--dim)">Chưa có job nào</td></tr>';
 }
 
 let current = null;

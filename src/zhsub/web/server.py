@@ -23,6 +23,7 @@ from pydantic import BaseModel
 from ..api import job_health, translate_video
 from ..config import Config
 from ..jobs import JobStore
+from ..models import RenderReport
 from ..progress import Cancelled, Progress
 from ..stages import s0_ingest
 
@@ -55,6 +56,23 @@ def index() -> str:
     return _PAGE.read_text(encoding="utf-8")
 
 
+def _outputs_for(work_dir: Path) -> list[str]:
+    """File đầu ra của một job.
+
+    Phụ đề lấy từ ``render_report.json`` vì đó là nguồn có thẩm quyền — S5 đặt tên
+    theo phần gốc của nguồn (``video-6.vi.srt``) chứ không theo job_id. Còn file
+    lồng tiếng thì S6 đặt theo job_id (``video-6_e0e4a896.vi.mp3``). Hai quy ước
+    khác nhau, nên đoán bằng cách so chuỗi là sai — hỏi thẳng từng bên.
+    """
+    names: list[str] = []
+    report_path = work_dir / "render_report.json"
+    if report_path.is_file():
+        report = RenderReport.model_validate(json.loads(report_path.read_text(encoding="utf-8")))
+        names += [Path(o).name for o in report.outputs]
+    names += [p.name for p in Path("output").glob(f"{work_dir.name}.*.mp3")]
+    return [n for n in dict.fromkeys(names) if (Path("output") / n).is_file()]
+
+
 @app.get("/api/jobs")
 def list_jobs() -> list[dict]:
     cfg = Config.load()
@@ -69,23 +87,10 @@ def list_jobs() -> list[dict]:
                 "stage": job.stage or "",
                 "error": job.error or "",
                 "health": asdict(job_health(work_dir)) if work_dir.is_dir() else None,
+                "outputs": _outputs_for(work_dir) if work_dir.is_dir() else [],
             }
         )
     return out
-
-
-@app.get("/api/jobs/{job_id}")
-def job_detail(job_id: str) -> dict:
-    cfg = Config.load()
-    work_dir = Path(cfg.paths.work_dir) / job_id
-    if not work_dir.is_dir():
-        raise HTTPException(404, f"Không tìm thấy job {job_id}")
-    outputs = sorted(p.name for p in Path("output").glob("*") if p.is_file())
-    return {
-        "job_id": job_id,
-        "health": asdict(job_health(work_dir)),
-        "outputs": [o for o in outputs if o.split(".")[0] in job_id or job_id.startswith(o.split(".")[0])],
-    }
 
 
 @app.post("/api/jobs")

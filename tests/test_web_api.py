@@ -118,6 +118,38 @@ def test_download_cannot_escape_the_output_folder(bad, tmp_path, monkeypatch):
     assert "bí mật" not in resp.text
 
 
+def test_outputs_come_from_the_report_not_from_guessing_names(tmp_path, monkeypatch):
+    """S5 đặt tên theo phần gốc của nguồn, S6 đặt theo job_id — hai quy ước khác
+    nhau, nên so chuỗi với job_id sẽ bỏ sót phụ đề."""
+    from zhsub.web.server import _outputs_for
+
+    monkeypatch.chdir(tmp_path)
+    work = tmp_path / "work" / "video-6_e0e4a896"
+    work.mkdir(parents=True)
+    (tmp_path / "output").mkdir()
+    for name in ("video-6.vi.srt", "video-6.vi.ass", "video-6_e0e4a896.vi.mp3"):
+        (tmp_path / "output" / name).write_text("x", encoding="utf-8")
+    write_doc(
+        work / "render_report.json",
+        RenderReport(outputs=["output/video-6.vi.srt", "output/video-6.vi.ass"]),
+    )
+
+    assert _outputs_for(work) == ["video-6.vi.srt", "video-6.vi.ass", "video-6_e0e4a896.vi.mp3"]
+
+
+def test_a_listed_output_that_was_deleted_is_not_offered(tmp_path, monkeypatch):
+    """Báo cáo ghi lại lần chạy trước; file có thể đã bị xoá từ lúc đó."""
+    from zhsub.web.server import _outputs_for
+
+    monkeypatch.chdir(tmp_path)
+    work = tmp_path / "work" / "j"
+    work.mkdir(parents=True)
+    (tmp_path / "output").mkdir()
+    write_doc(work / "render_report.json", RenderReport(outputs=["output/mất-rồi.srt"]))
+
+    assert _outputs_for(work) == []
+
+
 def test_a_real_output_file_downloads(tmp_path, monkeypatch):
     from fastapi.testclient import TestClient
 
