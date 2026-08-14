@@ -8,6 +8,7 @@ ones a viewer notices.
 
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 
@@ -298,6 +299,37 @@ def build_glossary(
     return GlossaryDoc(terms=terms, address_terms=address, style=style)
 
 
+def _salvage_style(raw: str) -> dict | None:
+    """Lấy riêng khối ``style`` từ một chuỗi JSON hỏng.
+
+    Trả lời của model có hai phần: ``style`` gồm bốn chuỗi ngắn, và
+    ``address_terms`` trong đó ``basis`` là văn xuôi tự do — chỗ dễ lọt dấu nháy
+    không escape nhất. Gặp thật trên một video: khối ``style`` hoàn toàn nguyên
+    vẹn nhưng bị vứt cả vì phần sau vỡ ở cột 385, và cả bốn lần thử đều vỡ y hệt.
+
+    ``style`` mới là phần quan trọng — nó ghim đại từ cho toàn bộ bản dịch, còn
+    ``address_terms`` thường rỗng và chỉ áp cho lời thoại trực tiếp.
+    """
+    start = raw.find('"style"')
+    if start == -1:
+        return None
+    brace = raw.find("{", start)
+    if brace == -1:
+        return None
+    depth = 0
+    for i in range(brace, len(raw)):
+        if raw[i] == "{":
+            depth += 1
+        elif raw[i] == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    return {"style": json.loads(raw[brace : i + 1])}
+                except json.JSONDecodeError:
+                    return None
+    return None
+
+
 def _extract_style(
     segments_doc: SegmentsDoc, terms: list[GlossaryTerm], provider: LLMProvider
 ) -> tuple[StyleDecision, list[AddressTerm]]:
@@ -313,8 +345,14 @@ def _extract_style(
     try:
         data = provider.complete_json(STYLE_SYSTEM, user)
     except LLMError as exc:
-        log.warning("S3: không phân tích được văn phong: %s", exc)
-        return StyleDecision(), []
+        # Cứu lấy phần đọc được thay vì bỏ trắng cả khối. Không tốn thêm lần gọi:
+        # dùng lại đúng câu trả lời cuối cùng đã nhận.
+        data = _salvage_style(getattr(exc, "last_raw", "") or "")
+        if data:
+            log.warning("S3: JSON hỏng nhưng cứu được khối style: %s", exc)
+        else:
+            log.warning("S3: không phân tích được văn phong: %s", exc)
+            return StyleDecision(), []
 
     style = StyleDecision()
     if isinstance(data, dict) and isinstance(data.get("style"), dict):

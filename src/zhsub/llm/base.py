@@ -96,7 +96,12 @@ class LLMProvider(ABC):
                     "LLM trả về JSON hỏng (lần %d/%d): %s | %r",
                     attempt + 1, self.max_retries + 1, exc, raw[:200],
                 )
-        raise LLMError(f"LLM không trả về JSON hợp lệ sau {self.max_retries + 1} lần: {last}")
+        # Đính kèm câu trả lời cuối để chỗ gọi tự cứu phần đọc được. Gặp thật ở S3:
+        # khối "style" nguyên vẹn ở đầu chuỗi nhưng bị vứt cả vì "address_terms"
+        # phía sau lọt dấu nháy không escape, và cả 4 lần thử đều vỡ y hệt.
+        error = LLMError(f"LLM không trả về JSON hợp lệ sau {self.max_retries + 1} lần: {last}")
+        error.last_raw = raw
+        raise error
 
 
 _FENCE_RE = re.compile(r"```(?:json)?\s*(.*?)```", re.DOTALL)
