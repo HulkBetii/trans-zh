@@ -12,8 +12,95 @@ Nguyên tắc bất di bất dịch: **timestamp chỉ đến từ ASR, không b
 LLM chỉ được trả về text và vị trí ngắt trên chuỗi ký tự; mọi mốc thời gian đều
 tra ngược về mảng token của S1.
 
-> **Trạng thái:** S0–S5 đã hoạt động, CLI đầy đủ (`run` / `batch` / `resume` /
-> `asr` / `jobs`). Benchmark ở `bench/` đã chọn `paraformer-zh` làm engine ASR.
+> **Trạng thái:** S0–S6 đã hoạt động, CLI đầy đủ (`run` / `batch` / `resume` /
+> `asr` / `jobs` / `dub` / `dub-calibrate` / `dub-names` / `chatgpt-login`).
+> Benchmark ở `bench/` đã chọn `paraformer-zh` làm engine ASR.
+
+---
+
+## Kinh nghiệm vận hành
+
+Rút ra sau khi chạy thật 6 video khác thể loại: vượt ngục, pháp y, tai nạn hàng
+không, án có trẻ vị thành niên, án hai nghi phạm, án nhóm thiếu niên. Mỗi mục dưới
+đây từng khiến ai đó (thường là tôi) kết luận sai trước khi đo lại.
+
+### Loại nội dung quyết định `chatgpt_web` có chạy được không
+
+| Nội dung | Kết quả |
+|---|---|
+| Tội phạm người lớn, điều tra pháp y, tai nạn | Trót lọt |
+| **Trẻ vị thành niên + tình dục + cái chết** | **Bị chặn** |
+
+Không ngẫu nhiên. Nhìn glossary đoán được trước: thấy các thuật ngữ kiểu `性窒息`,
+`异装癖` cộng nạn nhân vị thành niên thì biết sẽ có chunk bị chặn. Án mạng trẻ em
+KHÔNG tự động bị chặn — video nhóm thiếu niên giết bạn chạy sạch 23 lần gọi, 0 lần
+chặn. Tổ hợp mới là thứ kích hoạt.
+
+Bị chặn giờ không còn nguy hiểm: S2 chia đôi chunk, S4 chia đôi batch, và hội thoại
+bị bỏ sau mỗi lần từ chối. Video từng mất 36% chất lượng ngắt câu và tốn 51 lần gọi,
+sau khi sửa còn 0% và 12 lần gọi.
+
+### Cảnh báo CPS đo nhịp nói của video gốc, không đo chất lượng dịch
+
+| Video | Cue dài TB | CPS vượt |
+|---|---:|---:|
+| Pháp y Connecticut | 5,20s | 0,5% |
+| Bé trai áo đỏ | 4,30s | 1,9% |
+| Thảm họa Bijlmer | 3,96s | 5,9% |
+
+Cùng một cấu hình dịch, chênh nhau 12 lần. Người dẫn nói nhanh ngắt vụn thì mỗi cue
+ít thời gian hơn cho cùng lượng thông tin. **Thấy CPS cao đừng siết prompt** — và
+nếu đầu ra là lồng tiếng thì chỉ số này gần như không liên quan (xem
+[.srt là kịch bản lồng tiếng](#lồng-tiếng-s6)).
+
+### Ghim đại từ hoạt động, kể cả với nhiều nhân vật
+
+`subject_third_person_vi` chỉ chứa MỘT giá trị cho cả video. Giới hạn đó được ghi
+trong code như một rủi ro, nhưng ba video đã chứng minh nó không cắn:
+
+* Sáu video ra sáu lựa chọn khác nhau: `anh ta`, `ông ấy`, `ông ta`, `cậu bé`,
+  `cô ta`, `cậu ấy` — trong đó `cậu bé` là danh từ, không nằm trong danh sách rule 3
+  đề xuất. Nó đọc nội dung thật.
+* Hai nhân vật khác giới: model tự dùng `hắn` cho người thứ hai (77 `cô ta` /
+  29 `hắn`), phân biệt sạch.
+* Hai nhân vật CÙNG giới: nó khai thác đại từ phân theo tuổi (`cậu ấy` cho thiếu
+  niên 15 tuổi, `anh ta` cho người 20 tuổi), và chuyển sang tên riêng khi nhiều
+  người xuất hiện trong một câu.
+
+### `address_terms` rỗng là bình thường
+
+Có 3 cặp ở video có đối thoại thật, 0 ở video thuật lại thuần. Từng bị chẩn đoán
+nhầm là bug ở `_extract_style`. Nó chỉ áp cho lời thoại trực tiếp và **bị cấm dùng
+trong lời dẫn** — nên nó không bao giờ sửa được chuyện đại từ lời dẫn dao động.
+
+### Nhà cung cấp TTS trục trặc là điều kiện bình thường
+
+97, 115, 248 lần `server_busy` trong ba lần lồng tiếng. Phần chịu lỗi không phải
+phòng xa mà là điều kiện để chạy được. Đừng hạ `concurrency` khi gặp 503 — kiểm
+bằng một request thủ công trước: nếu request đơn lẻ cũng 503 thì endpoint hỏng thật,
+hạ luồng vô ích.
+
+### Chia nhỏ là mẫu hình phục hồi dùng được ở mọi khâu
+
+S4 chia batch, S2 chia chunk — cùng một hình dạng, cùng lý do: bộ lọc phản ứng với
+nội dung nên phần lành luôn đi qua được. **Và nó không cần thắng hoàn toàn mới có
+ích**, chỉ cần thu hẹp thiệt hại từ cả chunk xuống một mẩu.
+
+### Ba bug nặng nhất đều cùng một họ
+
+Thất bại cục bộ được phép giết toàn cục: đóng một tab làm sập trình duyệt, một lần
+chạm hạn mức dừng cả job dịch, một lần poll xui vứt 198 cue. Khi thêm xử lý lỗi ở
+đây, hỏi trước: **hỏng một phần thì phần còn lại có nên chết theo không?**
+
+### Đo đúng thứ cần đo trước khi sửa
+
+Bài học đắt nhất. Vấn đề "42% cue tràn giờ" lần lượt teo xuống 26%, rồi 5%, rồi
+1 cue cần tăng tốc 1.11× — mỗi lần đo kỹ hơn. Nguyên nhân: đo tốc độ đọc bằng mắt
+thay vì tốc độ nói, so với độ dài cue thay vì khoảng tới cue kế tiếp, và không biết
+0,65 giây "độ trễ" là padding cắt được.
+
+Nếu hành động ở lần đo đầu, đã hy sinh chất lượng câu chữ để chữa một thứ gần như
+không tồn tại.
 
 ---
 
