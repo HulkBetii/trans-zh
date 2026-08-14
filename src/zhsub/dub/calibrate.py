@@ -18,18 +18,22 @@ nhất, nên gộp hai đại lượng làm một sẽ sai ở đúng chỗ quan
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable, Sequence
+from datetime import datetime, timezone
 from pathlib import Path
 
 from ..config import Config
-from ..jsonio import read_doc
+from ..jsonio import sha256_json_canonical
 from ..media import probe_duration
-from ..models import TranslationsDoc
+from ..models import TtsCalibration, TtsCalibrationPoint
 from .audio import speech_bounds
 from .client import SpeechClient
+from .spoken import effective_spoken_items, resolve_voice_id
 
 log = logging.getLogger(__name__)
 
-MIN_SAMPLES = 3
+MIN_SAMPLES = 3  # Legacy export; shared calibration itself always uses eight.
+CALIBRATION_SAMPLE_COUNT = 8
 
 
 def pick_samples(texts: list[str], count: int) -> list[str]:
@@ -59,25 +63,63 @@ def fit(points: list[tuple[int, float]]) -> tuple[float, float]:
     return (sy - slope * sx) / n, slope
 
 
-def run(work_dir, cfg: Config, lang: str, samples: int = 8) -> tuple[float, float]:
-    work_dir = Path(work_dir)
-    doc = read_doc(work_dir / f"translations.{lang}.json", TranslationsDoc)
-    texts = pick_samples([i.translation for i in doc.items], samples)
-    if len(texts) < MIN_SAMPLES:
-        raise RuntimeError(f"cần ít nhất {MIN_SAMPLES} câu để đo, chỉ có {len(texts)}")
+def calibration_hash(calibration: TtsCalibration) -> str:
+    return sha256_json_canonical(calibration.model_dump(mode="json"))
 
-    voice_id = cfg.dub.require_voice()
+
+def calibrate_voice(
+    work_dir,
+    cfg: Config,
+    lang: str = "vi",
+    samples: int = CALIBRATION_SAMPLE_COUNT,
+    *,
+    voice_id: str | None = None,
+    sample_texts: Sequence[str] | None = None,
+    progress: Callable[[float, str], None] | None = None,
+) -> TtsCalibration:
+    """Measure one voice on exactly eight effective spoken samples.
+
+    ``sample_texts`` lets the voice library persist one shared calibration corpus;
+    the legacy CLI leaves it unset and derives a spread of samples from the job.
+    """
+    if lang != "vi":
+        raise ValueError("TTS currently supports Vietnamese only")
+    if samples != CALIBRATION_SAMPLE_COUNT:
+        raise ValueError("TTS calibration requires exactly 8 samples")
+
+    work_dir = Path(work_dir)
+    if voice_id is not None:
+        selected_voice = voice_id.strip()
+        if not selected_voice:
+            raise ValueError("voice_id must not be blank")
+    else:
+        selected_voice = resolve_voice_id(
+            work_dir,
+            cfg.dub.voice_id if cfg.dub.voice_id != "SET_ME" else None,
+        )
+    if sample_texts is None:
+        rows = effective_spoken_items(work_dir, selected_voice)
+        texts = pick_samples(
+            [item.effective_spoken_text for item in rows], CALIBRATION_SAMPLE_COUNT
+        )
+    else:
+        texts = pick_samples(list(sample_texts), CALIBRATION_SAMPLE_COUNT)
+    if len(texts) != CALIBRATION_SAMPLE_COUNT:
+        raise RuntimeError(
+            f"cần đúng {CALIBRATION_SAMPLE_COUNT} câu để đo, chỉ có {len(texts)}"
+        )
+
     client = SpeechClient(cfg.dub.base_url, cfg.dub.api_key())
     probe_dir = work_dir / "dub" / "_calibrate"
     probe_dir.mkdir(parents=True, exist_ok=True)
 
-    log.info("Đo giọng %s trên %d câu mẫu", voice_id, len(texts))
+    log.info("Đo giọng %s trên %d câu mẫu", selected_voice, len(texts))
     points: list[tuple[int, float]] = []
     try:
         for index, text in enumerate(texts):
             # Luôn ở tốc độ 1.0: hai hằng số này là mốc gốc, mọi tốc độ khác suy ra
             # từ chúng. Đo ở tốc độ khác rồi dùng làm mốc là tự nhân sai số.
-            task_id = client.synthesize(text, voice_id, 1.0)
+            task_id = client.synthesize(text, selected_voice, 1.0)
             url = client.wait(task_id).get("audio_url")
             if not url:
                 raise RuntimeError("task xong nhưng không có audio_url")
@@ -87,6 +129,8 @@ def run(work_dir, cfg: Config, lang: str, samples: int = 8) -> tuple[float, floa
             syllables = len(text.split())
             points.append((syllables, finish - begin))
             log.info("  %2d âm tiết -> %.2fs (đã cắt lặng)", syllables, finish - begin)
+            if progress is not None:
+                progress((index + 1) / CALIBRATION_SAMPLE_COUNT, f"{index + 1}/8 mẫu")
     finally:
         client.close()
 
@@ -95,4 +139,36 @@ def run(work_dir, cfg: Config, lang: str, samples: int = 8) -> tuple[float, floa
         "thời lượng = %.2fs + số_âm_tiết x %.3fs  (%.2f âm tiết/giây)",
         overhead, per_syllable, 1 / per_syllable if per_syllable else 0,
     )
-    return overhead, per_syllable
+    return TtsCalibration(
+        voice_id=selected_voice,
+        sample_count=CALIBRATION_SAMPLE_COUNT,
+        overhead_sec=round(overhead, 6),
+        sec_per_syllable=round(per_syllable, 6),
+        samples_hash=sha256_json_canonical(texts),
+        created_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        points=[
+            TtsCalibrationPoint(syllables=syllables, duration_sec=duration)
+            for syllables, duration in points
+        ],
+    )
+
+
+def run(
+    work_dir,
+    cfg: Config,
+    lang: str,
+    samples: int = CALIBRATION_SAMPLE_COUNT,
+    *,
+    voice_id: str | None = None,
+    progress: Callable[[float, str], None] | None = None,
+) -> tuple[float, float]:
+    """Legacy CLI wrapper returning the two historical TOML constants."""
+    result = calibrate_voice(
+        work_dir,
+        cfg,
+        lang,
+        samples,
+        voice_id=voice_id,
+        progress=progress,
+    )
+    return result.overhead_sec, result.sec_per_syllable

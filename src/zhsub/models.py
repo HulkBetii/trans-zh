@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 SCHEMA_VERSION = 1
 
@@ -256,6 +256,206 @@ class TranslationsDoc(_Doc):
 
 
 # ---------------------------------------------------------------------------
+# Manual subtitle overrides — overrides.<lang>.json
+# ---------------------------------------------------------------------------
+
+
+class SubtitleOverride(BaseModel):
+    segment_id: int
+    source_text_hash: str
+    base_translation_hash: str
+    text: str
+    updated_at: str
+
+    @field_validator("text")
+    @classmethod
+    def _reject_blank_text(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("override text must not be blank")
+        return value
+
+
+class OverridesDoc(_Doc):
+    lang: Lang
+    items: list[SubtitleOverride] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _check_unique_segment_ids(self) -> OverridesDoc:
+        segment_ids = [item.segment_id for item in self.items]
+        if len(segment_ids) != len(set(segment_ids)):
+            raise ValueError("override segment_id values must be unique")
+        return self
+
+
+class OverrideChange(BaseModel):
+    segment_id: int
+    text: str | None
+
+    @field_validator("text")
+    @classmethod
+    def _reject_blank_text(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("override text must not be blank")
+        return value
+
+
+OverrideStatus = Literal["valid", "base_changed", "stale"]
+
+
+class OverrideEvaluation(BaseModel):
+    segment_id: int
+    text: str
+    status: OverrideStatus
+
+
+class OverrideState(BaseModel):
+    lang: Lang
+    revision: str
+    items: list[SubtitleOverride] = Field(default_factory=list)
+    evaluations: list[OverrideEvaluation] = Field(default_factory=list)
+
+
+class EffectiveTranslationItem(BaseModel):
+    segment_id: int
+    source_text: str
+    model_text: str
+    effective_text: str
+    overridden: bool = False
+    stale: bool = False
+    base_changed: bool = False
+
+
+# ---------------------------------------------------------------------------
+# S6 speech preparation — speech.vi.json
+# ---------------------------------------------------------------------------
+
+
+SpeechOverrideStatus = Literal["valid", "base_changed", "stale"]
+
+
+class SpeechOverride(BaseModel):
+    segment_id: int
+    source_text_hash: str
+    base_spoken_hash: str
+    text: str
+    updated_at: str
+
+    @field_validator("text")
+    @classmethod
+    def _reject_blank_text(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("spoken override text must not be blank")
+        return value
+
+
+class SpeechDoc(_Doc):
+    lang: Literal["vi"] = "vi"
+    voice_id: str
+    overrides: list[SpeechOverride] = Field(default_factory=list)
+
+    @field_validator("voice_id")
+    @classmethod
+    def _reject_blank_voice(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("voice_id must not be blank")
+        return value.strip()
+
+    @model_validator(mode="after")
+    def _check_unique_segment_ids(self) -> SpeechDoc:
+        segment_ids = [item.segment_id for item in self.overrides]
+        if len(segment_ids) != len(set(segment_ids)):
+            raise ValueError("spoken override segment_id values must be unique")
+        return self
+
+
+class SpeechChange(BaseModel):
+    segment_id: int
+    text: str | None
+
+    @field_validator("text")
+    @classmethod
+    def _reject_blank_text(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("spoken override text must not be blank")
+        return value
+
+
+class SpeechEvaluation(BaseModel):
+    segment_id: int
+    text: str
+    status: SpeechOverrideStatus
+
+
+class SpeechState(BaseModel):
+    lang: Literal["vi"] = "vi"
+    voice_id: str
+    revision: str
+    overrides: list[SpeechOverride] = Field(default_factory=list)
+    evaluations: list[SpeechEvaluation] = Field(default_factory=list)
+
+
+class EffectiveSpokenItem(BaseModel):
+    segment_id: int
+    source_text: str
+    subtitle_text: str
+    base_spoken_text: str
+    effective_spoken_text: str
+    overridden: bool = False
+    stale: bool = False
+    base_changed: bool = False
+
+
+class TtsCalibrationPoint(BaseModel):
+    syllables: int
+    duration_sec: float
+
+
+class TtsCalibration(BaseModel):
+    provider: Literal["ai33_vbee"] = "ai33_vbee"
+    voice_id: str
+    sample_count: Literal[8] = 8
+    overhead_sec: float
+    sec_per_syllable: float
+    samples_hash: str
+    created_at: str
+    points: list[TtsCalibrationPoint] = Field(default_factory=list)
+
+
+class TtsCueReport(BaseModel):
+    segment_id: int
+    spoken_text_hash: str
+    speed: float
+    cache_hit: bool
+    requested_start_sec: float
+    actual_start_sec: float
+    duration_sec: float
+    room_sec: float
+    drift_sec: float
+
+
+class TtsWarning(BaseModel):
+    segment_id: int
+    kind: Literal["duration_overrun", "start_drift"]
+    detail: str
+    value: float
+    limit: float
+
+
+class TtsReport(_Doc):
+    lang: Literal["vi"] = "vi"
+    output: str
+    voice_id: str
+    voice_hash: str
+    calibration_hash: str
+    input_hash: str
+    speech_revision: str
+    subtitle_approval_signature: str = ""
+    duration_sec: float
+    cues: list[TtsCueReport] = Field(default_factory=list)
+    warnings: list[TtsWarning] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
 # S5 — render_report.json
 # ---------------------------------------------------------------------------
 
@@ -272,3 +472,12 @@ class RenderWarning(BaseModel):
 class RenderReport(_Doc):
     outputs: list[str] = Field(default_factory=list)
     warnings: list[RenderWarning] = Field(default_factory=list)
+    # Missing in legacy reports. A default keeps those artifacts readable while
+    # allowing the web API to detect outputs rendered from older effective text.
+    effective_translation_hashes: dict[str, str] = Field(default_factory=dict)
+    # Timing, source text, and media duration also affect rendered cues even when
+    # the effective translations stay unchanged.
+    segments_render_hash: str = ""
+    # A reused job can be submitted with different targets, formats, or bilingual
+    # mode; old artifacts must not be presented as current for the new request.
+    render_request_hash: str = ""

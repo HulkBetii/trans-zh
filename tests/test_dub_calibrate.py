@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 
+from zhsub.config import Config
+from zhsub.dub import calibrate
 from zhsub.dub.calibrate import fit, pick_samples
 
 
@@ -43,3 +45,47 @@ def test_fit_needs_samples_of_differing_length():
     """Mọi mẫu cùng số âm tiết thì hệ vô định — báo lỗi thay vì trả số bịa."""
     with pytest.raises(ValueError, match="cùng số âm tiết"):
         fit([(10, 2.3), (10, 2.4), (10, 2.2)])
+
+
+def test_calibration_accepts_a_voice_override_without_changing_job_voice(
+    tmp_path, monkeypatch
+):
+    calls: list[tuple[str, str]] = []
+
+    class FakeSpeechClient:
+        def __init__(self, base_url: str, api_key: str) -> None:
+            pass
+
+        def synthesize(self, text: str, voice_id: str, speed: float) -> str:
+            calls.append((text, voice_id))
+            return text
+
+        def wait(self, task_id: str) -> dict[str, str]:
+            return {"audio_url": task_id}
+
+        def download(self, url, destination):
+            destination.write_bytes(b"audio")
+            return destination
+
+        def close(self) -> None:
+            pass
+
+    monkeypatch.setattr(calibrate, "SpeechClient", FakeSpeechClient)
+    monkeypatch.setattr(calibrate, "probe_duration", lambda path: 1.0)
+    monkeypatch.setattr(calibrate, "speech_bounds", lambda path, duration: (0.0, duration))
+    monkeypatch.setenv("TEST_DUB_API_KEY", "secret")
+    cfg = Config()
+    cfg.dub.api_key_env = "TEST_DUB_API_KEY"
+    cfg.dub.voice_id = "job-voice"
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+
+    result = calibrate.calibrate_voice(
+        tmp_path,
+        cfg,
+        voice_id="calibration-voice",
+        sample_texts=texts,
+    )
+
+    assert result.voice_id == "calibration-voice"
+    assert len(calls) == 8
+    assert {voice for _, voice in calls} == {"calibration-voice"}

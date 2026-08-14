@@ -12,9 +12,10 @@ from __future__ import annotations
 import logging
 import re
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 
-from ..media import MediaError, _require, _run
+from ..media import MediaError, _require
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +25,14 @@ SILENCE_MIN_SEC = 0.08
 
 _SILENCE_START = re.compile(r"silence_start:\s*(-?[\d.]+)")
 _SILENCE_END = re.compile(r"silence_end:\s*([\d.]+)")
+
+
+@dataclass(frozen=True, slots=True)
+class AudioPlacement:
+    requested_start_sec: float
+    actual_start_sec: float
+    duration_sec: float
+    drift_sec: float
 
 
 def speech_bounds(path: Path, total_sec: float) -> tuple[float, float]:
@@ -72,6 +81,7 @@ def decode_pcm(path: Path, sample_rate: int, start_sec: float, end_sec: float) -
 def assemble(
     clips: list[tuple[float, bytes]], sample_rate: int, dst: Path, total_sec: float,
     min_gap_sec: float = 0.25,
+    placements: list[AudioPlacement] | None = None,
 ) -> Path:
     """Đặt từng đoạn tiếng vào đúng mốc thời gian, phần trống để im lặng.
 
@@ -98,6 +108,17 @@ def assemble(
         if offset + len(pcm) > len(buf):
             buf.extend(b"\x00" * (offset + len(pcm) - len(buf)))
         buf[offset : offset + len(pcm)] = pcm
+        if placements is not None:
+            actual_start = offset / (sample_rate * bytes_per_sample)
+            duration = len(pcm) / (sample_rate * bytes_per_sample)
+            placements.append(
+                AudioPlacement(
+                    requested_start_sec=start_sec,
+                    actual_start_sec=actual_start,
+                    duration_sec=duration,
+                    drift_sec=actual_start - start_sec,
+                )
+            )
         prev_end = offset + len(pcm)
     overlaps = pushed
 

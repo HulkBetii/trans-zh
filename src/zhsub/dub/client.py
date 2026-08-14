@@ -9,9 +9,12 @@ thẳng ``["status"]`` sẽ nổ KeyError giữa chừng một job 184 lần g�
 from __future__ import annotations
 
 import logging
+import os
 import random
 import time
+import uuid
 from pathlib import Path
+from typing import Any
 
 import httpx
 
@@ -23,6 +26,10 @@ log = logging.getLogger(__name__)
 # đúng endpoint hay quá tải nhất. Hỏi sớm rồi giãn dần lấy được cả hai.
 POLL_SCHEDULE_SEC = (2.0, 3.0, 4.0, 6.0, 8.0)
 POLL_MAX_ATTEMPTS = 60
+POLL_TIMEOUT_SEC = sum(
+    POLL_SCHEDULE_SEC[min(attempt, len(POLL_SCHEDULE_SEC) - 1)]
+    for attempt in range(POLL_MAX_ATTEMPTS)
+)
 # Endpoint /v1/task/{id} của nhà cung cấp có lúc trả 503 kéo dài hàng chục phút —
 # kiểm bằng một request thủ công đơn lẻ cũng 503, tức là hỏng thật chứ không phải
 # do gọi quá tay. Một job lồng tiếng chạy cả tiếng, nên chờ lâu vẫn rẻ hơn chết.
@@ -56,7 +63,7 @@ class SpeechClient:
         self.base_url = base_url.rstrip("/")
         self._client = httpx.Client(timeout=timeout_sec, headers={"xi-api-key": api_key})
 
-    def _request(self, method: str, path: str, **kwargs) -> dict:
+    def _request(self, method: str, path: str, **kwargs) -> Any:
         delay = RETRY_BASE_SEC
         for attempt in range(RETRY_MAX_ATTEMPTS):
             try:
@@ -79,7 +86,9 @@ class SpeechClient:
                 raise DubError(f"{path} trả về không phải JSON: {resp.text[:200]}") from exc
 
             # server_busy là áp lực dung lượng tạm thời, không phải lỗi của người gọi.
-            if resp.status_code == 503 or body.get("code") == "server_busy":
+            if resp.status_code == 503 or (
+                isinstance(body, dict) and body.get("code") == "server_busy"
+            ):
                 wait = delay + random.random()
                 _log_retry("server bận", wait, attempt)
                 time.sleep(wait)
@@ -113,16 +122,40 @@ class SpeechClient:
                 return task.get("metadata") or {}
             if status == "error":
                 raise DubError(f"task {task_id} hỏng: {task.get('error_message')}")
-        raise DubError(f"task {task_id} chưa xong sau {POLL_MAX_ATTEMPTS * POLL_INTERVAL_SEC:.0f}s")
+        raise DubError(f"task {task_id} chưa xong sau {POLL_TIMEOUT_SEC:.0f}s")
 
     def download(self, url: str, dst: Path) -> Path:
         dst.parent.mkdir(parents=True, exist_ok=True)
-        with self._client.stream("GET", url) as resp:
-            resp.raise_for_status()
-            with open(dst, "wb") as f:
-                for chunk in resp.iter_bytes():
-                    f.write(chunk)
-        return dst
+        tmp = dst.with_name(f"{dst.name}.tmp-{os.getpid()}-{uuid.uuid4().hex}")
+        try:
+            try:
+                with self._client.stream("GET", url) as resp:
+                    resp.raise_for_status()
+                    with open(tmp, "wb") as f:
+                        for chunk in resp.iter_bytes():
+                            f.write(chunk)
+                        f.flush()
+                        os.fsync(f.fileno())
+            except httpx.HTTPError as exc:
+                raise DubError(f"không tải được audio từ {url}: {exc}") from exc
+            if not tmp.is_file() or tmp.stat().st_size == 0:
+                raise DubError(f"audio tải về từ {url} bị rỗng")
+            os.replace(tmp, dst)
+            return dst
+        finally:
+            tmp.unlink(missing_ok=True)
+
+    def voices(self, provider: str = "vbee") -> list[dict[str, Any]]:
+        """Return the provider voice library without exposing credentials."""
+        body = self._request("GET", "/v3/voices", params={"provider": provider})
+        if isinstance(body, list):
+            return [item for item in body if isinstance(item, dict)]
+        if isinstance(body, dict):
+            for key in ("voices", "data", "items"):
+                items = body.get(key)
+                if isinstance(items, list):
+                    return [item for item in items if isinstance(item, dict)]
+        raise DubError(f"/v3/voices trả về dữ liệu không hợp lệ: {body}")
 
     def credits(self) -> int:
         return int(self._request("GET", "/v1/credits").get("credits", 0))
