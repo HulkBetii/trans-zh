@@ -33,9 +33,25 @@ _LAUNCH_ARGS = ["--disable-blink-features=AutomationControlled"]
 _VIEWPORT = {"width": 1280, "height": 800}
 # Chromium leaves these behind when killed and then refuses to start on the profile.
 _STALE_LOCKS = ("SingletonLock", "SingletonCookie", "SingletonSocket")
+_BROWSER_CLOSED_FRAGMENTS = (
+    "browser has been closed",
+    "browser closed",
+    "browser has disconnected",
+    "connection closed",
+    "target page, context or browser has been closed",
+)
 
 _sessions: dict[Path, BrowserSession] = {}
 _sessions_lock = threading.Lock()
+
+
+class BrowserSessionUnavailable(RuntimeError):
+    """The browser stopped and the current LLM call should be retried."""
+
+
+def _browser_stopped_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    return any(fragment in message for fragment in _BROWSER_CLOSED_FRAGMENTS)
 
 
 def _load_account(path: Path) -> dict:
@@ -66,18 +82,28 @@ class BrowserSession:
         self._page = None
         self._ctx = None
         self._pw = None
+        self._thread: threading.Thread | None = None
 
     def start(self) -> None:
         ready = threading.Event()
-        thread = threading.Thread(target=self._serve_loop, args=(ready,), daemon=True, name="zhsub-chatgpt")
-        thread.start()
+        self._thread = threading.Thread(
+            target=self._serve_loop, args=(ready,), daemon=True, name="zhsub-chatgpt"
+        )
+        self._thread.start()
         ready.wait()
-        self.run(self._launch())
+        try:
+            self.run(self._launch())
+        except Exception:
+            self.stop()
+            raise
 
     def _serve_loop(self, ready: threading.Event) -> None:
         asyncio.set_event_loop(self._loop)
         self._loop.call_soon(ready.set)
-        self._loop.run_forever()
+        try:
+            self._loop.run_forever()
+        finally:
+            self._loop.close()
 
     def run(self, coro):
         """Block the calling thread until ``coro`` finishes on the browser loop.
@@ -105,6 +131,45 @@ class BrowserSession:
         await ensure_logged_in(page, _load_account(self.account_file), self.manual_login_timeout_sec)
         self._page = page
 
+    async def _is_alive(self) -> bool:
+        browser = self._ctx.browser if self._ctx is not None else None
+        return bool(browser and browser.is_connected())
+
+    def is_alive(self) -> bool:
+        if self._loop.is_closed() or not self._loop.is_running() or self._ctx is None:
+            return False
+        try:
+            return bool(self.run(self._is_alive()))
+        except Exception as exc:  # noqa: BLE001 - a dead Playwright transport is expected here
+            log.info("Phiên ChatGPT Playwright không còn hoạt động: %s", exc)
+            return False
+
+    async def _shutdown(self) -> None:
+        if self._ctx is not None:
+            try:
+                await self._ctx.close()
+            except Exception as exc:  # noqa: BLE001 - the browser may already be gone
+                log.info("Không cần đóng context ChatGPT đã dừng: %s", exc)
+        if self._pw is not None:
+            try:
+                await self._pw.stop()
+            except Exception as exc:  # noqa: BLE001 - transport shutdown is best effort
+                log.info("Không cần dừng Playwright đã đóng: %s", exc)
+        self._page = None
+        self._ctx = None
+        self._pw = None
+
+    def stop(self) -> None:
+        if self._loop.is_running():
+            try:
+                self.run(self._shutdown())
+            except Exception as exc:  # noqa: BLE001 - shutdown follows a crashed browser
+                log.warning("Không thể dọn hoàn toàn phiên ChatGPT Playwright: %s", exc)
+            finally:
+                self._loop.call_soon_threadsafe(self._loop.stop)
+        if self._thread is not None and self._thread is not threading.current_thread():
+            self._thread.join(timeout=5)
+
     async def _new_page(self):
         """Reopen the tab after it died. Cookies live in the context, so it only
         needs a sanity check rather than another login."""
@@ -124,18 +189,30 @@ class BrowserSession:
         each other.
         """
         with self._lock:
-            if self._page is None or self._page.is_closed():
-                self._page = self.run(self._new_page())
+            try:
+                if self._page is None or self._page.is_closed():
+                    self._page = self.run(self._new_page())
+            except Exception as exc:
+                if not self.is_alive():
+                    self._page = None
+                    raise BrowserSessionUnavailable(
+                        "Phiên ChatGPT Playwright đã tắt trong lúc mở tab."
+                    ) from exc
+                raise
             try:
                 yield self._page
-            except Exception:
+            except Exception as exc:
                 # Only a genuinely closed tab is discarded. Closing it on *any* failure
                 # was catastrophic: launch_persistent_context shuts Chromium down when
                 # its last page closes, so one slow answer killed the browser and every
                 # later call in every parallel job died with "browser has been closed".
                 # A slow or malformed reply leaves a perfectly usable tab behind.
-                if self._page.is_closed():
+                if self._page.is_closed() or _browser_stopped_error(exc):
                     self._page = None
+                    if not self.is_alive():
+                        raise BrowserSessionUnavailable(
+                            "Phiên ChatGPT Playwright đã tắt khi đang xử lý yêu cầu."
+                        ) from exc
                 raise
 
 
@@ -149,10 +226,23 @@ def get_session(cfg: ChatGPTWebConfig) -> BrowserSession:
     profile_dir = Path(cfg.profile_dir).resolve()
     with _sessions_lock:
         session = _sessions.get(profile_dir)
+        if session is not None and not session.is_alive():
+            log.warning("Phiên ChatGPT Playwright đã tắt — tự khởi động lại")
+            session.stop()
+            _sessions.pop(profile_dir, None)
+            session = None
         if session is None:
+            log.info("Tự khởi động ChatGPT Playwright cho profile %s", profile_dir)
             session = BrowserSession(
                 profile_dir, Path(cfg.account_file), cfg.manual_login_timeout_sec
             )
-            session.start()
+            try:
+                session.start()
+            except ChatGPTLoginError:
+                raise
+            except Exception as exc:
+                raise BrowserSessionUnavailable(
+                    f"Không thể tự khởi động ChatGPT Playwright: {exc}"
+                ) from exc
             _sessions[profile_dir] = session
         return session

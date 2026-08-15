@@ -14,7 +14,7 @@ import logging
 from ...config import ChatGPTWebConfig
 from ..base import LLMError, LLMProvider, NonRetryableLLMError
 from .chat import ChatGPTContentRefusal, ChatGPTResponseError, ask
-from .session import get_session
+from .session import BrowserSessionUnavailable, get_session
 
 log = logging.getLogger(__name__)
 
@@ -67,27 +67,31 @@ class ChatGPTWebProvider(LLMProvider):
         # had scrolled far up the conversation. Re-sending costs no tokens here.
         prompt = compose_prompt(system, user, json_mode)
 
-        session = get_session(self._web)
-        with session.page() as page:
-            try:
+        try:
+            session = get_session(self._web)
+            with session.page() as page:
                 text, url = session.run(ask(page, prompt, int(self.timeout_sec), conversation))
-            except ChatGPTContentRefusal as exc:
-                # Vẫn là LLMError nên stage chạy được đường phục hồi của mình, nhưng
-                # vòng thử lại bỏ qua — gửi lại đúng văn bản đó chỉ nhận đúng lời từ
-                # chối đó. Đo trên một video án mạng: mỗi lần bị chặn tốn 12 lần gọi
-                # trước khi tới được bước chia đôi batch, cả 12 đều gửi một nội dung.
-                #
-                # Bỏ luôn hội thoại: một thread đã từ chối một lần có thể kéo theo
-                # các lượt sau, nên lượt kế tiếp mở chat mới thay vì nối vào đó. Đây
-                # là suy đoán chứ chưa đo được, nhưng mở chat mới không tốn gì.
-                self._conversations.pop(system, None)
-                log.warning("ChatGPT chặn nội dung — bỏ thread này, để stage tự xử")
-                raise NonRetryableLLMError(f"ChatGPT web: {exc}") from exc
-            except ChatGPTResponseError as exc:
-                # Retryable: a slow or truncated answer usually comes back fine on the
-                # next attempt. Login and rate-limit errors deliberately propagate as
-                # they are, so the job fails fast instead of retrying blind.
-                raise LLMError(f"ChatGPT web: {exc}") from exc
+        except BrowserSessionUnavailable as exc:
+            raise LLMError(
+                "ChatGPT Playwright đã dừng; hệ thống sẽ tự khởi động lại và thử tiếp."
+            ) from exc
+        except ChatGPTContentRefusal as exc:
+            # Vẫn là LLMError nên stage chạy được đường phục hồi của mình, nhưng
+            # vòng thử lại bỏ qua — gửi lại đúng văn bản đó chỉ nhận đúng lời từ
+            # chối đó. Đo trên một video án mạng: mỗi lần bị chặn tốn 12 lần gọi
+            # trước khi tới được bước chia đôi batch, cả 12 đều gửi một nội dung.
+            #
+            # Bỏ luôn hội thoại: một thread đã từ chối một lần có thể kéo theo
+            # các lượt sau, nên lượt kế tiếp mở chat mới thay vì nối vào đó. Đây
+            # là suy đoán chứ chưa đo được, nhưng mở chat mới không tốn gì.
+            self._conversations.pop(system, None)
+            log.warning("ChatGPT chặn nội dung — bỏ thread này, để stage tự xử")
+            raise NonRetryableLLMError(f"ChatGPT web: {exc}") from exc
+        except ChatGPTResponseError as exc:
+            # Retryable: a slow or truncated answer usually comes back fine on the
+            # next attempt. Login and rate-limit errors deliberately propagate as
+            # they are, so the job fails fast instead of retrying blind.
+            raise LLMError(f"ChatGPT web: {exc}") from exc
 
         if url:
             if conversation is None:

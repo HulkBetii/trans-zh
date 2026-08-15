@@ -346,6 +346,17 @@ def test_a_dead_tab_is_replaced():
     assert sess._page is None
 
 
+def test_a_disconnected_browser_is_marked_for_restart():
+    sess = session_mod.BrowserSession(Path("profile"), Path("account.json"), 1.0)
+    sess._page = FakePage(reply="ok")
+
+    with pytest.raises(session_mod.BrowserSessionUnavailable):
+        with sess.page():
+            raise RuntimeError("Target page, context or browser has been closed")
+
+    assert sess._page is None
+
+
 def test_page_serialises_concurrent_callers():
     """batch -j 4 không được cho 4 luồng cùng gõ vào một ô nhập."""
     sess = session_mod.BrowserSession(Path("profile"), Path("account.json"), 1.0)
@@ -369,3 +380,79 @@ def test_page_serialises_concurrent_callers():
 
     assert len(peak) == 4
     assert max(peak) == 1
+
+
+class SessionStub:
+    instances: list[SessionStub] = []
+
+    def __init__(self, profile_dir: Path, account_file: Path, manual_timeout: float) -> None:
+        self.profile_dir = profile_dir
+        self.account_file = account_file
+        self.manual_timeout = manual_timeout
+        self.alive = False
+        self.started = False
+        self.stopped = False
+        self.instances.append(self)
+
+    def start(self) -> None:
+        self.started = True
+        self.alive = True
+
+    def stop(self) -> None:
+        self.stopped = True
+        self.alive = False
+
+    def is_alive(self) -> bool:
+        return self.alive
+
+
+def test_get_session_starts_browser_on_first_llm_call(tmp_path, monkeypatch):
+    SessionStub.instances = []
+    monkeypatch.setattr(session_mod, "_sessions", {})
+    monkeypatch.setattr(session_mod, "BrowserSession", SessionStub)
+    cfg = ChatGPTWebConfig(
+        profile_dir=str(tmp_path / "profile"),
+        account_file=str(tmp_path / "account.json"),
+    )
+
+    first = session_mod.get_session(cfg)
+    second = session_mod.get_session(cfg)
+
+    assert first is second
+    assert first.started is True
+    assert len(SessionStub.instances) == 1
+
+
+def test_get_session_restarts_a_closed_browser(tmp_path, monkeypatch):
+    SessionStub.instances = []
+    monkeypatch.setattr(session_mod, "_sessions", {})
+    monkeypatch.setattr(session_mod, "BrowserSession", SessionStub)
+    cfg = ChatGPTWebConfig(profile_dir=str(tmp_path / "profile"))
+
+    previous = session_mod.get_session(cfg)
+    previous.alive = False
+    restarted = session_mod.get_session(cfg)
+
+    assert restarted is not previous
+    assert restarted.started is True
+    assert previous.stopped is True
+    assert len(SessionStub.instances) == 2
+
+
+def test_provider_retries_after_playwright_stops(instant_polling, monkeypatch):
+    class ClosedSession:
+        @contextmanager
+        def page(self):
+            raise session_mod.BrowserSessionUnavailable("browser closed")
+            yield
+
+    page = FakePage(reply="ok")
+    sessions = iter([ClosedSession(), FakeSession(page)])
+    monkeypatch.setattr("zhsub.llm.chatgpt_web.provider.get_session", lambda web: next(sessions))
+    monkeypatch.setattr("zhsub.llm.base.time.sleep", lambda delay: None)
+    provider = ChatGPTWebProvider(
+        model="chatgpt-web", web=ChatGPTWebConfig(), max_retries=1, timeout_sec=1
+    )
+
+    assert provider.complete("RULES", "batch 1") == "ok"
+    assert len(page.messages) == 1
