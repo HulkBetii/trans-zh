@@ -5,6 +5,13 @@ __pycache__/
 dist/
 build/
 
+# Frontend tooling; src/zhsub/web/static is the distributable bundle.
+web-ui/node_modules/
+web-ui/.vite/
+web-ui/coverage/
+web-ui/playwright-report/
+web-ui/test-results/
+
 # State & output của pipeline
 work/
 output/

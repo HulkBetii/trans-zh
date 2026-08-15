@@ -1,0 +1,3867 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "zhsub Subtitle Production Studio",
+    "version": "1"
+  },
+  "paths": {
+    "/api/v1/meta": {
+      "get": {
+        "summary": "Meta",
+        "operationId": "meta_api_v1_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "summary": "Get Settings",
+        "operationId": "get_settings_api_v1_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/credentials/{credential_id}": {
+      "put": {
+        "summary": "Put Credential",
+        "operationId": "put_credential_api_v1_settings_credentials__credential_id__put",
+        "parameters": [
+          {
+            "name": "credential_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CredentialId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Credential",
+        "operationId": "delete_credential_api_v1_settings_credentials__credential_id__delete",
+        "parameters": [
+          {
+            "name": "credential_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CredentialId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsRevisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/credentials/{credential_id}/test": {
+      "post": {
+        "summary": "Test Credential",
+        "operationId": "test_credential_api_v1_settings_credentials__credential_id__test_post",
+        "parameters": [
+          {
+            "name": "credential_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CredentialId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialTestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tts/voices": {
+      "get": {
+        "summary": "List Tts Voices",
+        "operationId": "list_tts_voices_api_v1_tts_voices_get",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Search"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 30,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TtsVoicePage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs": {
+      "get": {
+        "summary": "List Jobs V1",
+        "operationId": "list_jobs_v1_api_v1_jobs_get",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Search"
+            }
+          },
+          {
+            "name": "execution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Execution"
+            }
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Quality"
+            }
+          },
+          {
+            "name": "lane",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pipeline",
+                "tts",
+                "any"
+              ],
+              "type": "string",
+              "default": "pipeline",
+              "title": "Lane"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Job",
+        "operationId": "create_job_api_v1_jobs_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJobRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}": {
+      "get": {
+        "summary": "Get Job",
+        "operationId": "get_job_api_v1_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/retry": {
+      "post": {
+        "summary": "Retry Job",
+        "operationId": "retry_job_api_v1_jobs__job_id__retry_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/retranslate": {
+      "post": {
+        "summary": "Retranslate Job",
+        "operationId": "retranslate_job_api_v1_jobs__job_id__retranslate_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/render": {
+      "post": {
+        "summary": "Render Job",
+        "operationId": "render_job_api_v1_jobs__job_id__render_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/approve": {
+      "post": {
+        "summary": "Approve Job",
+        "operationId": "approve_job_api_v1_jobs__job_id__approve_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/unapprove": {
+      "post": {
+        "summary": "Unapprove Job",
+        "operationId": "unapprove_job_api_v1_jobs__job_id__unapprove_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/glossary": {
+      "get": {
+        "summary": "Get Glossary",
+        "operationId": "get_glossary_api_v1_jobs__job_id__glossary_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlossaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Put Glossary",
+        "operationId": "put_glossary_api_v1_jobs__job_id__glossary_put",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GlossaryUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlossaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/subtitles/{lang}": {
+      "get": {
+        "summary": "Get Subtitles",
+        "operationId": "get_subtitles_api_v1_jobs__job_id__subtitles__lang__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubtitleResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/subtitle-overrides/{lang}": {
+      "put": {
+        "summary": "Put Subtitle Overrides",
+        "operationId": "put_subtitle_overrides_api_v1_jobs__job_id__subtitle_overrides__lang__put",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverrideUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubtitleResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi": {
+      "get": {
+        "summary": "Get Tts Workspace",
+        "operationId": "get_tts_workspace_api_v1_jobs__job_id__tts_vi_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TtsWorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/settings": {
+      "put": {
+        "summary": "Put Tts Settings",
+        "operationId": "put_tts_settings_api_v1_jobs__job_id__tts_vi_settings_put",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TtsSettingsUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TtsWorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/spoken-overrides": {
+      "put": {
+        "summary": "Put Tts Spoken Overrides",
+        "operationId": "put_tts_spoken_overrides_api_v1_jobs__job_id__tts_vi_spoken_overrides_put",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpokenOverrideUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TtsWorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/preview": {
+      "post": {
+        "summary": "Preview Tts",
+        "operationId": "preview_tts_api_v1_jobs__job_id__tts_vi_preview_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TtsPreviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/calibrate": {
+      "post": {
+        "summary": "Calibrate Tts",
+        "operationId": "calibrate_tts_api_v1_jobs__job_id__tts_vi_calibrate_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/render": {
+      "post": {
+        "summary": "Render Tts",
+        "operationId": "render_tts_api_v1_jobs__job_id__tts_vi_render_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/approve": {
+      "post": {
+        "summary": "Approve Tts",
+        "operationId": "approve_tts_api_v1_jobs__job_id__tts_vi_approve_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TtsWorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/unapprove": {
+      "post": {
+        "summary": "Unapprove Tts",
+        "operationId": "unapprove_tts_api_v1_jobs__job_id__tts_vi_unapprove_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TtsWorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/tts/vi/previews/{segment_id}": {
+      "get": {
+        "summary": "Download Tts Preview",
+        "operationId": "download_tts_preview_api_v1_jobs__job_id__tts_vi_previews__segment_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "segment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Segment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/runs/{run_id}": {
+      "get": {
+        "summary": "Get Run",
+        "operationId": "get_run_api_v1_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/runs/{run_id}/cancel": {
+      "post": {
+        "summary": "Cancel Run",
+        "operationId": "cancel_run_api_v1_runs__run_id__cancel_post",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiMessage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/runs/{run_id}/events": {
+      "get": {
+        "summary": "Run Events",
+        "operationId": "run_events_api_v1_runs__run_id__events_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/roots": {
+      "get": {
+        "summary": "File Roots Endpoint",
+        "operationId": "file_roots_endpoint_api_v1_files_roots_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRootsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files": {
+      "get": {
+        "summary": "List Files",
+        "operationId": "list_files_api_v1_files_get",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/media": {
+      "get": {
+        "summary": "Job Media",
+        "operationId": "job_media_api_v1_jobs__job_id__media_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}/artifacts/{artifact_id}": {
+      "get": {
+        "summary": "Download Artifact",
+        "operationId": "download_artifact_api_v1_jobs__job_id__artifacts__artifact_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "artifact_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Artifact Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddressTerm": {
+        "properties": {
+          "speaker": {
+            "type": "string",
+            "title": "Speaker"
+          },
+          "addressee": {
+            "type": "string",
+            "title": "Addressee"
+          },
+          "vi_self": {
+            "type": "string",
+            "title": "Vi Self"
+          },
+          "vi_other": {
+            "type": "string",
+            "title": "Vi Other"
+          },
+          "basis": {
+            "type": "string",
+            "title": "Basis",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "speaker",
+          "addressee",
+          "vi_self",
+          "vi_other"
+        ],
+        "title": "AddressTerm",
+        "description": "Vietnamese address terms are a **pairwise** relation and do not fit the\n``{zh, pinyin, vi, en}`` shape of :class:`GlossaryTerm`, hence a separate\nsection."
+      },
+      "ApiMessage": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "default": true
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "ApiMessage"
+      },
+      "ArtifactResponse": {
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "title": "Artifact Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "subtitle",
+              "audio",
+              "report",
+              "other"
+            ],
+            "title": "Kind"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "current",
+              "stale",
+              "missing"
+            ],
+            "title": "State"
+          },
+          "download_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "artifact_id",
+          "name",
+          "kind",
+          "state"
+        ],
+        "title": "ArtifactResponse"
+      },
+      "CreateJobRequest": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/SourceRequest"
+          },
+          "targets": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "vi",
+                "en"
+              ]
+            },
+            "type": "array",
+            "title": "Targets"
+          },
+          "formats": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "srt",
+                "ass"
+              ]
+            },
+            "type": "array",
+            "title": "Formats"
+          },
+          "bilingual": {
+            "type": "boolean",
+            "title": "Bilingual",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "title": "CreateJobRequest"
+      },
+      "CreateJobResponse": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id",
+          "run_id"
+        ],
+        "title": "CreateJobResponse"
+      },
+      "CredentialId": {
+        "type": "string",
+        "enum": [
+          "openai",
+          "anthropic",
+          "ai33"
+        ],
+        "title": "CredentialId"
+      },
+      "CredentialTestRequest": {
+        "properties": {
+          "secret": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "password",
+                "writeOnly": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret"
+          }
+        },
+        "type": "object",
+        "title": "CredentialTestRequest"
+      },
+      "CredentialTestResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "code",
+          "message",
+          "latency_ms"
+        ],
+        "title": "CredentialTestResponse"
+      },
+      "CredentialUpdateRequest": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "secret": {
+            "type": "string",
+            "format": "password",
+            "title": "Secret",
+            "writeOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "secret"
+        ],
+        "title": "CredentialUpdateRequest"
+      },
+      "ExecutionStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "cancelling",
+          "cancelled",
+          "failed",
+          "interrupted",
+          "completed"
+        ],
+        "title": "ExecutionStatus"
+      },
+      "FileEntryResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "directory",
+              "file"
+            ],
+            "title": "Kind"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "path",
+          "kind"
+        ],
+        "title": "FileEntryResponse"
+      },
+      "FileListResponse": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/FileEntryResponse"
+            },
+            "type": "array",
+            "title": "Entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path",
+          "entries"
+        ],
+        "title": "FileListResponse"
+      },
+      "FileRootResponse": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "path"
+        ],
+        "title": "FileRootResponse"
+      },
+      "FileRootsResponse": {
+        "properties": {
+          "roots": {
+            "items": {
+              "$ref": "#/components/schemas/FileRootResponse"
+            },
+            "type": "array",
+            "title": "Roots"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roots"
+        ],
+        "title": "FileRootsResponse"
+      },
+      "GlossaryDoc": {
+        "properties": {
+          "schema": {
+            "type": "integer",
+            "title": "Schema",
+            "default": 1
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "default": 1
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/GlossaryTerm"
+            },
+            "type": "array",
+            "title": "Terms"
+          },
+          "address_terms": {
+            "items": {
+              "$ref": "#/components/schemas/AddressTerm"
+            },
+            "type": "array",
+            "title": "Address Terms"
+          },
+          "style": {
+            "$ref": "#/components/schemas/StyleDecision"
+          }
+        },
+        "type": "object",
+        "title": "GlossaryDoc"
+      },
+      "GlossaryResponse": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "document": {
+            "$ref": "#/components/schemas/GlossaryDoc"
+          },
+          "editor_locked": {
+            "type": "boolean",
+            "title": "Editor Locked",
+            "default": false
+          },
+          "lock_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "document"
+        ],
+        "title": "GlossaryResponse"
+      },
+      "GlossaryTerm": {
+        "properties": {
+          "zh": {
+            "type": "string",
+            "title": "Zh"
+          },
+          "pinyin": {
+            "type": "string",
+            "title": "Pinyin",
+            "default": ""
+          },
+          "vi": {
+            "type": "string",
+            "title": "Vi",
+            "default": ""
+          },
+          "en": {
+            "type": "string",
+            "title": "En",
+            "default": ""
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "person",
+              "place",
+              "org",
+              "term",
+              "dish",
+              "product",
+              "other"
+            ],
+            "title": "Type",
+            "default": "other"
+          },
+          "keep_source": {
+            "type": "boolean",
+            "title": "Keep Source",
+            "default": false
+          },
+          "note": {
+            "type": "string",
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "zh"
+        ],
+        "title": "GlossaryTerm"
+      },
+      "GlossaryUpdateRequest": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "document": {
+            "$ref": "#/components/schemas/GlossaryDoc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "document"
+        ],
+        "title": "GlossaryUpdateRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "title": "Method",
+            "default": ""
+          },
+          "subject_pronoun": {
+            "type": "string",
+            "title": "Subject Pronoun",
+            "default": ""
+          },
+          "cps_warnings": {
+            "type": "integer",
+            "title": "Cps Warnings",
+            "default": 0
+          },
+          "address_terms": {
+            "type": "integer",
+            "title": "Address Terms",
+            "default": 0
+          },
+          "segments": {
+            "type": "integer",
+            "title": "Segments",
+            "default": 0
+          },
+          "terms": {
+            "type": "integer",
+            "title": "Terms",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "HealthResponse"
+      },
+      "JobDetail": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "targets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Targets"
+          },
+          "execution_status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "quality_status": {
+            "$ref": "#/components/schemas/QualityStatus"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Progress",
+            "default": 0.0
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "attention_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Attention Reasons"
+          },
+          "active_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lanes": {
+            "items": {
+              "$ref": "#/components/schemas/JobLaneSummary"
+            },
+            "type": "array",
+            "title": "Lanes"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "request": {
+            "$ref": "#/components/schemas/JobRequestSnapshot"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageState"
+            },
+            "type": "array",
+            "title": "Stages"
+          },
+          "health": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HealthResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/ArtifactResponse"
+            },
+            "type": "array",
+            "title": "Artifacts"
+          },
+          "allowed_actions": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "cancel",
+                "retry",
+                "retranslate",
+                "render",
+                "approve",
+                "unapprove"
+              ]
+            },
+            "type": "array",
+            "title": "Allowed Actions"
+          },
+          "glossary_stale": {
+            "type": "boolean",
+            "title": "Glossary Stale",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id",
+          "title",
+          "targets",
+          "execution_status",
+          "quality_status",
+          "request",
+          "stages",
+          "artifacts",
+          "allowed_actions"
+        ],
+        "title": "JobDetail"
+      },
+      "JobLaneSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "pipeline",
+              "tts"
+            ],
+            "title": "Id"
+          },
+          "started": {
+            "type": "boolean",
+            "title": "Started",
+            "default": true
+          },
+          "execution_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionStatus"
+              },
+              {
+                "type": "string",
+                "const": "not_started"
+              }
+            ],
+            "title": "Execution Status"
+          },
+          "quality_status": {
+            "$ref": "#/components/schemas/QualityStatus"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Progress",
+            "default": 0.0
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "attention_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Attention Reasons"
+          },
+          "active_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latest_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allowed_actions": {
+            "items": {
+              "type": "string",
+              "const": "cancel"
+            },
+            "type": "array",
+            "title": "Allowed Actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "execution_status",
+          "quality_status"
+        ],
+        "title": "JobLaneSummary"
+      },
+      "JobPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/JobSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "JobPage"
+      },
+      "JobRequestSnapshot": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/SourceRequest"
+          },
+          "targets": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "vi",
+                "en"
+              ]
+            },
+            "type": "array",
+            "title": "Targets"
+          },
+          "formats": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "srt",
+                "ass"
+              ]
+            },
+            "type": "array",
+            "title": "Formats"
+          },
+          "bilingual": {
+            "type": "boolean",
+            "title": "Bilingual",
+            "default": false
+          },
+          "output_dir": {
+            "type": "string",
+            "title": "Output Dir"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "targets",
+          "formats",
+          "output_dir"
+        ],
+        "title": "JobRequestSnapshot"
+      },
+      "JobSummary": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "targets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Targets"
+          },
+          "execution_status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "quality_status": {
+            "$ref": "#/components/schemas/QualityStatus"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Progress",
+            "default": 0.0
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "attention_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Attention Reasons"
+          },
+          "active_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lanes": {
+            "items": {
+              "$ref": "#/components/schemas/JobLaneSummary"
+            },
+            "type": "array",
+            "title": "Lanes"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id",
+          "title",
+          "targets",
+          "execution_status",
+          "quality_status"
+        ],
+        "title": "JobSummary"
+      },
+      "MetaResponse": {
+        "properties": {
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageDescriptor"
+            },
+            "type": "array",
+            "title": "Stages"
+          },
+          "targets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Targets"
+          },
+          "formats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Formats"
+          },
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Capabilities"
+          },
+          "readiness": {
+            "items": {
+              "$ref": "#/components/schemas/ReadinessItem"
+            },
+            "type": "array",
+            "title": "Readiness"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stages",
+          "targets",
+          "formats",
+          "capabilities",
+          "readiness"
+        ],
+        "title": "MetaResponse"
+      },
+      "OverrideChange": {
+        "properties": {
+          "segment_id": {
+            "type": "integer",
+            "title": "Segment Id"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "segment_id",
+          "text"
+        ],
+        "title": "OverrideChange"
+      },
+      "OverrideUpdateRequest": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/OverrideChange"
+            },
+            "type": "array",
+            "title": "Changes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "changes"
+        ],
+        "title": "OverrideUpdateRequest"
+      },
+      "QualityStatus": {
+        "type": "string",
+        "enum": [
+          "needs_review",
+          "degraded",
+          "approved"
+        ],
+        "title": "QualityStatus"
+      },
+      "ReadinessItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "warning",
+              "blocked"
+            ],
+            "title": "Status"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "status"
+        ],
+        "title": "ReadinessItem"
+      },
+      "RunResponse": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "lane": {
+            "type": "string",
+            "enum": [
+              "pipeline",
+              "tts"
+            ],
+            "title": "Lane",
+            "default": "pipeline"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "from_stage": {
+            "type": "string",
+            "title": "From Stage"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Progress",
+            "default": 0.0
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "queue_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue Position"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "event_seq": {
+            "type": "integer",
+            "title": "Event Seq",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "job_id",
+          "kind",
+          "from_stage",
+          "status"
+        ],
+        "title": "RunResponse"
+      },
+      "SettingsCredentialResponse": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CredentialId"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "configured": {
+            "type": "boolean",
+            "title": "Configured"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "environment",
+              "credential_store",
+              "none"
+            ],
+            "title": "Source"
+          },
+          "editable": {
+            "type": "boolean",
+            "title": "Editable"
+          },
+          "masked_value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "********"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Masked Value"
+          },
+          "env_name": {
+            "type": "string",
+            "title": "Env Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "configured",
+          "source",
+          "editable",
+          "env_name"
+        ],
+        "title": "SettingsCredentialResponse"
+      },
+      "SettingsProviderId": {
+        "type": "string",
+        "enum": [
+          "segment",
+          "translate",
+          "tts"
+        ],
+        "title": "SettingsProviderId"
+      },
+      "SettingsProviderResponse": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/SettingsProviderId"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "base_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Url"
+          },
+          "credential_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CredentialId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "provider"
+        ],
+        "title": "SettingsProviderResponse"
+      },
+      "SettingsResponse": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "credential_store_available": {
+            "type": "boolean",
+            "title": "Credential Store Available"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/SettingsProviderResponse"
+            },
+            "type": "array",
+            "title": "Providers"
+          },
+          "credentials": {
+            "items": {
+              "$ref": "#/components/schemas/SettingsCredentialResponse"
+            },
+            "type": "array",
+            "title": "Credentials"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "credential_store_available",
+          "providers",
+          "credentials"
+        ],
+        "title": "SettingsResponse"
+      },
+      "SettingsRevisionRequest": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision"
+        ],
+        "title": "SettingsRevisionRequest"
+      },
+      "SourceRequest": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "local",
+              "url"
+            ],
+            "title": "Kind"
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 8192,
+            "minLength": 1,
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "value"
+        ],
+        "title": "SourceRequest"
+      },
+      "SpokenOverrideUpdateRequest": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/OverrideChange"
+            },
+            "type": "array",
+            "title": "Changes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "changes"
+        ],
+        "title": "SpokenOverrideUpdateRequest"
+      },
+      "StageDescriptor": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "short_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "StageDescriptor"
+      },
+      "StageState": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "cache_hit": {
+            "type": "boolean",
+            "title": "Cache Hit",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "StageState"
+      },
+      "StyleDecision": {
+        "properties": {
+          "speech_register": {
+            "type": "string",
+            "title": "Speech Register",
+            "default": ""
+          },
+          "narrator_self_vi": {
+            "type": "string",
+            "title": "Narrator Self Vi",
+            "default": ""
+          },
+          "audience_vi": {
+            "type": "string",
+            "title": "Audience Vi",
+            "default": ""
+          },
+          "subject_third_person_vi": {
+            "type": "string",
+            "title": "Subject Third Person Vi",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "StyleDecision"
+      },
+      "SubtitleCue": {
+        "properties": {
+          "segment_id": {
+            "type": "integer",
+            "title": "Segment Id"
+          },
+          "start": {
+            "type": "number",
+            "title": "Start"
+          },
+          "end": {
+            "type": "number",
+            "title": "End"
+          },
+          "source_text": {
+            "type": "string",
+            "title": "Source Text"
+          },
+          "model_text": {
+            "type": "string",
+            "title": "Model Text"
+          },
+          "effective_text": {
+            "type": "string",
+            "title": "Effective Text"
+          },
+          "overridden": {
+            "type": "boolean",
+            "title": "Overridden",
+            "default": false
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "default": false
+          },
+          "base_changed": {
+            "type": "boolean",
+            "title": "Base Changed",
+            "default": false
+          },
+          "override_state": {
+            "type": "string",
+            "enum": [
+              "none",
+              "manual",
+              "base_changed",
+              "stale"
+            ],
+            "title": "Override State",
+            "default": "none"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/SubtitleWarningResponse"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "reviewed": {
+            "type": "boolean",
+            "title": "Reviewed",
+            "default": false
+          },
+          "cps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cps"
+          },
+          "line_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "segment_id",
+          "start",
+          "end",
+          "source_text",
+          "model_text",
+          "effective_text"
+        ],
+        "title": "SubtitleCue"
+      },
+      "SubtitleResponse": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "vi",
+              "en"
+            ],
+            "title": "Language"
+          },
+          "cues": {
+            "items": {
+              "$ref": "#/components/schemas/SubtitleCue"
+            },
+            "type": "array",
+            "title": "Cues"
+          },
+          "editor_locked": {
+            "type": "boolean",
+            "title": "Editor Locked",
+            "default": false
+          },
+          "output_stale": {
+            "type": "boolean",
+            "title": "Output Stale",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "language",
+          "cues"
+        ],
+        "title": "SubtitleResponse"
+      },
+      "SubtitleWarningResponse": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "limit": {
+            "type": "number",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "detail",
+          "value",
+          "limit"
+        ],
+        "title": "SubtitleWarningResponse"
+      },
+      "TtsCueResponse": {
+        "properties": {
+          "segment_id": {
+            "type": "integer",
+            "title": "Segment Id"
+          },
+          "start": {
+            "type": "number",
+            "title": "Start"
+          },
+          "end": {
+            "type": "number",
+            "title": "End"
+          },
+          "subtitle_text": {
+            "type": "string",
+            "title": "Subtitle Text"
+          },
+          "default_spoken_text": {
+            "type": "string",
+            "title": "Default Spoken Text"
+          },
+          "effective_spoken_text": {
+            "type": "string",
+            "title": "Effective Spoken Text"
+          },
+          "override_state": {
+            "type": "string",
+            "enum": [
+              "none",
+              "manual",
+              "base_changed",
+              "stale"
+            ],
+            "title": "Override State",
+            "default": "none"
+          },
+          "room_seconds": {
+            "type": "number",
+            "title": "Room Seconds"
+          },
+          "predicted_duration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Duration"
+          },
+          "overflow_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overflow Seconds"
+          },
+          "speed": {
+            "type": "number",
+            "title": "Speed",
+            "default": 1.0
+          },
+          "preview_state": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "current",
+              "stale"
+            ],
+            "title": "Preview State",
+            "default": "missing"
+          },
+          "preview_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "segment_id",
+          "start",
+          "end",
+          "subtitle_text",
+          "default_spoken_text",
+          "effective_spoken_text",
+          "room_seconds"
+        ],
+        "title": "TtsCueResponse"
+      },
+      "TtsPreviewRequest": {
+        "properties": {
+          "segment_id": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Segment Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "segment_id"
+        ],
+        "title": "TtsPreviewRequest"
+      },
+      "TtsSettingsUpdateRequest": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "voice_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Voice Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision",
+          "voice_id"
+        ],
+        "title": "TtsSettingsUpdateRequest"
+      },
+      "TtsVoicePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TtsVoiceResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "TtsVoicePage"
+      },
+      "TtsVoiceResponse": {
+        "properties": {
+          "voice_id": {
+            "type": "string",
+            "title": "Voice Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "preview_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview Url"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url"
+          },
+          "calibrated": {
+            "type": "boolean",
+            "title": "Calibrated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "voice_id",
+          "name"
+        ],
+        "title": "TtsVoiceResponse"
+      },
+      "TtsWorkspaceResponse": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          },
+          "language": {
+            "type": "string",
+            "const": "vi",
+            "title": "Language",
+            "default": "vi"
+          },
+          "provider": {
+            "type": "string",
+            "const": "vbee",
+            "title": "Provider",
+            "default": "vbee"
+          },
+          "provider_ready": {
+            "type": "boolean",
+            "title": "Provider Ready",
+            "default": false
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Id"
+          },
+          "selected_voice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TtsVoiceResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "calibration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VoiceCalibrationResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subtitle_approved": {
+            "type": "boolean",
+            "title": "Subtitle Approved",
+            "default": false
+          },
+          "execution_status": {
+            "type": "string",
+            "enum": [
+              "not_started",
+              "queued",
+              "running",
+              "cancelling",
+              "cancelled",
+              "failed",
+              "interrupted",
+              "completed"
+            ],
+            "title": "Execution Status",
+            "default": "not_started"
+          },
+          "quality_status": {
+            "$ref": "#/components/schemas/QualityStatus",
+            "default": "needs_review"
+          },
+          "latest_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "active_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "attention_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Attention Reasons"
+          },
+          "allowed_actions": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "preview",
+                "calibrate",
+                "render",
+                "cancel",
+                "approve",
+                "unapprove"
+              ]
+            },
+            "type": "array",
+            "title": "Allowed Actions"
+          },
+          "cues": {
+            "items": {
+              "$ref": "#/components/schemas/TtsCueResponse"
+            },
+            "type": "array",
+            "title": "Cues"
+          },
+          "total_cues": {
+            "type": "integer",
+            "title": "Total Cues",
+            "default": 0
+          },
+          "uncached_cues": {
+            "type": "integer",
+            "title": "Uncached Cues",
+            "default": 0
+          },
+          "output": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "output_stale": {
+            "type": "boolean",
+            "title": "Output Stale",
+            "default": false
+          },
+          "editor_locked": {
+            "type": "boolean",
+            "title": "Editor Locked",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "revision"
+        ],
+        "title": "TtsWorkspaceResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VoiceCalibrationResponse": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "const": "vbee",
+            "title": "Provider",
+            "default": "vbee"
+          },
+          "voice_id": {
+            "type": "string",
+            "title": "Voice Id"
+          },
+          "overhead_sec": {
+            "type": "number",
+            "title": "Overhead Sec"
+          },
+          "sec_per_syllable": {
+            "type": "number",
+            "title": "Sec Per Syllable"
+          },
+          "sample_count": {
+            "type": "integer",
+            "title": "Sample Count"
+          },
+          "source_job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Job Id"
+          },
+          "calibrated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calibrated At"
+          },
+          "revision": {
+            "type": "string",
+            "title": "Revision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "voice_id",
+          "overhead_sec",
+          "sec_per_syllable",
+          "sample_count",
+          "revision"
+        ],
+        "title": "VoiceCalibrationResponse"
+      }
+    }
+  }
+}

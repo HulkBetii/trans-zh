@@ -98,6 +98,62 @@ def test_ensure_context_passes_a_real_context_through():
     assert ensure_context(ctx) is ctx
 
 
+def test_pipeline_persists_cancel_before_stage_entry(tmp_path):
+    from zhsub.config import Config
+    from zhsub.jobs import JobStore
+    from zhsub.pipeline import RunRequest, run_job
+
+    config = Config()
+    config.paths.work_dir = str(tmp_path / "work")
+    store = JobStore(tmp_path / "jobs.db")
+    cancel = threading.Event()
+    cancel.set()
+
+    with pytest.raises(Cancelled):
+        run_job(
+            RunRequest("source.mp4", ["vi"], tmp_path / "output"),
+            config,
+            store,
+            job_id="job",
+            ctx=RunContext(cancel=cancel),
+        )
+
+    assert store.get("job").status == "cancelled"  # type: ignore[union-attr]
+
+
+def test_pipeline_persists_cancel_after_stage_write(tmp_path, monkeypatch):
+    from zhsub.config import Config
+    from zhsub.jobs import JobStore
+    from zhsub.pipeline import RunRequest, run_job
+
+    config = Config()
+    config.paths.work_dir = str(tmp_path / "work")
+    store = JobStore(tmp_path / "jobs.db")
+    cancel = threading.Event()
+
+    def finish_stage(*_args, **_kwargs):
+        cancel.set()
+
+    monkeypatch.setattr("zhsub.pipeline._run_stage", finish_stage)
+
+    with pytest.raises(Cancelled):
+        run_job(
+            RunRequest(
+                "source.mp4",
+                ["vi"],
+                tmp_path / "output",
+                from_stage="render",
+            ),
+            config,
+            store,
+            job_id="job",
+            ctx=RunContext(cancel=cancel),
+        )
+
+    assert store.get("job").status == "cancelled"  # type: ignore[union-attr]
+    assert store.latest_stage_runs("job")["render"]["status"] == "cancelled"
+
+
 def test_cancelling_mid_translation_keeps_what_was_already_paid_for(tmp_path):
     """The claim the Cancel button rests on: stopping wastes no completed work.
 

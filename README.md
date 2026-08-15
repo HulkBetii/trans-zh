@@ -13,8 +13,9 @@ LLM chỉ được trả về text và vị trí ngắt trên chuỗi ký tự; 
 tra ngược về mảng token của S1.
 
 > **Trạng thái:** S0–S6 đã hoạt động, CLI đầy đủ (`run` / `batch` / `resume` /
-> `asr` / `jobs` / `dub` / `dub-calibrate` / `dub-names` / `chatgpt-login`).
-> Benchmark ở `bench/` đã chọn `paraformer-zh` làm engine ASR.
+> `asr` / `jobs` / `dub` / `dub-calibrate` / `dub-names` / `chatgpt-login`) và
+> Subtitle Production Studio chạy local qua `zhsub web`. Benchmark ở `bench/` đã
+> chọn `paraformer-zh` làm engine ASR.
 
 ---
 
@@ -124,7 +125,7 @@ winget install astral-sh.uv
 ### 3. Dependencies (bao gồm PyTorch bản CUDA)
 
 ```bash
-uv sync --extra bench
+uv sync --extra bench --extra web
 ```
 
 Chỉ vậy thôi. `pyproject.toml` đã khai báo sẵn index của PyTorch:
@@ -349,11 +350,71 @@ bạn đang đăng nhập sẵn; pipeline không bao giờ tự nhập tài kho�
 Kết quả trung gian nằm ở `work/<job_id>/`. `job_id` sinh tất định theo nguồn nên
 chạy lại cùng một file là dùng lại kết quả cũ thay vì làm lại từ đầu.
 
+## Subtitle Production Studio (web)
+
+Cài dependency web và chạy server:
+
+```bash
+uv sync --extra web
+uv run zhsub web
+```
+
+Mở `http://127.0.0.1:8756`. Studio chỉ bind loopback và không hỗ trợ
+`0.0.0.0` khi chưa có xác thực. File media được chọn bằng đường dẫn tuyệt đối hoặc
+filesystem browser local; video lớn không được upload qua HTTP. Bundle production
+được phục vụ hoàn toàn từ package, không dùng CDN và không cần Node.js lúc chạy.
+
+Khi phát triển frontend, chạy FastAPI và Vite ở hai terminal:
+
+```bash
+# Terminal 1, từ thư mục gốc
+uv run zhsub web
+
+# Terminal 2
+cd web-ui
+npm ci
+npm run dev
+```
+
+Vite mở `http://127.0.0.1:5173` và proxy `/api` sang FastAPI. Trước khi đóng gói,
+build React vào `src/zhsub/web/static`; Hatch sẽ đưa nguyên bundle này vào wheel:
+
+```bash
+cd web-ui
+npm run lint
+npm run typecheck
+npm test
+npm run build
+cd ..
+uv build
+```
+
+### Settings và API key
+
+Tab **Cài đặt** quản lý credential OpenAI, Anthropic và AI33/Vbee ở cấp ứng
+dụng. Provider, model và endpoint chỉ hiển thị để đối chiếu; vẫn được cấu hình
+trong `zhsub.toml`. API key nhập từ Studio là write-only và được lưu bằng kho
+credential của hệ điều hành, không ghi vào TOML, SQLite, artifact hay
+`localStorage`.
+
+Biến môi trường có quyền ưu tiên. Khi `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` hoặc
+`AI33_API_KEY` đã tồn tại trong môi trường chạy server, Studio chỉ hiển thị trạng
+thái `ENV` và không ghi đè key đó. Có thể kiểm tra kết nối bằng endpoint không
+phát sinh lượt dịch/TTS. Việc thay hoặc xóa key bị khóa trong lúc còn run đang
+chờ hoặc đang chạy để một job không dùng lẫn credential cũ và mới.
+
 ## Lồng tiếng (S6)
 
-Sinh audio tiếng Việt khớp timeline gốc, để ghép thẳng vào video. **Không nằm
-trong `zhsub run`** vì mỗi cue là một lần gọi API trả tiền — video 17 phút hết 184
-lần.
+Studio có tab **Lồng tiếng** cho job chứa bản dịch tiếng Việt. Workflow gồm chọn
+một giọng Vbee, hiệu chuẩn dùng chung bằng đúng 8 mẫu, chỉnh riêng văn bản đọc
+từng cue, nghe thử có xác nhận chi phí, rồi tạo MP3 timeline. Nghe thử được phép
+trước khi duyệt phụ đề; render toàn bộ chỉ mở khi phụ đề đã được duyệt và mọi
+spoken override còn hợp lệ. Duyệt audio là trạng thái riêng, không thay đổi trạng
+thái duyệt phụ đề.
+
+S6 sinh audio tiếng Việt khớp timeline gốc. V1 chỉ xuất MP3, không mux lại video.
+Stage này **không nằm trong `zhsub run`** vì mỗi cue cache miss là một lần gọi API
+trả tiền — video 17 phút có thể cần 184 lần.
 
 ```bash
 setx AI33_API_KEY sk_...          # mở lại terminal sau khi đặt
@@ -659,7 +720,9 @@ có cách nào phát hiện.
 
 ---
 
-## Không nằm trong phạm vi
+## Ngoài phạm vi Studio v1
 
-Không TTS, không lồng tiếng, không voice cloning, không burn-in phụ đề vào video,
-không dựng video output, không web UI.
+Batch, pronunciation names và trình sửa provider/model/endpoint chưa có trong
+giao diện web; các lệnh CLI tương ứng vẫn hoạt động. Studio cũng không hỗ trợ
+upload media, bind mạng công khai, cloud hosting, voice cloning, burn-in phụ đề
+hoặc dựng video output.

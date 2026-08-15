@@ -61,21 +61,42 @@ def _log_retry(reason: str, wait_sec: float, attempt: int) -> None:
 class SpeechClient:
     def __init__(self, base_url: str, api_key: str, timeout_sec: float = 180.0) -> None:
         self.base_url = base_url.rstrip("/")
-        self._client = httpx.Client(timeout=timeout_sec, headers={"xi-api-key": api_key})
+        self._api_key = api_key
+        self._client = httpx.Client(timeout=timeout_sec)
 
     def _request(self, method: str, path: str, **kwargs) -> Any:
         delay = RETRY_BASE_SEC
+        request_headers = dict(kwargs.pop("headers", {}) or {})
+        request_headers["xi-api-key"] = self._api_key
         for attempt in range(RETRY_MAX_ATTEMPTS):
             try:
-                resp = self._client.request(method, f"{self.base_url}{path}", **kwargs)
+                resp = self._client.request(
+                    method,
+                    f"{self.base_url}{path}",
+                    headers=request_headers,
+                    **kwargs,
+                )
             except httpx.HTTPError as exc:
                 raise DubError(f"lỗi mạng khi gọi {path}: {exc}") from exc
 
             if resp.status_code == 429:
                 # Retry-After là con số nhà cung cấp đưa ra; jitter để nhiều luồng
                 # không cùng thức dậy một lúc rồi lại đâm vào nhau.
-                wait = float(resp.headers.get("Retry-After", delay)) + random.random()
+                try:
+                    retry_after = float(resp.headers.get("Retry-After", delay))
+                except (TypeError, ValueError):
+                    retry_after = delay
+                wait = max(0.0, retry_after) + random.random()
                 _log_retry("chạm hạn mức", wait, attempt)
+                time.sleep(wait)
+                delay = min(delay * 2, RETRY_CAP_SEC)
+                continue
+
+            # Gateways sometimes return an HTML 503 page. Retry by status before
+            # attempting JSON parsing so transient provider outages stay retryable.
+            if resp.status_code == 503:
+                wait = delay + random.random()
+                _log_retry("server bận", wait, attempt)
                 time.sleep(wait)
                 delay = min(delay * 2, RETRY_CAP_SEC)
                 continue
@@ -86,9 +107,7 @@ class SpeechClient:
                 raise DubError(f"{path} trả về không phải JSON: {resp.text[:200]}") from exc
 
             # server_busy là áp lực dung lượng tạm thời, không phải lỗi của người gọi.
-            if resp.status_code == 503 or (
-                isinstance(body, dict) and body.get("code") == "server_busy"
-            ):
+            if isinstance(body, dict) and body.get("code") == "server_busy":
                 wait = delay + random.random()
                 _log_retry("server bận", wait, attempt)
                 time.sleep(wait)
@@ -145,9 +164,27 @@ class SpeechClient:
         finally:
             tmp.unlink(missing_ok=True)
 
-    def voices(self, provider: str = "vbee") -> list[dict[str, Any]]:
+    def voices(
+        self,
+        provider: str = "vbee",
+        *,
+        language: str = "Vietnamese",
+        search: str = "",
+        page: int = 1,
+        page_size: int = 50,
+    ) -> list[dict[str, Any]]:
         """Return the provider voice library without exposing credentials."""
-        body = self._request("GET", "/v3/voices", params={"provider": provider})
+        if page < 1 or not 1 <= page_size <= 100:
+            raise ValueError("invalid voice page")
+        params: dict[str, Any] = {
+            "provider": provider,
+            "language": language,
+            "page": page,
+            "page_size": page_size,
+        }
+        if search.strip():
+            params["search"] = search.strip()
+        body = self._request("GET", "/v3/voices", params=params)
         if isinstance(body, list):
             return [item for item in body if isinstance(item, dict)]
         if isinstance(body, dict):

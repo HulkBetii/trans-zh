@@ -153,9 +153,8 @@ def build_plan(
         configured_voice,
         override_voice_id=voice_id,
     )
-    ensure_speech_doc(root, selected_voice)
-    state = get_speech_state(root)
-    spoken_rows = effective_spoken_items(root)
+    state = get_speech_state(root, selected_voice)
+    spoken_rows = effective_spoken_items(root, selected_voice)
     row_by_id = {row.segment_id: row for row in spoken_rows}
     segments = read_doc(root / "segments.json", SegmentsDoc).segments
     total_sec = _source_duration(root, segments)
@@ -221,6 +220,23 @@ def build_plan(
         cues=tuple(cues),
         total_duration_sec=total_sec,
     )
+
+
+def _persist_selected_voice(
+    work_dir: str | Path,
+    cfg: Config,
+    voice_id: str | None,
+) -> str:
+    configured_voice = (
+        cfg.dub.voice_id if cfg.dub.voice_id and cfg.dub.voice_id != "SET_ME" else None
+    )
+    selected_voice = resolve_voice_id(
+        work_dir,
+        configured_voice,
+        override_voice_id=voice_id,
+    )
+    ensure_speech_doc(work_dir, selected_voice)
+    return selected_voice
 
 
 def _fetch_clip(
@@ -297,6 +313,10 @@ def _synthesize_all(
                 except Exception as exc:  # noqa: BLE001 - report all failed cues together
                     failures.append((cue.segment_id, f"{type(exc).__name__}: {exc}"))
                     log.warning("TTS cue %d failed: %s", cue.segment_id, exc)
+                    # Provider calls are paid. Once a cue has exhausted its own
+                    # retries, drain only the already submitted work instead of
+                    # purchasing the rest of a render that must fail anyway.
+                    exhausted = True
                 ctx.report(
                     completed / max(len(plan.cues), 1),
                     f"vi: {completed}/{len(plan.cues)} cue",
@@ -324,7 +344,8 @@ def preview_cue(
     force: bool = False,
 ) -> Path:
     """Synthesize one paid preview using the same cache as full rendering."""
-    plan = build_plan(work_dir, cfg, lang, voice_id=voice_id, calibration=calibration)
+    selected_voice = _persist_selected_voice(work_dir, cfg, voice_id)
+    plan = build_plan(work_dir, cfg, lang, voice_id=selected_voice, calibration=calibration)
     cue = next((item for item in plan.cues if item.segment_id == segment_id), None)
     if cue is None:
         raise ValueError(f"unknown subtitle segment id: {segment_id}")
@@ -352,12 +373,15 @@ def run(
     if lang != "vi":
         raise ValueError("TTS currently supports Vietnamese only")
     ctx = ensure_context(ctx)
-    plan = build_plan(work_dir, cfg, lang, voice_id=voice_id, calibration=calibration)
+    selected_voice = _persist_selected_voice(work_dir, cfg, voice_id)
+    plan = build_plan(work_dir, cfg, lang, voice_id=selected_voice, calibration=calibration)
     cache_hits = _synthesize_all(plan, cfg, force=force, ctx=ctx)
+    ctx.raise_if_cancelled()
 
     clips: list[tuple[float, bytes]] = []
     durations: dict[int, float] = {}
     for cue in plan.cues:
+        ctx.raise_if_cancelled()
         clip = cue.clip_path
         if not clip.is_file() or clip.stat().st_size == 0:
             raise RuntimeError(f"missing synthesized clip for cue {cue.segment_id}")
@@ -375,6 +399,7 @@ def run(
 
     destination = Path(out_dir) / f"{Path(work_dir).name}.vi.mp3"
     placements: list[AudioPlacement] = []
+    ctx.raise_if_cancelled()
     # Positional argument keeps compatibility with simple test doubles that accept
     # only *args while still collecting actual placement drift in production.
     assemble(
@@ -385,6 +410,9 @@ def run(
         cfg.dub.min_gap_sec,
         placements,
     )
+    # If cancellation arrived during ffmpeg assembly, leave the audio without a
+    # current report. The cached clips remain reusable on the next render.
+    ctx.raise_if_cancelled()
     if len(placements) != len(plan.cues):
         placements = [
             AudioPlacement(

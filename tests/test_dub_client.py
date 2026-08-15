@@ -45,6 +45,24 @@ def test_timeout_raises_a_dub_error_instead_of_name_error(monkeypatch):
     client.close()
 
 
+def test_html_503_is_retried_before_json_parsing(monkeypatch):
+    client = SpeechClient("https://example.test", "secret")
+    request = httpx.Request("GET", "https://example.test/v1/task/task-1")
+    responses = iter(
+        [
+            httpx.Response(503, text="<html>busy</html>", request=request),
+            httpx.Response(200, json={"status": "done"}, request=request),
+        ]
+    )
+    monkeypatch.setattr(client._client, "request", lambda *args, **kwargs: next(responses))
+    monkeypatch.setattr("zhsub.dub.client.time.sleep", lambda _: None)
+    monkeypatch.setattr("zhsub.dub.client.random.random", lambda: 0.0)
+
+    assert client._request("GET", "/v1/task/task-1") == {"status": "done"}
+
+    client.close()
+
+
 class _StreamResponse:
     def __init__(self, chunks, error=None):
         self._chunks = chunks
@@ -91,12 +109,24 @@ def test_download_replaces_the_cache_only_after_a_complete_stream(tmp_path: Path
 
 def test_voice_library_accepts_wrapped_ai33_responses(monkeypatch):
     client = SpeechClient("https://example.test", "secret")
+    observed = {}
+
+    def fake_request(*args, **kwargs):
+        observed.update(kwargs["params"])
+        return {"voices": [{"voice_id": "vbee-one"}]}
+
     monkeypatch.setattr(
         client,
         "_request",
-        lambda *args, **kwargs: {"voices": [{"voice_id": "vbee-one"}]},
+        fake_request,
     )
 
     assert client.voices() == [{"voice_id": "vbee-one"}]
+    assert observed == {
+        "provider": "vbee",
+        "language": "Vietnamese",
+        "page": 1,
+        "page_size": 50,
+    }
 
     client.close()

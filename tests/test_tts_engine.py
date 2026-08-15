@@ -187,3 +187,49 @@ def test_cancel_stops_dispatching_new_paid_cues_and_keeps_in_flight_cache(
     assert 1 <= len(fake_tts.calls) <= 2
     assert list((work_dir / "dub" / "vi").glob("*.mp3"))
     assert not (work_dir / "tts_report.vi.json").exists()
+
+
+def test_cancel_during_pcm_decode_skips_assembly_and_report(
+    tmp_path, fake_tts, monkeypatch
+):
+    work_dir = tmp_path / "work" / "job"
+    _write_base(work_dir)
+    cancel = threading.Event()
+
+    def cancel_after_first_decode(*args):
+        cancel.set()
+        return b"\x01\x02" * 250
+
+    monkeypatch.setattr(s6_dub, "decode_pcm", cancel_after_first_decode)
+    monkeypatch.setattr(
+        s6_dub,
+        "assemble",
+        lambda *args: pytest.fail("assembly must not start after cancellation"),
+    )
+    ctx = RunContext(cancel=cancel)
+
+    with pytest.raises(Cancelled):
+        s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", ctx=ctx)
+
+    assert not (work_dir / "tts_report.vi.json").exists()
+
+
+def test_first_terminal_provider_failure_stops_new_paid_dispatch(
+    tmp_path, fake_tts, monkeypatch
+):
+    work_dir = tmp_path / "work" / "job"
+    _write_base(work_dir)
+    config = _config()
+    config.dub.concurrency = 1
+
+    def fail_fetch(cue, client, voice_id, *, force=False):
+        del client, voice_id, force
+        fake_tts.calls.append(cue.text)
+        raise RuntimeError("provider rejected request")
+
+    monkeypatch.setattr(s6_dub, "_fetch_clip", fail_fetch)
+
+    with pytest.raises(RuntimeError, match="1/4 cue failed"):
+        s6_dub.run(work_dir, config, "vi", tmp_path / "output")
+
+    assert len(fake_tts.calls) == 1

@@ -12,18 +12,44 @@ import logging
 from pathlib import Path
 
 from ..config import Config
-from ..jsonio import read_doc, write_doc
+from ..jsonio import read_doc, sha256_json_canonical, write_doc
 from ..models import (
     RenderReport,
     RenderWarning,
     Segment,
     SegmentsDoc,
-    TranslationsDoc,
 )
+from ..overrides import effective_items, effective_items_hash
 from ..subtitle import Cue, write_srt
 from ..timing import Span, cps, relieve_cps, wrap_lines
 
 log = logging.getLogger(__name__)
+
+
+def build_segments_render_hash(segments: list[Segment], duration_sec: float) -> str:
+    return sha256_json_canonical(
+        {
+            "duration_sec": duration_sec,
+            "segments": [
+                [segment.id, segment.start, segment.end, segment.text_zh]
+                for segment in segments
+            ],
+        }
+    )
+
+
+def build_render_request_hash(
+    langs: list[str],
+    formats: tuple[str, ...] | list[str],
+    bilingual: bool,
+) -> str:
+    return sha256_json_canonical(
+        {
+            "targets": sorted(langs),
+            "formats": sorted(formats),
+            "bilingual": bilingual,
+        }
+    )
 
 
 def _relieve_and_wrap(
@@ -126,20 +152,17 @@ def run(
     ingest = read_doc(work_dir / "ingest.json", IngestDoc)
     duration = ingest.media.duration_sec
     stem = ingest.source.title or work_dir.name
+    segments_render_hash = build_segments_render_hash(segments, duration)
+    render_request_hash = build_render_request_hash(langs, formats, bilingual)
 
     warnings: list[RenderWarning] = []
     outputs: list[str] = []
+    effective_translation_hashes: dict[str, str] = {}
 
     for lang in langs:
-        tdoc = read_doc(work_dir / f"translations.{lang}.json", TranslationsDoc)
-        texts = {item.id: item.translation for item in tdoc.items}
-
-        # Acceptance criterion #2 is enforced here, not assumed downstream.
-        if len(tdoc.items) != len(segments):
-            raise ValueError(
-                f"translations.{lang}.json có {len(tdoc.items)} mục nhưng segments.json "
-                f"có {len(segments)} segment. Quan hệ phải là 1-1."
-            )
+        items = effective_items(work_dir, lang)
+        texts = {item.segment_id: item.effective_text for item in items}
+        effective_translation_hashes[lang] = effective_items_hash(items)
 
         cues = build_cues(segments, texts, lang, cfg, duration, warnings, bilingual)
         suffix = f".{lang}.bilingual" if bilingual else f".{lang}"
@@ -153,7 +176,13 @@ def run(
             _write_ass(cues, path)
             outputs.append(str(path))
 
-    report = RenderReport(outputs=outputs, warnings=warnings)
+    report = RenderReport(
+        outputs=outputs,
+        warnings=warnings,
+        effective_translation_hashes=effective_translation_hashes,
+        segments_render_hash=segments_render_hash,
+        render_request_hash=render_request_hash,
+    )
     write_doc(work_dir / "render_report.json", report)
 
     if warnings:

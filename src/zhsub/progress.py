@@ -24,6 +24,9 @@ STAGE_LABELS = {
     "glossary": "Trích thuật ngữ",
     "translate": "Dịch",
     "render": "Xuất phụ đề",
+    "tts_preview": "Nghe thử giọng",
+    "tts_calibrate": "Hiệu chuẩn giọng",
+    "tts_render": "Sinh audio lồng tiếng",
 }
 
 # Rough share of a full run per stage, for a single overall progress bar. Measured
@@ -36,6 +39,14 @@ STAGE_WEIGHTS = {
     "glossary": 0.10,
     "translate": 0.60,
     "render": 0.05,
+}
+
+# TTS runs have their own progress scale and must not change the denominator used
+# by the core pipeline's overall progress bar.
+TTS_STAGE_WEIGHTS = {
+    "tts_preview": 1.0,
+    "tts_calibrate": 1.0,
+    "tts_render": 1.0,
 }
 
 
@@ -84,6 +95,11 @@ class RunContext:
         self._on_progress = on_progress
         self._cancel = cancel or threading.Event()
         self._stages = stages or list(STAGE_WEIGHTS)
+        self._weights = (
+            TTS_STAGE_WEIGHTS
+            if self._stages and all(stage in TTS_STAGE_WEIGHTS for stage in self._stages)
+            else STAGE_WEIGHTS
+        )
         self._stage: str = self._stages[0] if self._stages else "ingest"
 
     # -- cancellation ------------------------------------------------------
@@ -113,9 +129,9 @@ class RunContext:
             return
 
         stage_fraction = min(max(stage_fraction, 0.0), 1.0)
-        done = sum(STAGE_WEIGHTS.get(s, 0.0) for s in self._stages_before(self._stage))
-        current = STAGE_WEIGHTS.get(self._stage, 0.0)
-        total = sum(STAGE_WEIGHTS.get(s, 0.0) for s in self._stages) or 1.0
+        done = sum(self._weights.get(s, 0.0) for s in self._stages_before(self._stage))
+        current = self._weights.get(self._stage, 0.0)
+        total = sum(self._weights.get(s, 0.0) for s in self._stages) or 1.0
 
         self._on_progress(
             Progress(

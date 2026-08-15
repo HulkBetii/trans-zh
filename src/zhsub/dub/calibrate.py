@@ -64,7 +64,21 @@ def fit(points: list[tuple[int, float]]) -> tuple[float, float]:
 
 
 def calibration_hash(calibration: TtsCalibration) -> str:
-    return sha256_json_canonical(calibration.model_dump(mode="json"))
+    """Hash only the calibration values that affect synthesized audio.
+
+    SQLite intentionally stores the reusable coefficients rather than the
+    original probe files and points. Including provenance fields here made the
+    same calibration hash differently after it was reloaded from the database.
+    """
+    return sha256_json_canonical(
+        {
+            "provider": calibration.provider,
+            "voice_id": calibration.voice_id,
+            "sample_count": calibration.sample_count,
+            "overhead_sec": calibration.overhead_sec,
+            "sec_per_syllable": calibration.sec_per_syllable,
+        }
+    )
 
 
 def calibrate_voice(

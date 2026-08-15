@@ -6,7 +6,8 @@ import pytest
 
 from zhsub.config import Config
 from zhsub.dub import calibrate
-from zhsub.dub.calibrate import fit, pick_samples
+from zhsub.dub.calibrate import calibration_hash, fit, pick_samples
+from zhsub.models import TtsCalibration, TtsCalibrationPoint
 
 
 def test_samples_span_short_to_long():
@@ -45,6 +46,26 @@ def test_fit_needs_samples_of_differing_length():
     """Mọi mẫu cùng số âm tiết thì hệ vô định — báo lỗi thay vì trả số bịa."""
     with pytest.raises(ValueError, match="cùng số âm tiết"):
         fit([(10, 2.3), (10, 2.4), (10, 2.2)])
+
+
+def test_calibration_hash_ignores_provenance_not_persisted_in_sqlite():
+    original = TtsCalibration(
+        voice_id="voice-a",
+        overhead_sec=0.15,
+        sec_per_syllable=0.217,
+        samples_hash="original-samples",
+        created_at="2026-01-01T00:00:00Z",
+        points=[TtsCalibrationPoint(syllables=4, duration_sec=1.1)],
+    )
+    reloaded = original.model_copy(
+        update={
+            "samples_hash": "database-revision",
+            "created_at": "2026-02-01T00:00:00Z",
+            "points": [],
+        }
+    )
+
+    assert calibration_hash(original) == calibration_hash(reloaded)
 
 
 def test_calibration_accepts_a_voice_override_without_changing_job_voice(

@@ -14,7 +14,7 @@ from pathlib import Path
 
 from .config import Config
 from .jobs import STAGES, JobStore
-from .progress import RunContext, ensure_context
+from .progress import Cancelled, RunContext, ensure_context
 from .stages import s0_ingest, s1_asr, s2_segment, s3_glossary, s4_translate, s5_render
 
 log = logging.getLogger(__name__)
@@ -59,17 +59,22 @@ def run_job(
     log.info("Job %s: chạy %s", job_id, " -> ".join(todo))
 
     for stage in todo:
-        ctx.enter_stage(stage)
-        if store is not None:
-            store.mark_running(job_id, stage)
         try:
+            ctx.enter_stage(stage)
+            if store is not None:
+                store.mark_running(job_id, stage)
             _run_stage(stage, req, cfg, work_dir, job_id, ctx)
+            ctx.report(1.0)
+        except Cancelled:
+            if store is not None:
+                store.mark_job_cancelled(job_id, stage)
+            log.info("Job %s được huỷ an toàn ở stage %s", job_id, stage)
+            raise
         except Exception as exc:
             if store is not None:
                 store.mark_failed(job_id, stage, f"{type(exc).__name__}: {exc}")
             log.error("Job %s hỏng ở stage %s: %s", job_id, stage, exc)
             raise
-        ctx.report(1.0)
         if store is not None:
             store.mark_stage_done(job_id, stage)
 

@@ -21,6 +21,8 @@ dependencies = [
     "rich>=14.0",
     # LLM providers
     "httpx>=0.28",
+    # OS credential vault for API keys managed by the local Studio.
+    "keyring>=25.6",
     # Ingest
     "yt-dlp>=2025.1.15",
 ]
@@ -58,6 +60,9 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build]
+artifacts = ["src/zhsub/web/static/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/zhsub"]

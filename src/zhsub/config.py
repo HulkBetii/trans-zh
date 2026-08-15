@@ -12,7 +12,14 @@ import tomllib
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
+
+from .credentials import (
+    CredentialStore,
+    CredentialStoreError,
+    get_default_credential_store,
+    resolve_secret,
+)
 
 DEFAULT_CONFIG_NAMES = ("zhsub.toml", "zhsub.toml.example")
 _PLACEHOLDER = "SET_ME"
@@ -138,9 +145,24 @@ class LLMProfile(BaseModel):
     temperature: float = 0.0
     max_retries: int = 3
     timeout_sec: float = 120.0
+    _credential_store: CredentialStore = PrivateAttr(
+        default_factory=get_default_credential_store
+    )
+
+    def bind_credential_store(self, store: CredentialStore) -> LLMProfile:
+        self._credential_store = store
+        return self
+
+    def credential_available(self) -> bool:
+        if self.provider == "chatgpt_web" or not self.api_key_env:
+            return True
+        try:
+            return resolve_secret(self.api_key_env, self._credential_store) is not None
+        except CredentialStoreError:
+            return False
 
     def api_key(self) -> str:
-        """Resolve the key from the environment.
+        """Resolve the key from the environment, then the OS credential vault.
 
         An empty ``api_key_env`` means the endpoint needs no auth — Ollama, LM
         Studio and vLLM all ignore the header. They do still reject a *missing*
@@ -148,11 +170,11 @@ class LLMProfile(BaseModel):
         """
         if not self.api_key_env:
             return "local"
-        key = os.environ.get(self.api_key_env, "").strip()
+        key = resolve_secret(self.api_key_env, self._credential_store)
         if not key:
             raise RuntimeError(
-                f"Chưa có API key: biến môi trường {self.api_key_env} trống. "
-                f"Đặt nó rồi chạy lại, hoặc để api_key_env = \"\" nếu endpoint chạy local."
+                f"Chưa có API key cho {self.api_key_env}. "
+                f'Đặt nó rồi chạy lại, hoặc để api_key_env = "" nếu endpoint chạy local.'
             )
         return key
 
@@ -234,13 +256,24 @@ class DubConfig(BaseModel):
     # backend — hai tài nguyên khác nhau, và `server_busy` là tín hiệu của cái thứ
     # hai. 4 luồng đã chạy sạch trên clip thử.
     concurrency: int = 4
+    _credential_store: CredentialStore = PrivateAttr(
+        default_factory=get_default_credential_store
+    )
+
+    def bind_credential_store(self, store: CredentialStore) -> DubConfig:
+        self._credential_store = store
+        return self
+
+    def credential_available(self) -> bool:
+        try:
+            return resolve_secret(self.api_key_env, self._credential_store) is not None
+        except CredentialStoreError:
+            return False
 
     def api_key(self) -> str:
-        key = os.environ.get(self.api_key_env, "").strip()
+        key = resolve_secret(self.api_key_env, self._credential_store)
         if not key:
-            raise RuntimeError(
-                f"Chưa có API key: biến môi trường {self.api_key_env} trống."
-            )
+            raise RuntimeError(f"Chưa có API key cho {self.api_key_env}.")
         return key
 
     def require_voice(self) -> str:
@@ -262,20 +295,38 @@ class Config(BaseModel):
     llm: LLMConfig = Field(default_factory=LLMConfig)
     dub: DubConfig = Field(default_factory=DubConfig)
 
+    def bind_credential_store(self, store: CredentialStore) -> Config:
+        self.llm.segment.bind_credential_store(store)
+        self.llm.translate.bind_credential_store(store)
+        self.dub.bind_credential_store(store)
+        return self
+
     @classmethod
-    def load(cls, path: str | Path | None = None) -> Config:
+    def load(
+        cls,
+        path: str | Path | None = None,
+        *,
+        credential_store: CredentialStore | None = None,
+    ) -> Config:
         """Load config, falling back to ``zhsub.toml`` then the example file.
 
         Finding neither is fine — defaults are usable, which matters for the
         benchmark stage since it never touches an LLM.
         """
         if path is not None:
-            return cls._from_file(Path(path))
-        for name in DEFAULT_CONFIG_NAMES:
-            candidate = Path.cwd() / name
-            if candidate.is_file():
-                return cls._from_file(candidate)
-        return cls()
+            config = cls._from_file(Path(path))
+        else:
+            config = cls()
+            for name in DEFAULT_CONFIG_NAMES:
+                candidate = Path.cwd() / name
+                if candidate.is_file():
+                    config = cls._from_file(candidate)
+                    break
+        return (
+            config.bind_credential_store(credential_store)
+            if credential_store is not None
+            else config
+        )
 
     @classmethod
     def _from_file(cls, path: Path) -> Config:
