@@ -438,18 +438,41 @@ hai lần.
 ### Đổi giọng thì phải đo lại
 
 `overhead_sec` và `sec_per_syllable` là số đo của **đúng một giọng**. Dùng số của
-giọng khác thì S6 tính sai tốc độ — âm thầm, không báo lỗi, chỉ hiện ra dưới dạng
-tiếng lệch khỏi hình.
+giọng khác thì S6 tính sai tốc độ khoảng 21% — trước đây âm thầm, chỉ hiện ra
+dưới dạng tiếng lệch khỏi hình sau khi đã render xong cả video.
+
+**Giờ nó từ chối chạy.** S6 không còn tự dựng hằng số cho một giọng chưa đo: hoặc
+có số đo đúng giọng, hoặc báo lỗi nêu tên cả hai giọng.
 
 ```bash
 uv run zhsub dub-calibrate <job_id> --lang vi
 ```
 
 Nó tổng hợp 8 câu dài ngắn khác nhau, cắt lặng, rồi khớp tuyến tính
-`thời lượng = overhead + số_âm_tiết × hệ_số` và in ra hai dòng để dán vào
-`zhsub.toml`. Khớp hai tham số chứ không lấy một tỉ lệ, vì mỗi câu có phần
-đầu/cuối không tỉ lệ với độ dài — với cue 1.5 giây thì chính `overhead` quyết
-định, mà cue ngắn lại là nhóm dễ tràn nhất.
+`thời lượng = overhead + số_âm_tiết × hệ_số`, **ghi vào SQLite** (bảng
+`voice_calibrations`) và in ra hai dòng tương ứng cho `zhsub.toml`. Khớp hai tham
+số chứ không lấy một tỉ lệ, vì mỗi câu có phần đầu/cuối không tỉ lệ với độ dài —
+với cue 1.5 giây thì chính `overhead` quyết định, mà cue ngắn lại là nhóm dễ tràn
+nhất.
+
+Thứ tự tra cứu: **SQLite trước, hằng số TOML sau** (và chỉ khi `voice_id` trong
+`[dub]` đúng bằng giọng của job). Studio đọc cùng bảng đó, nên hai bên không còn
+chạy bằng hai bộ số khác nhau.
+
+Mẫu đo được lưu lại theo nội dung ở `work/<job>/dub/_calibrate/`, nên chạy lại
+sau khi hỏng hoặc hủy **không tốn thêm lượt TTS nào**. Muốn đo mới hoàn toàn thì
+thêm `--force`; bấm "Hiệu chuẩn 8 mẫu" trong Studio cho một giọng đã có số đo
+cũng tự đo lại.
+
+Hai điều đã gặp khi đo thật:
+
+- **Overhead có thể ra âm.** Giọng gần như không có phần đầu/cuối nào sau khi cắt
+  lặng, lại ngắt nhịp nhiều hơn ở câu dài, thì đường thẳng khớp nhất cắt trục
+  tung dưới 0 — nghĩa là cue một âm tiết được dự đoán dài âm giây. Gặp vậy thì
+  khớp lại với overhead ghim ở 0, và phải khớp **lại** hệ số chứ không chỉ ép
+  overhead xuống 0 (ép suông làm sai số gấp gần ba lần).
+- **Đo hai lần cùng một giọng lệch nhau ~2%.** Nhà cung cấp không trả audio giống
+  hệt nhau, nên đừng coi con số đo được là chính xác tuyệt đối.
 
 ### Ba điều đo được, đừng chỉnh mò
 

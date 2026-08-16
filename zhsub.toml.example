@@ -132,9 +132,13 @@ timeout_sec = 180
 # min_gap_sec = 0.25        # nhịp thở tối thiểu giữa hai câu
 # concurrency = 4           # đừng nâng: 8 làm backend trả server_busy liên tục
 #
-# Hai hằng số dưới là SỐ ĐO của riêng voice_id ở trên. Đổi giọng thì chạy
-# `zhsub dub-calibrate <job_id>` để đo lại — dùng số của giọng khác thì S6 tính
-# sai tốc độ mà không báo lỗi gì.
+# Hai hằng số dưới là SỐ ĐO của riêng voice_id ở trên, và chỉ được dùng khi
+# giọng của job đúng bằng voice_id đó. Job dùng giọng khác mà chưa đo thì S6 TỪ
+# CHỐI chạy — trước đây nó lặng lẽ mượn hai số này và tính sai ~21% tốc độ đọc.
+#
+# Kho số đo trong SQLite (bảng voice_calibrations) được ưu tiên hơn hai dòng
+# này; `zhsub dub-calibrate <job_id>` ghi thẳng vào đó nên Studio và CLI dùng
+# chung một con số.
 # overhead_sec = 0.15
 # sec_per_syllable = 0.217
 

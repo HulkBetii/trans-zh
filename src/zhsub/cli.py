@@ -220,6 +220,43 @@ def cmd_batch(
         raise typer.Exit(code=1)
 
 
+def _resolve_dub_calibration(work_dir: Path, cfg: Config):
+    """Số đo trong SQLite trước, hằng số TOML sau, không có thì từ chối.
+
+    Đây là nơi duy nhất hằng số trong zhsub.toml còn được dùng làm hiệu chuẩn —
+    một lựa chọn tường minh của host không có database, chứ không phải mặc định
+    âm thầm chôn trong S6. Và chỉ khi giọng cấu hình ĐÚNG BẰNG giọng của job:
+    dùng chéo hai giọng là sai ~21% tốc độ đọc mà không báo gì.
+    """
+    from .dub.calibrate import (
+        VOICE_CALIBRATION_MISMATCH,
+        VOICE_NOT_CALIBRATED,
+        UncalibratedVoiceError,
+        calibration_from_config,
+        calibration_from_record,
+    )
+    from .dub.spoken import resolve_voice_id
+    from .jobs import TTS_PROVIDER, JobStore
+
+    voice_id = resolve_voice_id(work_dir, cfg.dub.configured_voice_id())
+    stored = JobStore(cfg.paths.jobs_db).get_voice_calibration(TTS_PROVIDER, voice_id)
+    if stored is not None:
+        return calibration_from_record(stored)
+
+    from_config = calibration_from_config(cfg)
+    if from_config is not None and from_config.voice_id == voice_id:
+        return from_config
+    if from_config is not None:
+        raise UncalibratedVoiceError(
+            VOICE_CALIBRATION_MISMATCH.format(
+                selected=voice_id, configured=from_config.voice_id, job=work_dir.name
+            )
+        )
+    raise UncalibratedVoiceError(
+        VOICE_NOT_CALIBRATED.format(voice=voice_id, job=work_dir.name)
+    )
+
+
 @app.command("dub")
 def cmd_dub(
     job_id: str = typer.Argument(..., help="job_id đã dịch xong"),
@@ -298,27 +335,42 @@ def cmd_dub_names(
 def cmd_dub_calibrate(
     job_id: str = typer.Argument(..., help="job_id đã dịch xong, dùng làm câu mẫu"),
     lang: str = typer.Option("vi", "--lang", "-l"),
-    samples: int = typer.Option(8, "--samples", min=3, max=20),
     config: Path | None = typer.Option(None, "--config", "-c"),
+    force: bool = typer.Option(False, "--force", help="Tổng hợp lại cả những mẫu đã có"),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ) -> None:
-    """Đo tốc độ đọc của giọng đang cấu hình, in ra hai hằng số cho [dub].
+    """Đo tốc độ đọc của giọng đang cấu hình và lưu vào kho số đo.
 
-    Phải chạy lại mỗi khi đổi `voice_id`: hai con số đó là của đúng một giọng, dùng
-    nhầm thì S6 tính sai tốc độ mà không báo lỗi gì.
+    Ghi thẳng vào SQLite để Studio và CLI dùng chung một con số. Trước đây lệnh
+    này chỉ in ra màn hình, nên hai bên có thể chạy bằng hai bộ hằng số khác nhau
+    mà không ai biết.
+
+    Bỏ tuỳ chọn --samples: mọi giá trị khác 8 đều bị chặn ở tầng dưới, nên nó chỉ
+    có thể thất bại.
     """
     _setup_logging(verbose)
-    from .dub import calibrate
+    from .dub.calibrate import calibrate_voice
+    from .jobs import TTS_PROVIDER, JobStore
 
     cfg = Config.load(config)
     work_dir = Path(cfg.paths.work_dir) / job_id
     if not work_dir.is_dir():
         raise typer.BadParameter(f"Không tìm thấy {work_dir}")
 
-    overhead, per_syllable = calibrate.run(work_dir, cfg, lang, samples)
-    typer.echo("\nDán vào zhsub.toml, mục [dub]:")
-    typer.echo(f"  overhead_sec = {overhead:.2f}")
-    typer.echo(f"  sec_per_syllable = {per_syllable:.3f}")
+    result = calibrate_voice(work_dir, cfg, lang, force=force)
+    JobStore(cfg.paths.jobs_db).save_voice_calibration(
+        TTS_PROVIDER,
+        result.voice_id,
+        result.overhead_sec,
+        result.sec_per_syllable,
+        sample_count=result.sample_count,
+        source_job_id=job_id,
+    )
+    typer.echo("")
+    typer.echo(f"Đã lưu số đo của {result.voice_id} vào {cfg.paths.jobs_db}")
+    typer.echo("Hai hằng số tương ứng trong zhsub.toml, mục [dub]:")
+    typer.echo(f"  overhead_sec = {result.overhead_sec:.3f}")
+    typer.echo(f"  sec_per_syllable = {result.sec_per_syllable:.3f}")
 
 
 @app.command("chatgpt-login")

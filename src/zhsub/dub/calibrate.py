@@ -21,6 +21,7 @@ import logging
 from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from ..config import Config
 from ..jsonio import sha256_json_canonical
@@ -32,7 +33,6 @@ from .spoken import effective_spoken_items, resolve_voice_id
 
 log = logging.getLogger(__name__)
 
-MIN_SAMPLES = 3  # Legacy export; shared calibration itself always uses eight.
 CALIBRATION_SAMPLE_COUNT = 8
 
 
@@ -162,6 +162,57 @@ def _fetch_probe(
     return False
 
 
+def calibration_revision(record: Any) -> str:
+    """Chữ ký của một dòng số đo trong SQLite, dùng cho khóa lạc quan."""
+    return sha256_json_canonical(
+        {
+            "provider": record.provider,
+            "voice_id": record.voice_id,
+            "overhead_sec": record.overhead_sec,
+            "sec_per_syllable": record.sec_per_syllable,
+            "sample_count": record.sample_count,
+        }
+    )
+
+
+def calibration_from_record(record: Any) -> TtsCalibration:
+    """SQLite -> TtsCalibration. Một bản duy nhất: trước đây có ba, mỗi nơi một kiểu."""
+    return TtsCalibration(
+        voice_id=record.voice_id,
+        overhead_sec=record.overhead_sec,
+        sec_per_syllable=record.sec_per_syllable,
+        sample_count=record.sample_count,
+        samples_hash=calibration_revision(record),
+        created_at=(
+            datetime.fromtimestamp(record.updated_at, timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z")
+            if getattr(record, "updated_at", None)
+            else ""
+        ),
+        points=[],
+    )
+
+
+def calibration_from_config(cfg: Config) -> TtsCalibration | None:
+    """Hai hằng số trong zhsub.toml, gắn với ĐÚNG giọng ghi cùng chỗ.
+
+    Không đoán tên giọng: chính chỗ đó là lỗi cũ. Chưa đặt voice_id thì không có
+    số đo nào để nói tới.
+    """
+    voice_id = cfg.dub.configured_voice_id()
+    if voice_id is None:
+        return None
+    return TtsCalibration(
+        voice_id=voice_id,
+        overhead_sec=cfg.dub.overhead_sec,
+        sec_per_syllable=cfg.dub.sec_per_syllable,
+        samples_hash="config",
+        created_at="config",
+        points=[],
+    )
+
+
 def calibrate_voice(
     work_dir,
     cfg: Config,
@@ -251,24 +302,3 @@ def calibrate_voice(
             for syllables, duration in points
         ],
     )
-
-
-def run(
-    work_dir,
-    cfg: Config,
-    lang: str,
-    samples: int = CALIBRATION_SAMPLE_COUNT,
-    *,
-    voice_id: str | None = None,
-    progress: Callable[[float, str], None] | None = None,
-) -> tuple[float, float]:
-    """Legacy CLI wrapper returning the two historical TOML constants."""
-    result = calibrate_voice(
-        work_dir,
-        cfg,
-        lang,
-        samples,
-        voice_id=voice_id,
-        progress=progress,
-    )
-    return result.overhead_sec, result.sec_per_syllable

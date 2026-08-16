@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from ..config import Config
+from ..dub.calibrate import calibration_from_record
 from ..jobs import TTS_PROVIDER, Run, JobStore
 from ..progress import Cancelled, Progress
 
@@ -265,15 +266,7 @@ class RunScheduler:
         if calibration is None and voice_id:
             stored = self.store.get_voice_calibration(TTS_PROVIDER, str(voice_id))
             if stored is not None:
-                calibration = {
-                    "voice_id": stored.voice_id,
-                    "overhead_sec": stored.overhead_sec,
-                    "sec_per_syllable": stored.sec_per_syllable,
-                    "sample_count": stored.sample_count,
-                    "samples_hash": payload.get("calibration_hash", "stored"),
-                    "created_at": str(stored.updated_at),
-                    "points": [],
-                }
+                calibration = calibration_from_record(stored)
 
         if run.kind == "tts_preview":
             segment_id = int(payload["segment_id"])

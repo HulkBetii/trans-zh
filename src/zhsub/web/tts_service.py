@@ -9,7 +9,12 @@ from pathlib import Path
 from typing import Any, Callable
 
 from ..config import Config
-from ..dub.calibrate import VOICE_NOT_CALIBRATED, calibrate_voice
+from ..dub.calibrate import (
+    VOICE_NOT_CALIBRATED,
+    calibrate_voice,
+    calibration_from_record as _calibration_model,
+    calibration_revision as _calibration_revision,
+)
 from ..dub.client import SpeechClient
 from ..dub.spoken import (
     SpeechConflictError,
@@ -57,29 +62,6 @@ def _utc_iso(timestamp: float | None) -> str | None:
     if timestamp is None:
         return None
     return datetime.fromtimestamp(timestamp, timezone.utc).isoformat().replace("+00:00", "Z")
-
-
-def _calibration_revision(record: Any) -> str:
-    return sha256_json_canonical(
-        {
-            "provider": record.provider,
-            "voice_id": record.voice_id,
-            "overhead_sec": record.overhead_sec,
-            "sec_per_syllable": record.sec_per_syllable,
-            "sample_count": record.sample_count,
-        }
-    )
-
-
-def _calibration_model(record: Any) -> TtsCalibration:
-    return TtsCalibration(
-        voice_id=record.voice_id,
-        overhead_sec=record.overhead_sec,
-        sec_per_syllable=record.sec_per_syllable,
-        samples_hash=_calibration_revision(record),
-        created_at=_utc_iso(record.created_at) or "",
-        points=[],
-    )
 
 
 def _voice_tier(item: dict[str, Any]) -> str | None:
