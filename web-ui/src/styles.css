@@ -703,6 +703,12 @@ code, time, .mono-input { font-family: "IBM Plex Mono", monospace; }
 .tts-voice-dialog { width: min(760px, 100%); max-height: min(760px, 90vh); display: flex; flex-direction: column; background: var(--stone-0); box-shadow: 0 30px 90px rgba(0,0,0,.25); }
 .tts-voice-dialog > header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
 .tts-voice-dialog h2 { font-size: 18px; }
+.tts-voice-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 12px 16px 5px; }
+.tts-voice-filters .tts-voice-search { flex: 1 1 220px; margin: 0; }
+.tts-voice-ownership { display: flex; flex: 0 0 auto; gap: 2px; padding: 2px; background: var(--stone-1); }
+.tts-voice-ownership button { padding: 5px 11px; border: 0; background: transparent; color: var(--muted); font-size: 11px; }
+.tts-voice-ownership button:hover { color: var(--ink); }
+.tts-voice-ownership button.active { background: var(--cinnabar); color: white; }
 .tts-voice-search { display: flex; align-items: center; gap: 8px; margin: 12px 16px 5px; padding: 8px 9px; color: var(--muted); border-bottom: 1px solid var(--line-strong); }
 .tts-voice-search:focus-within { border-color: var(--cinnabar); }
 .tts-voice-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font-size: 11px; }

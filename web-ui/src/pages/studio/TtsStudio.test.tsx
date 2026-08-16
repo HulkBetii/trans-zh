@@ -161,6 +161,55 @@ test("selects a voice in the library and saves the revisioned setting", async ()
   expect(JSON.parse(String(put?.[1]?.body))).toEqual({ revision: "tts-rev-1", voice_id: "voice-2" });
 });
 
+test("browses community voices, which the provider hides unless asked for", async () => {
+  // Nhà cung cấp mặc định chỉ trả 25 giọng chính hãng; cả thư viện là 1268. Giọng
+  // dự án đang dùng (Duy Onyx) nằm ở nhóm cộng đồng nên trước đây không hề hiện ra.
+  const noVoiceWorkspace = { ...workspace, voice_id: null, selected_voice: null, calibration: null, allowed_actions: ["calibrate"] as const };
+  const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes("/tts/voices")) {
+      const community = new URL(url, "http://localhost").searchParams.get("ownership") === "community";
+      return jsonResponse({
+        items: [community
+          ? { voice_id: "vbee_n_hn_male_duyonyx_oaistable_vc", name: "Duy Onyx", locale: "vi-VN", gender: "male" }
+          : { voice_id: "vbee_hn_female_ngochuyen", name: "HN - Ngọc Huyền", locale: "vi-VN", gender: "female" }],
+        page: 1, page_size: 30, total: 1, has_more: false, credits: null,
+      });
+    }
+    return jsonResponse(noVoiceWorkspace);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  const user = userEvent.setup();
+  renderApp(<TtsStudio job={job} />);
+
+  await user.click(await screen.findByRole("button", { name: "Mở thư viện giọng" }));
+  expect(await screen.findByRole("button", { name: /Ngọc Huyền/ })).toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "Cộng đồng" }));
+
+  expect(await screen.findByRole("button", { name: /Duy Onyx/ })).toBeInTheDocument();
+  expect(fetchMock.mock.calls.some(([input]) => String(input).includes("ownership=community"))).toBe(true);
+});
+
+test("asks for every voice source by default", async () => {
+  const noVoiceWorkspace = { ...workspace, voice_id: null, selected_voice: null, calibration: null, allowed_actions: ["calibrate"] as const };
+  const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    if (String(input).includes("/tts/voices")) {
+      return jsonResponse({ items: [], page: 1, page_size: 30, total: 0, has_more: false, credits: null });
+    }
+    return jsonResponse(noVoiceWorkspace);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  const user = userEvent.setup();
+  renderApp(<TtsStudio job={job} />);
+
+  await user.click(await screen.findByRole("button", { name: "Mở thư viện giọng" }));
+
+  await waitFor(() => expect(
+    fetchMock.mock.calls.some(([input]) => String(input).includes("ownership=all")),
+  ).toBe(true));
+});
+
 test("keeps voice setup available before a voice has generated the cue plan", async () => {
   const noVoiceWorkspace = { ...workspace, voice_id: null, selected_voice: null, calibration: null, cues: [], total_cues: 0, allowed_actions: [] as const };
   vi.stubGlobal("fetch", vi.fn(async () => jsonResponse(noVoiceWorkspace)));

@@ -29,6 +29,7 @@ import type {
   TtsExecutionStatus,
   TtsVoice,
   TtsWorkspace,
+  VoiceOwnership,
 } from "../../api/types";
 import { EmptyState } from "../../components/EmptyState";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
@@ -565,13 +566,15 @@ function TtsInspector({ cue, dirty, onClose }: { cue: TtsCue; dirty: boolean; on
 
 function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open: boolean; selectedVoiceId: string; onClose: () => void; onSelect: (voice: TtsVoice) => void }) {
   const [search, setSearch] = useState("");
+  const [ownership, setOwnership] = useState<VoiceOwnership>("all");
   const [page, setPage] = useState(1);
   const [voices, setVoices] = useState<TtsVoice[]>([]);
-  const query = useTtsVoices({ search, page, page_size: 30 }, open);
+  const query = useTtsVoices({ search, page, page_size: 30, ownership }, open);
   const dialogRef = useDialogFocus<HTMLElement>(open, onClose);
   useEffect(() => {
     if (!open) {
       setSearch("");
+      setOwnership("all");
       setPage(1);
       setVoices([]);
     }
@@ -585,7 +588,22 @@ function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open
     <div className="modal-layer" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section ref={dialogRef} className="tts-voice-dialog" role="dialog" aria-modal="true" aria-labelledby="tts-voice-title">
         <header><div><span className="eyebrow">Voice library · Vbee</span><h2 id="tts-voice-title">Chọn giọng tiếng Việt</h2></div><button className="icon-button" onClick={onClose} aria-label="Đóng thư viện giọng"><X size={19} /></button></header>
-        <label className="tts-voice-search"><Search size={15} /><input autoFocus value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); setVoices([]); }} placeholder="Tìm tên, vùng, giới tính…" /></label>
+        <div className="tts-voice-filters">
+          <label className="tts-voice-search"><Search size={15} /><input autoFocus value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); setVoices([]); }} placeholder="Tìm tên, vùng, giới tính…" /></label>
+          <div className="tts-voice-ownership" role="group" aria-label="Nguồn giọng">
+            {voiceOwnershipOptions.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={ownership === option.id ? "active" : ""}
+                aria-pressed={ownership === option.id}
+                onClick={() => { setOwnership(option.id); setPage(1); setVoices([]); }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="tts-voice-list" aria-live="polite">
           {query.isLoading && voices.length === 0 && <div className="tts-dialog-message"><LoaderCircle className="spin" size={18} />Đang lấy thư viện giọng…</div>}
           {query.isError && <div className="tts-dialog-message tts-danger"><AlertTriangle size={18} />{errorMessage(query.error)}</div>}
@@ -598,6 +616,14 @@ function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open
     </div>
   );
 }
+
+// Giọng chính hãng chỉ có 25; cả thư viện là 1268. Mặc định "Tất cả" vì giọng dự
+// án đang dùng (Duy Onyx) nằm ở nhóm cộng đồng.
+const voiceOwnershipOptions: { id: VoiceOwnership; label: string }[] = [
+  { id: "all", label: "Tất cả" },
+  { id: "vbee", label: "Vbee" },
+  { id: "community", label: "Cộng đồng" },
+];
 
 function deduplicateVoices(voices: TtsVoice[]): TtsVoice[] {
   return [...new Map(voices.map((voice) => [voice.voice_id, voice])).values()];

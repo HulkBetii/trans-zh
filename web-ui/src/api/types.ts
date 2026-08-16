@@ -75,6 +75,8 @@ export type TtsOverrideState = Schemas["TtsCueResponse"]["override_state"];
 export type TtsPreviewState = Schemas["TtsCueResponse"]["preview_state"];
 export type TtsVoice = Schemas["TtsVoiceResponse"];
 export type TtsVoicePage = Schemas["TtsVoicePage"];
+/** Nguồn giọng vbee. Chính hãng chỉ có 25 giọng; cả thư viện là 1268. */
+export type VoiceOwnership = "all" | "vbee" | "community";
 export type VoiceCalibration = Schemas["VoiceCalibrationResponse"];
 export type TtsCue = Schemas["TtsCueResponse"];
 export type TtsWorkspace = Omit<TtsWorkspaceDto, "latest_run" | "active_run" | "attention_reasons" | "allowed_actions" | "cues"> & {

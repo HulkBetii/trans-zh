@@ -36,6 +36,19 @@ from .schemas import (
 
 PROVIDER = "ai33_vbee"
 LANGUAGE = "vi"
+#: Nguồn giọng của vbee. Mặc định của nhà cung cấp là chỉ giọng chính hãng (25
+#: giọng); cả thư viện là 1268.
+VOICE_OWNERSHIPS = ("all", "vbee", "community")
+
+
+def _is_vietnamese(item: dict[str, Any]) -> bool:
+    if str(item.get("language") or "").casefold() == "vietnamese":
+        return True
+    return any(
+        str(child.get("locale") or "").casefold().startswith("vi")
+        for child in item.get("languages") or []
+        if isinstance(child, dict)
+    )
 CALIBRATION_SAMPLES = 8
 log = logging.getLogger(__name__)
 
@@ -151,40 +164,42 @@ class TtsService:
             )
         return SpeechClient(self.config.dub.base_url, self.config.dub.api_key())
 
-    def voices(self, *, search: str = "", page: int = 1, page_size: int = 30) -> TtsVoicePage:
+    def voices(
+        self,
+        *,
+        search: str = "",
+        page: int = 1,
+        page_size: int = 30,
+        ownership: str = "all",
+    ) -> TtsVoicePage:
+        """Một trang thư viện giọng.
+
+        Phân trang và tìm kiếm để nhà cung cấp làm, không làm lại trong bộ nhớ:
+        thư viện có 1268 giọng khi tính cả nhóm cộng đồng, nên cách cũ (lấy 100 mục
+        đầu rồi tự cắt trang) khiến trang thứ tư trở đi luôn rỗng và ô tìm kiếm chỉ
+        soi được trong 100 mục đó.
+        """
         if page < 1 or page_size < 1 or page_size > 100:
             raise ValueError("invalid voice page")
+        if ownership not in VOICE_OWNERSHIPS:
+            raise ValueError(f"invalid voice ownership: {ownership!r}")
         client = self._client()
         try:
-            raw = client.voices(
+            raw, total = client.voice_page(
                 provider="vbee",
                 language="Vietnamese",
                 search=search,
-                page=1,
-                page_size=100,
+                page=page,
+                page_size=page_size,
+                voice_ownership=ownership,
             )
-            filtered: list[dict[str, Any]] = []
-            query = search.strip().casefold()
-            for item in raw:
-                language = str(item.get("language") or "").casefold()
-                languages = item.get("languages") or []
-                is_vietnamese = language == "vietnamese" or any(
-                    str(child.get("locale") or "").casefold().startswith("vi")
-                    for child in languages
-                    if isinstance(child, dict)
-                )
-                if not is_vietnamese:
-                    continue
-                haystack = " ".join(
-                    str(item.get(key) or "")
-                    for key in ("voice_id", "name", "description", "locale", "gender", "age", "category")
-                ).casefold()
-                if query and query not in haystack:
-                    continue
-                filtered.append(item)
-            total = len(filtered)
-            offset = (page - 1) * page_size
-            rows = filtered[offset : offset + page_size]
+            # Chốt chặn cuối: chỉ nhận giọng tiếng Việt. Đã truyền language cho nhà
+            # cung cấp nên bình thường không bỏ gì; nếu có thì trừ khỏi tổng để số
+            # đếm khớp danh sách đang hiện. Trên nhiều trang con số thành xấp xỉ,
+            # nhưng danh sách đúng quan trọng hơn con số đúng — một giọng tiếng Anh
+            # lọt vào sẽ đọc hỏng cả video.
+            rows = [item for item in raw if _is_vietnamese(item)]
+            total = max(0, total - (len(raw) - len(rows)))
             items = [
                 TtsVoiceResponse(
                     voice_id=str(item.get("voice_id") or ""),
@@ -215,7 +230,7 @@ class TtsService:
                 page=page,
                 page_size=page_size,
                 total=total,
-                has_more=offset + len(items) < total,
+                has_more=page * page_size < total,
                 credits=credits,
             )
         finally:

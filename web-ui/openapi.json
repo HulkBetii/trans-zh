@@ -220,6 +220,21 @@
               "default": 30,
               "title": "Page Size"
             }
+          },
+          {
+            "name": "ownership",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "all",
+                "vbee",
+                "community"
+              ],
+              "type": "string",
+              "default": "all",
+              "title": "Ownership"
+            }
           }
         ],
         "responses": {

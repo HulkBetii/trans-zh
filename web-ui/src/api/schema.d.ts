@@ -1605,6 +1605,7 @@ export interface operations {
                 search?: string;
                 page?: number;
                 page_size?: number;
+                ownership?: "all" | "vbee" | "community";
             };
             header?: never;
             path?: never;

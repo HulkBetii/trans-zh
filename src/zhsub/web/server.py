@@ -1496,10 +1496,15 @@ def create_app(
         search: str = "",
         page: int = Query(1, ge=1),
         page_size: int = Query(30, ge=1, le=100),
+        ownership: Literal["all", "vbee", "community"] = "all",
     ) -> TtsVoicePage:
         service = get_tts_service()
         try:
-            return service.voices(search=search, page=page, page_size=page_size)
+            return service.voices(
+                search=search, page=page, page_size=page_size, ownership=ownership
+            )
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
         except RuntimeError as exc:
             raise HTTPException(503, str(exc)) from exc
         except DubError as exc:

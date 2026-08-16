@@ -12,6 +12,7 @@ import type {
   JobsPage,
   RunEvent,
   RunRecord,
+  VoiceOwnership,
 } from "./types";
 
 export const queryKeys = {
@@ -94,7 +95,10 @@ export function useTts(jobId: string) {
   });
 }
 
-export function useTtsVoices(params: { search?: string; page?: number; page_size?: number }, enabled = true) {
+export function useTtsVoices(
+  params: { search?: string; page?: number; page_size?: number; ownership?: VoiceOwnership },
+  enabled = true,
+) {
   return useQuery({
     queryKey: queryKeys.ttsVoices(params),
     queryFn: () => api.ttsVoices(params),

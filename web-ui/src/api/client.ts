@@ -29,6 +29,7 @@ import type {
   TtsWorkspace,
   TtsWorkspaceDto,
   SpokenOverrideUpdateRequest,
+  VoiceOwnership,
 } from "./types";
 
 const API_BASE = "/api/v1";
@@ -241,11 +242,14 @@ export const api = {
       body: JSON.stringify({ revision, changes }),
     }).then(normalizeSubtitles),
 
-  ttsVoices: (params: { search?: string; page?: number; page_size?: number } = {}) => {
+  ttsVoices: (
+    params: { search?: string; page?: number; page_size?: number; ownership?: VoiceOwnership } = {},
+  ) => {
     const query = new URLSearchParams();
     if (params.search) query.set("search", params.search);
     if (params.page) query.set("page", String(params.page));
     if (params.page_size) query.set("page_size", String(params.page_size));
+    if (params.ownership) query.set("ownership", params.ownership);
     return request<TtsVoicePage>(`/tts/voices?${query}`);
   },
   tts: (jobId: string) =>

@@ -164,7 +164,7 @@ class SpeechClient:
         finally:
             tmp.unlink(missing_ok=True)
 
-    def voices(
+    def voice_page(
         self,
         provider: str = "vbee",
         *,
@@ -172,8 +172,20 @@ class SpeechClient:
         search: str = "",
         page: int = 1,
         page_size: int = 50,
-    ) -> list[dict[str, Any]]:
-        """Return the provider voice library without exposing credentials."""
+        voice_ownership: str = "all",
+    ) -> tuple[list[dict[str, Any]], int]:
+        """Một trang thư viện giọng, kèm tổng số thật để phân trang cho đúng.
+
+        ``voice_ownership`` là tham số riêng của vbee: ``vbee`` chỉ giọng chính
+        hãng, ``community`` chỉ giọng cộng đồng, ``all`` cả hai. Không truyền thì
+        nhà cung cấp mặc định chỉ trả giọng chính hãng — đo được 25 giọng, trong khi
+        ``all`` cho 1268. Chính giọng dự án đang dùng
+        (``vbee_n_hn_male_duyonyx_oaistable_vc``, tên hiển thị "Duy Onyx") nằm ở
+        nhóm cộng đồng, nên trước đây nó không hề xuất hiện trong danh sách chọn.
+
+        Trả kèm ``total`` vì thư viện giờ lớn hơn một trang rất nhiều: lấy 100 mục
+        đầu rồi phân trang trong bộ nhớ sẽ khiến trang thứ tư trở đi rỗng.
+        """
         if page < 1 or not 1 <= page_size <= 100:
             raise ValueError("invalid voice page")
         params: dict[str, Any] = {
@@ -182,17 +194,30 @@ class SpeechClient:
             "page": page,
             "page_size": page_size,
         }
+        if provider == "vbee" and voice_ownership:
+            params["voice_ownership"] = voice_ownership
         if search.strip():
             params["search"] = search.strip()
+
         body = self._request("GET", "/v3/voices", params=params)
         if isinstance(body, list):
-            return [item for item in body if isinstance(item, dict)]
+            items = [item for item in body if isinstance(item, dict)]
+            return items, len(items)
         if isinstance(body, dict):
             for key in ("voices", "data", "items"):
-                items = body.get(key)
-                if isinstance(items, list):
-                    return [item for item in items if isinstance(item, dict)]
+                rows = body.get(key)
+                if isinstance(rows, list):
+                    items = [item for item in rows if isinstance(item, dict)]
+                    pagination = body.get("pagination")
+                    total = len(items)
+                    if isinstance(pagination, dict) and isinstance(pagination.get("total"), int):
+                        total = pagination["total"]
+                    return items, total
         raise DubError(f"/v3/voices trả về dữ liệu không hợp lệ: {body}")
+
+    def voices(self, provider: str = "vbee", **kwargs: Any) -> list[dict[str, Any]]:
+        """Chỉ danh sách, bỏ tổng số — cho chỗ gọi không cần phân trang."""
+        return self.voice_page(provider, **kwargs)[0]
 
     def credits(self) -> int:
         return int(self._request("GET", "/v1/credits").get("credits", 0))

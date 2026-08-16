@@ -198,8 +198,16 @@ def _save_calibration(store: JobStore, job_id: str) -> None:
 
 
 class _FakeSpeechClient:
+    #: Tham số của lần gọi gần nhất, để test kiểm nguồn giọng được truyền xuống.
+    last_params: dict = {}
+
     def __init__(self, *_args, **_kwargs) -> None:
         pass
+
+    def voice_page(self, provider: str = "vbee", **kwargs):
+        _FakeSpeechClient.last_params = {"provider": provider, **kwargs}
+        rows = self.voices()
+        return rows, len(rows)
 
     def voices(self, **_kwargs):
         return [

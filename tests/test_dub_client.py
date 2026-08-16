@@ -127,6 +127,9 @@ def test_voice_library_accepts_wrapped_ai33_responses(monkeypatch):
         "language": "Vietnamese",
         "page": 1,
         "page_size": 50,
+        # Không truyền thì nhà cung cấp chỉ trả 25 giọng chính hãng, trong khi cả
+        # thư viện là 1268 — kể cả giọng dự án đang dùng.
+        "voice_ownership": "all",
     }
 
     client.close()
