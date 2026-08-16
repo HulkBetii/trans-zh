@@ -34,11 +34,8 @@ class PathsConfig(BaseModel):
     # trong server, tính tương đối với cwd — nghĩa là một app đã cài sẽ ghi ra
     # bất kỳ đâu mà shortcut trỏ tới, và bộ test ghi thẳng vào output/ của repo.
     #
-    # CHƯA XONG: chỉ job MỚI đọc giá trị này. Job cũ không có request_json đi qua
-    # `_snapshot_for` / `_allowed_output_roots` trong web/server.py, hai chỗ vẫn
-    # nằm cứng "output" vì chúng là hàm cấp module không với tới config. Đổi giá
-    # trị này thì những job đó tìm output sai chỗ và tải về sẽ 404. Để sửa hẳn
-    # phải luồn config qua `_artifacts_for` và ~11 nơi gọi `_snapshot_for`.
+    # Job cũ không có request_json cũng theo giá trị này: `_snapshot_for` dựng
+    # snapshot từ gốc được truyền vào, nên không còn nhánh nào tự đoán "output".
     output_dir: str = "output"
 
 

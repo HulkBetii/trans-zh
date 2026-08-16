@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import partial
 import hashlib
 import importlib.util
 import ipaddress
@@ -197,7 +198,12 @@ def _source_title(source: SourceRequest, job_id: str) -> str:
     return tail or parsed.hostname or job_id
 
 
-def _snapshot_for(job: Job) -> JobRequestSnapshot:
+def _output_root(runtime: RunScheduler) -> Path:
+    """Gốc thư mục output theo cấu hình đang chạy."""
+    return Path(runtime.config.paths.output_dir)
+
+
+def _snapshot_for(job: Job, output_root: Path) -> JobRequestSnapshot:
     if job.request is not None:
         try:
             return JobRequestSnapshot.model_validate(job.request)
@@ -212,7 +218,7 @@ def _snapshot_for(job: Job) -> JobRequestSnapshot:
         targets=[target for target in job.targets if target in {"vi", "en"}] or ["vi"],
         formats=["srt", "ass"],
         bilingual=False,
-        output_dir=str(Path("output").resolve()),
+        output_dir=str(output_root.resolve(strict=False)),
     )
 
 
@@ -288,10 +294,11 @@ def _artifact_language(name: str) -> str | None:
     return match.group(1).lower() if match else None
 
 
-def _allowed_output_roots(job: Job, snapshot: JobRequestSnapshot) -> list[Path]:
-    if job.request is not None:
-        return [Path(snapshot.output_dir).resolve(strict=False)]
-    return [Path("output").resolve(strict=False)]
+def _allowed_output_roots(snapshot: JobRequestSnapshot) -> list[Path]:
+    """Snapshot luôn mang gốc đúng rồi — kể cả job cũ không có request_json, vì
+    `_snapshot_for` dựng nó từ cấu hình. Nhánh fallback thứ hai ở đây từng là bản
+    sao thứ hai của hằng "output", và là chỗ duy nhất còn phớt lờ cấu hình."""
+    return [Path(snapshot.output_dir).resolve(strict=False)]
 
 
 def _render_report(work_dir: Path) -> RenderReport | None:
@@ -314,7 +321,7 @@ def _tts_report(work_dir: Path) -> TtsReport | None:
         return None
 
 
-def _tts_output_stale(job: Job, store: JobStore, report: TtsReport) -> bool:
+def _tts_output_stale(job: Job, store: JobStore, report: TtsReport, output_root: Path) -> bool:
     try:
         speech = get_speech_state(job.work_dir, report.voice_id)
     except (OSError, ValueError, json.JSONDecodeError):
@@ -334,7 +341,7 @@ def _tts_output_stale(job: Job, store: JobStore, report: TtsReport) -> bool:
         report.voice_id != speech.voice_id
         or report.speech_revision != speech.revision
         or report.calibration_hash != calibration_hash(calibration)
-        or report.subtitle_approval_signature != _approval_signature(job)
+        or report.subtitle_approval_signature != _approval_signature(job, output_root)
     )
 
 
@@ -405,12 +412,12 @@ def _expected_subtitle_paths(
     return expected
 
 
-def _artifacts_for(job: Job, store: JobStore | None = None) -> list[ArtifactResponse]:
+def _artifacts_for(job: Job, output_root: Path, store: JobStore | None = None) -> list[ArtifactResponse]:
     work_dir = Path(job.work_dir)
-    snapshot = _snapshot_for(job)
+    snapshot = _snapshot_for(job, output_root)
     render_report = _render_report(work_dir)
     tts_report = _tts_report(work_dir)
-    roots = _allowed_output_roots(job, snapshot)
+    roots = _allowed_output_roots(snapshot)
     expected_paths = _expected_subtitle_paths(job, snapshot)
     candidates: list[tuple[Path, str]] = []
     if render_report is not None:
@@ -459,7 +466,7 @@ def _artifacts_for(job: Job, store: JobStore | None = None) -> list[ArtifactResp
                 tts_report is None
                 or tts_output_path != path
                 or store is None
-                or _tts_output_stale(job, store, tts_report)
+                or _tts_output_stale(job, store, tts_report, output_root)
             )
         state: Literal["current", "stale", "missing"] = (
             "missing" if not exists else "stale" if stale else "current"
@@ -510,9 +517,10 @@ def _artifacts_for(job: Job, store: JobStore | None = None) -> list[ArtifactResp
 def _attention_reasons(
     job: Job,
     store: JobStore,
+    output_root: Path,
 ) -> tuple[list[str], bool, list[ArtifactResponse]]:
     work_dir = Path(job.work_dir)
-    snapshot = _snapshot_for(job)
+    snapshot = _snapshot_for(job, output_root)
     reasons: list[str] = []
     health = _safe_health(work_dir)
     if health.method == "rule_fallback":
@@ -530,7 +538,7 @@ def _attention_reasons(
         reasons.append("stale_overrides")
     if base_changed:
         reasons.append("override_base_changed")
-    artifacts = _artifacts_for(job, store)
+    artifacts = _artifacts_for(job, output_root, store)
     report_exists = (work_dir / "render_report.json").is_file()
     if (report_exists or job.status == "done") and any(
         item.kind == "subtitle" and item.state in {"stale", "missing"}
@@ -540,9 +548,9 @@ def _attention_reasons(
     return list(dict.fromkeys(reasons)), glossary_stale, artifacts
 
 
-def _approval_signature(job: Job) -> str:
+def _approval_signature(job: Job, output_root: Path) -> str:
     work_dir = Path(job.work_dir)
-    snapshot = _snapshot_for(job)
+    snapshot = _snapshot_for(job, output_root)
     names = ["segments.json", "glossary.json", "render_report.json"]
     for lang in snapshot.targets:
         names.extend([f"translations.{lang}.json", f"overrides.{lang}.json"])
@@ -554,8 +562,8 @@ def _approval_signature(job: Job) -> str:
     return digest.hexdigest()
 
 
-def _quality_for(job: Job, execution: ExecutionStatus, reasons: list[str]) -> QualityStatus:
-    current_signature = _approval_signature(job)
+def _quality_for(job: Job, execution: ExecutionStatus, reasons: list[str], output_root: Path) -> QualityStatus:
+    current_signature = _approval_signature(job, output_root)
     if (
         job.approved_signature == current_signature
         and not _APPROVAL_BLOCKERS.intersection(reasons)
@@ -567,13 +575,13 @@ def _quality_for(job: Job, execution: ExecutionStatus, reasons: list[str]) -> Qu
     return QualityStatus.needs_review
 
 
-def _job_summary(store: JobStore, job: Job, tts_service: TtsService) -> JobSummary:
+def _job_summary(store: JobStore, job: Job, tts_service: TtsService, output_root: Path) -> JobSummary:
     latest = store.latest_run(job.job_id, lane="pipeline")
     active = latest if latest is not None and latest.status in ACTIVE_RUN_STATUSES else None
     execution = _execution_for(job, latest)
-    reasons, _, _ = _attention_reasons(job, store)
-    snapshot = _snapshot_for(job)
-    pipeline_quality = _quality_for(job, execution, reasons)
+    reasons, _, _ = _attention_reasons(job, store, output_root)
+    snapshot = _snapshot_for(job, output_root)
+    pipeline_quality = _quality_for(job, execution, reasons, output_root)
     pipeline_latest = _run_response(store, latest)
     pipeline_active = _run_response(store, active)
     pipeline_lane = JobLaneSummary(
@@ -649,10 +657,10 @@ def _job_summary(store: JobStore, job: Job, tts_service: TtsService) -> JobSumma
     )
 
 
-def _stage_states(store: JobStore, job: Job, active: Run | None) -> list[StageState]:
+def _stage_states(store: JobStore, job: Job, active: Run | None, output_root: Path) -> list[StageState]:
     latest_stages = store.latest_stage_runs(job.job_id)
     work_dir = Path(job.work_dir)
-    snapshot = _snapshot_for(job)
+    snapshot = _snapshot_for(job, output_root)
     artifact_exists = {
         "ingest": (work_dir / "ingest.json").is_file(),
         "asr": (work_dir / "asr.json").is_file(),
@@ -702,13 +710,13 @@ def _stage_states(store: JobStore, job: Job, active: Run | None) -> list[StageSt
     return result
 
 
-def _job_detail(store: JobStore, job: Job, tts_service: TtsService) -> JobDetail:
-    summary = _job_summary(store, job, tts_service)
+def _job_detail(store: JobStore, job: Job, tts_service: TtsService, output_root: Path) -> JobDetail:
+    summary = _job_summary(store, job, tts_service, output_root)
     latest = store.latest_run(job.job_id, lane="pipeline")
     active = latest if latest is not None and latest.status in ACTIVE_RUN_STATUSES else None
-    reasons, glossary_stale, artifacts = _attention_reasons(job, store)
+    reasons, glossary_stale, artifacts = _attention_reasons(job, store, output_root)
     work_dir = Path(job.work_dir)
-    snapshot = _snapshot_for(job)
+    snapshot = _snapshot_for(job, output_root)
     actions: list[str] = []
     if active is not None:
         actions.append("cancel")
@@ -728,7 +736,7 @@ def _job_detail(store: JobStore, job: Job, tts_service: TtsService) -> JobDetail
         **summary.model_dump(exclude={"attention_reasons"}),
         attention_reasons=reasons,
         request=snapshot,
-        stages=_stage_states(store, job, active),
+        stages=_stage_states(store, job, active, output_root),
         health=HealthResponse.model_validate(asdict(_safe_health(work_dir))),
         artifacts=artifacts,
         allowed_actions=actions,
@@ -1074,8 +1082,8 @@ def _validate_source(source: SourceRequest) -> str:
     return str(path)
 
 
-def _media_path(job: Job) -> Path | None:
-    snapshot = _snapshot_for(job)
+def _media_path(job: Job, output_root: Path) -> Path | None:
+    snapshot = _snapshot_for(job, output_root)
     if snapshot.source.kind == "local":
         try:
             source = Path(snapshot.source.value).resolve(strict=True)
@@ -1214,7 +1222,11 @@ def create_app(
                 tts_service = TtsService(
                     cfg,
                     store,
-                    subtitle_signature=_approval_signature,
+                    # Callback chỉ nhận job, nên gốc output phải đóng vào đây —
+                    # nếu không thì đúng ở chỗ này cấu hình lại bị bỏ qua.
+                    subtitle_signature=partial(
+                        _approval_signature, output_root=Path(cfg.paths.output_dir)
+                    ),
                 )
                 try:
                     tts_service.seed_config_calibration()
@@ -1255,7 +1267,7 @@ def create_app(
 
     def require_tts_job(job_id: str) -> tuple[RunScheduler, Job, TtsService]:
         runtime, job = require_job(job_id)
-        if TTS_LANGUAGE not in _snapshot_for(job).targets:
+        if TTS_LANGUAGE not in _snapshot_for(job, _output_root(get_runtime())).targets:
             raise HTTPException(404, "Vietnamese TTS is not available for this job")
         return runtime, job, get_tts_service()
 
@@ -1522,7 +1534,7 @@ def create_app(
         runtime = get_runtime()
         tts_service = get_tts_service()
         summaries = [
-            _job_summary(runtime.store, job, tts_service)
+            _job_summary(runtime.store, job, tts_service, _output_root(get_runtime()))
             for job in runtime.store.list()
         ]
         summaries.sort(key=lambda item: item.updated_at or "", reverse=True)
@@ -1610,14 +1622,14 @@ def create_app(
     @api.get("/api/v1/jobs/{job_id}", response_model=JobDetail)
     def get_job(job_id: str) -> JobDetail:
         runtime, job = require_job(job_id)
-        return _job_detail(runtime.store, job, get_tts_service())
+        return _job_detail(runtime.store, job, get_tts_service(), _output_root(get_runtime()))
 
     def enqueue_action(job_id: str, kind: str, from_stage: str, *, force: bool = False) -> RunResponse:
         runtime, job = require_job(job_id)
         if job.request is None:
             runtime.store.set_request(
                 job_id,
-                _snapshot_for(job).model_dump(mode="json"),
+                _snapshot_for(job, _output_root(get_runtime())).model_dump(mode="json"),
             )
         try:
             run = runtime.enqueue(job_id, kind, from_stage, force=force)
@@ -1656,7 +1668,7 @@ def create_app(
     @api.post("/api/v1/jobs/{job_id}/render", response_model=RunResponse)
     def render_job(job_id: str) -> RunResponse:
         _, job = require_job(job_id)
-        snapshot = _snapshot_for(job)
+        snapshot = _snapshot_for(job, output_root)
         if not all((Path(job.work_dir) / f"translations.{lang}.json").is_file() for lang in snapshot.targets):
             raise _conflict(
                 "action_not_allowed",
@@ -1667,7 +1679,7 @@ def create_app(
     @api.post("/api/v1/jobs/{job_id}/approve", response_model=JobDetail)
     def approve_job(job_id: str) -> JobDetail:
         runtime, job = require_job(job_id)
-        detail = _job_detail(runtime.store, job, get_tts_service())
+        detail = _job_detail(runtime.store, job, get_tts_service(), _output_root(get_runtime()))
         if detail.execution_status != ExecutionStatus.completed:
             raise _conflict(
                 "action_not_allowed",
@@ -1681,12 +1693,12 @@ def create_app(
                 reasons=sorted(blockers),
             )
         try:
-            runtime.store.approve(job_id, _approval_signature(job))
+            runtime.store.approve(job_id, _approval_signature(job, _output_root(get_runtime())))
         except ValueError as exc:
             raise _conflict("action_not_allowed", str(exc)) from exc
         updated = runtime.store.get(job_id)
         assert updated is not None
-        return _job_detail(runtime.store, updated, get_tts_service())
+        return _job_detail(runtime.store, updated, get_tts_service(), _output_root(get_runtime()))
 
     @api.post("/api/v1/jobs/{job_id}/unapprove", response_model=JobDetail)
     def unapprove_job(job_id: str) -> JobDetail:
@@ -1694,7 +1706,7 @@ def create_app(
         runtime.store.set_approval(job_id, None)
         updated = runtime.store.get(job_id)
         assert updated is not None
-        return _job_detail(runtime.store, updated, get_tts_service())
+        return _job_detail(runtime.store, updated, get_tts_service(), _output_root(get_runtime()))
 
     @api.get("/api/v1/jobs/{job_id}/glossary", response_model=GlossaryResponse)
     def get_glossary(job_id: str) -> GlossaryResponse:
@@ -1825,7 +1837,7 @@ def create_app(
                 artifact.kind == "subtitle"
                 and artifact.language == lang
                 and artifact.state != "current"
-                for artifact in _artifacts_for(job, runtime.store)
+                for artifact in _artifacts_for(job, _output_root(get_runtime()), runtime.store)
             )
         )
         return SubtitleResponse(
@@ -2016,7 +2028,7 @@ def create_app(
                 "voice_id": workspace.voice_id,
                 "speech_revision": workspace.revision,
                 "calibration_revision": workspace.calibration.revision,
-                "subtitle_approval_signature": _approval_signature(job),
+                "subtitle_approval_signature": _approval_signature(job, _output_root(get_runtime())),
             },
         )
 
@@ -2194,7 +2206,7 @@ def create_app(
     @api.get("/api/v1/jobs/{job_id}/media")
     def job_media(job_id: str, request: Request):
         _, job = require_job(job_id)
-        path = _media_path(job)
+        path = _media_path(job, _output_root(get_runtime()))
         if path is None:
             raise HTTPException(404, "Job media is not available")
         size = path.stat().st_size
@@ -2217,8 +2229,8 @@ def create_app(
     @api.get("/api/v1/jobs/{job_id}/artifacts/{artifact_id}")
     def download_artifact(job_id: str, artifact_id: str) -> FileResponse:
         _, job = require_job(job_id)
-        snapshot = _snapshot_for(job)
-        roots = _allowed_output_roots(job, snapshot)
+        snapshot = _snapshot_for(job, _output_root(get_runtime()))
+        roots = _allowed_output_roots(snapshot)
         report = _render_report(Path(job.work_dir))
         candidates: list[Path] = []
         if report:
