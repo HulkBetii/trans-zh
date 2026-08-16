@@ -39,6 +39,9 @@ def _config(tmp_path: Path) -> Config:
     config = Config()
     config.paths.jobs_db = str(tmp_path / "jobs.db")
     config.paths.work_dir = str(tmp_path / "work")
+    # Không trỏ vào tmp_path thì mỗi lần chạy test đẻ một thư mục vào output/
+    # thật của repo — đã tích được 909 cái trước khi ai đó để ý.
+    config.paths.output_dir = str(tmp_path / "output")
     config.paths.cache_dir = str(tmp_path / "cache")
     config.dub.api_key_env = API_KEY_ENV
     config.dub.voice_id = "SET_ME"

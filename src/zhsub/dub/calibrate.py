@@ -18,6 +18,7 @@ nhất, nên gộp hai đại lượng làm một sẽ sai ở đúng chỗ quan
 from __future__ import annotations
 
 import logging
+import re
 from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
@@ -148,6 +149,28 @@ def _probe_path(probe_dir: Path, text: str, voice_id: str) -> Path:
     return probe_dir / f"{len(text.split()):03d}-{digest}.mp3"
 
 
+_LEGACY_PROBE = re.compile(r"^\d{2}\.mp3$")
+
+
+def drop_legacy_probes(probe_dir: Path) -> int:
+    """Xóa probe đặt tên theo vị trí (``00.mp3``) của bản trước khi có cache.
+
+    Xóa chứ không đổi tên, dù đổi tên nghe hấp dẫn hơn vì tiết kiệm 8 lượt TTS.
+    Muốn đổi tên thì phải ĐOÁN rằng câu thứ i hôm nay vẫn đúng là câu đã sinh ra
+    ``0i.mp3`` hôm trước — chỉ đúng khi lời đọc của job chưa hề đổi. Đoán sai thì
+    gán nhầm audio cho câu, và phép khớp ra một hệ số sai mà không có dấu hiệu
+    nào: đúng họ lỗi mà cả đợt này đang dọn.
+
+    Tám lượt TTS rẻ hơn một hiệu chuẩn sai âm thầm.
+    """
+    stale = [path for path in probe_dir.glob("*.mp3") if _LEGACY_PROBE.match(path.name)]
+    for path in stale:
+        path.unlink()
+    if stale:
+        log.info("Bỏ %d probe tên cũ, sẽ đo lại (không đoán câu nào ứng với file nào)", len(stale))
+    return len(stale)
+
+
 def _fetch_probe(
     client: SpeechClient, text: str, voice_id: str, path: Path, *, force: bool
 ) -> bool:
@@ -262,6 +285,7 @@ def calibrate_voice(
     client = SpeechClient(cfg.dub.base_url, cfg.dub.api_key())
     probe_dir = work_dir / "dub" / "_calibrate"
     probe_dir.mkdir(parents=True, exist_ok=True)
+    drop_legacy_probes(probe_dir)
 
     log.info("Đo giọng %s trên %d câu mẫu", selected_voice, len(texts))
     points: list[tuple[int, float]] = []

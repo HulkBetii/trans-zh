@@ -30,6 +30,11 @@ class PathsConfig(BaseModel):
     cache_dir: str = ".cache"
     jobs_db: str = "jobs.db"
 
+    # Nơi Studio ghi phụ đề và audio đã xuất. Trước đây hằng số "output" nằm cứng
+    # trong server, tính tương đối với cwd — nghĩa là một app đã cài sẽ ghi ra
+    # bất kỳ đâu mà shortcut trỏ tới, và bộ test ghi thẳng vào output/ của repo.
+    output_dir: str = "output"
+
 
 class IngestConfig(BaseModel):
     sample_rate: int = 16000

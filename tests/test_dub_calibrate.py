@@ -246,3 +246,22 @@ def test_pick_samples_keeps_input_order_for_equal_lengths():
     texts = ["b b", "a a", "c c", "d"]
 
     assert calibrate.pick_samples(texts, 8) == ["d", "b b", "a a", "c c"]
+
+
+def test_probes_named_by_position_are_dropped_not_reused(tmp_path, monkeypatch):
+    """Đổi tên probe cũ là ĐOÁN câu nào ứng với file nào — đoán sai thì hệ số sai
+    mà không có dấu hiệu nào. Tám lượt TTS rẻ hơn một hiệu chuẩn sai âm thầm."""
+    calls = _install_fake_client(monkeypatch)
+    probe_dir = tmp_path / "dub" / "_calibrate"
+    probe_dir.mkdir(parents=True)
+    for index in range(8):
+        (probe_dir / f"{index:02d}.mp3").write_bytes(b"audio cu")
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+
+    calibrate.calibrate_voice(
+        tmp_path, _calibrate_config(monkeypatch), voice_id="v", sample_texts=texts
+    )
+
+    assert len(calls) == 8
+    assert not list(probe_dir.glob("[0-9][0-9].mp3"))
+    assert len(list(probe_dir.glob("*.mp3"))) == 8

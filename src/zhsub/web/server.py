@@ -1587,7 +1587,7 @@ def create_app(
         source = SourceRequest(kind=request_body.source.kind, value=source_value)
         job_id = s0_ingest.make_job_id(source_value)
         work_dir = Path(runtime.config.paths.work_dir).resolve(strict=False) / job_id
-        output_dir = Path("output").resolve(strict=False) / job_id
+        output_dir = Path(runtime.config.paths.output_dir).resolve(strict=False) / job_id
         snapshot = JobRequestSnapshot(
             source=source,
             targets=request_body.targets,

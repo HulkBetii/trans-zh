@@ -37,6 +37,9 @@ def _config(tmp_path: Path) -> Config:
     config = Config()
     config.paths.jobs_db = str(tmp_path / "jobs.db")
     config.paths.work_dir = str(tmp_path / "work")
+    # Không trỏ vào tmp_path thì mỗi lần chạy test đẻ một thư mục vào output/
+    # thật của repo — đã tích được 909 cái trước khi ai đó để ý.
+    config.paths.output_dir = str(tmp_path / "output")
     config.paths.cache_dir = str(tmp_path / "cache")
     return config
 
@@ -567,7 +570,11 @@ def test_media_range_and_artifact_ownership(tmp_path):
     assert "secret" not in denied.text
 
 
-def test_report_cannot_claim_another_new_jobs_output(tmp_path):
+def test_report_cannot_claim_another_new_jobs_output(tmp_path, monkeypatch):
+    # Server tính output_dir là ./output tương đối với cwd, nên không chdir thì
+    # test này ghi thẳng vào thư mục output thật của repo — mỗi lần chạy một thư
+    # mục mới, và đến lúc hash trùng thì mkdir(parents=True) nổ.
+    monkeypatch.chdir(tmp_path)
     first = tmp_path / "first.mp4"
     second = tmp_path / "second.mp4"
     first.write_bytes(b"1")
@@ -717,3 +724,18 @@ def test_serve_rejects_non_loopback_before_starting_uvicorn():
         assert "loopback" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("serve accepted a non-loopback host")
+
+
+def test_new_jobs_write_where_the_config_says(tmp_path):
+    """output_dir từng là hằng "output" nằm cứng, tính tương đối với cwd.
+
+    Hệ quả: bộ test đẻ thư mục vào output/ thật của repo (909 cái trước khi có
+    người để ý), và một app đã cài sẽ ghi output vào bất kỳ đâu shortcut trỏ tới.
+    """
+    source = tmp_path / "movie.mp4"
+    source.write_bytes(b"0")
+    with _client(tmp_path) as client:
+        created = _create(client, source)
+        job = client.get(f"/api/v1/jobs/{created['job_id']}").json()
+
+    assert Path(job["request"]["output_dir"]).is_relative_to(tmp_path)
