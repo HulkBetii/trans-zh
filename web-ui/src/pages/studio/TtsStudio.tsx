@@ -34,6 +34,7 @@ import type {
 import { EmptyState } from "../../components/EmptyState";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
+import { useRevisionedDraft } from "../../hooks/useRevisionedDraft";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 import { errorMessage, formatBytes, formatDate, formatTime } from "../../lib/format";
@@ -106,10 +107,8 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
   const [followPlayback, setFollowPlayback] = useState(true);
   const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const [conflict, setConflict] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [lastQueuedRun, setLastQueuedRun] = useState<RunRecord | null>(null);
-  const dataRevisionRef = useRef(data.revision);
   const playerRef = useRef<HTMLVideoElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const dirtyCount = Object.keys(changes).length;
@@ -122,29 +121,16 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
   const inspectorRef = useDialogFocus<HTMLElement>(mobileInspector && inspectorOpen, inspectorClose);
   useUnsavedChanges(dirty);
 
-  useEffect(() => {
-    if (data.revision !== dataRevisionRef.current) {
-      dataRevisionRef.current = data.revision;
-      if (dirty) {
-        setConflict(true);
-        return;
-      }
-      setWorkspace(data);
-      setRevision(data.revision);
-      setDraftVoiceId(data.voice_id ?? "");
-      setDraftVoice((current) => data.selected_voice ?? (current?.voice_id === data.voice_id ? current : null));
-      setConflict(false);
-      return;
-    }
-    if (dirty) {
-      setWorkspace(data);
-      return;
-    }
-    setWorkspace(data);
-    setRevision(data.revision);
-    setDraftVoiceId(data.voice_id ?? "");
-    setDraftVoice((current) => data.selected_voice ?? (current?.voice_id === data.voice_id ? current : null));
-  }, [data, dirty]);
+  const adopt = useCallback((next: TtsWorkspace) => {
+    setWorkspace(next);
+    setRevision(next.revision);
+    setDraftVoiceId(next.voice_id ?? "");
+    setDraftVoice((current) => next.selected_voice ?? (current?.voice_id === next.voice_id ? current : null));
+    setChanges({});
+  }, []);
+  // Cùng revision: hấp thụ trạng thái chạy và khóa editor mà không đụng bản nháp.
+  const refresh = useCallback((next: TtsWorkspace) => setWorkspace(next), []);
+  const { conflict, discardDraft, markSaved, markConflict } = useRevisionedDraft({ data, dirty, onAdopt: adopt, onRefresh: refresh });
 
   useEffect(() => {
     if (!lastQueuedRun) return;
@@ -205,7 +191,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
   }, [filtered, selectedId]);
 
   const applySaved = useCallback((saved: TtsWorkspace, options: { clearVoice: boolean; clearSpokenIds: number[] }) => {
-    dataRevisionRef.current = saved.revision;
+    markSaved(saved);
     setWorkspace(saved);
     setRevision(saved.revision);
     if (options.clearVoice) {
@@ -219,10 +205,9 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
         return next;
       });
     }
-    setConflict(false);
     setActionError(null);
     queryClient.setQueryData(queryKeys.tts(job.job_id), saved);
-  }, [job.job_id, queryClient]);
+  }, [job.job_id, markSaved, queryClient]);
 
   const saveDrafts = useMutation({
     mutationFn: async (request: SaveRequest) => {
@@ -265,7 +250,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
         setActionError(errorMessage(error));
       }
       const originalError = error instanceof PartialTtsSaveError ? error.originalError : error;
-      if (originalError instanceof ApiError && originalError.code === "revision_conflict") setConflict(true);
+      if (originalError instanceof ApiError && originalError.code === "revision_conflict") markConflict();
     },
   });
 
@@ -278,7 +263,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
     },
     onError: (error) => {
       setActionError(errorMessage(error));
-      if (error instanceof ApiError && error.code === "revision_conflict") setConflict(true);
+      if (error instanceof ApiError && error.code === "revision_conflict") markConflict();
     },
   });
 
@@ -401,8 +386,8 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       {conflict && (
         <div className="conflict-banner" role="alert">
           <AlertTriangle size={19} />
-          <div><strong>TTS đã thay đổi ở tab khác</strong><p>Các chỉnh sửa local vẫn còn trên màn hình nhưng chưa được lưu.</p></div>
-          <button className="secondary-button" onClick={() => window.location.reload()}><RefreshCcw size={16} />Tải bản mới</button>
+          <div><strong>TTS đã thay đổi ở tab khác</strong><p>Chỉnh sửa của bạn vẫn còn trên màn hình và chưa bị ghi đè. Lưu tạm khóa để không đè lên bản mới.</p></div>
+          <button className="secondary-button danger" onClick={discardDraft}><RefreshCcw size={16} />Bỏ chỉnh sửa & lấy bản mới</button>
         </div>
       )}
       {actionError && <div className="inline-alert error" role="alert"><AlertTriangle size={16} /><span>{actionError}</span></div>}
@@ -574,7 +559,7 @@ function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open
   // Tìm kiếm do nhà cung cấp thực hiện, nên mỗi phím gõ là một request thật ra
   // ai33.pro. Chờ người dùng ngừng gõ rồi mới hỏi.
   const debouncedSearch = useDebouncedValue(search, 300);
-  const filterKey = `${ownership} ${debouncedSearch}`;
+  const filterKey = `${ownership} ${debouncedSearch}`;
   const [activeFilterKey, setActiveFilterKey] = useState(filterKey);
 
   // Đổi bộ lọc thì trang tích lũy phải về 1 ngay trong render này. Để cho effect

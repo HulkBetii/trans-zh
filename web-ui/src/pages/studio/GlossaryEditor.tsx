@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, LoaderCircle, Plus, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ApiError, api } from "../../api/client";
 import { queryKeys } from "../../api/queries";
 import type { AddressTerm, GlossaryDocument, GlossaryTerm, JobDetail, RevisionedGlossary } from "../../api/types";
 import { EmptyState } from "../../components/EmptyState";
+import { useRevisionedDraft } from "../../hooks/useRevisionedDraft";
 import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 import { errorMessage } from "../../lib/format";
 
@@ -25,9 +26,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
   const [document, setDocument] = useState(() => structuredClone(data.document));
   const [baseline, setBaseline] = useState(() => JSON.stringify(data.document));
   const [currentRevision, setCurrentRevision] = useState(data.revision);
-  const [conflict, setConflict] = useState(false);
   const [followUpError, setFollowUpError] = useState<string | null>(null);
-  const dataRevisionRef = useRef(data.revision);
   const nextTermId = useRef(data.document.terms.length);
   const nextAddressId = useRef(data.document.address_terms.length);
   const [termIds, setTermIds] = useState(() => data.document.terms.map((_, index) => `term-${index}`));
@@ -42,7 +41,6 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
   // Nhận một bản từ server làm bản nền mới. Phải dựng lại termIds/addressIds:
   // trước đây việc đó do remount lo, giờ không còn remount nữa.
   const adopt = useCallback((next: RevisionedGlossary) => {
-    dataRevisionRef.current = next.revision;
     setDocument(structuredClone(next.document));
     setBaseline(JSON.stringify(next.document));
     setCurrentRevision(next.revision);
@@ -50,19 +48,9 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
     setAddressIds(next.document.address_terms.map((_, index) => `address-${index}`));
     nextTermId.current = next.document.terms.length;
     nextAddressId.current = next.document.address_terms.length;
-    setConflict(false);
   }, []);
 
-  useEffect(() => {
-    if (data.revision === dataRevisionRef.current) return;
-    dataRevisionRef.current = data.revision;
-    // Có bản nháp thì giữ nguyên và báo; người dùng tự quyết bỏ hay không.
-    if (dirty) {
-      setConflict(true);
-      return;
-    }
-    adopt(data);
-  }, [adopt, data, dirty]);
+  const { conflict, discardDraft, markSaved, markConflict } = useRevisionedDraft({ data, dirty, onAdopt: adopt });
 
   const saveMutation = useMutation({
     mutationFn: async (retranslate: boolean) => {
@@ -76,6 +64,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
       }
     },
     onSuccess: ({ saved, followUpError: retranslateError }) => {
+      markSaved(saved);
       adopt(saved);
       setFollowUpError(retranslateError);
       queryClient.setQueryData(queryKeys.glossary(job.job_id), saved);
@@ -83,7 +72,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
       void queryClient.invalidateQueries({ queryKey: ["jobs"] });
     },
     onError: (error) => {
-      if (error instanceof ApiError && error.code === "revision_conflict") setConflict(true);
+      if (error instanceof ApiError && error.code === "revision_conflict") markConflict();
     },
   });
 
@@ -118,10 +107,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
   return (
     <div className="glossary-editor">
       {editorLocked && <div className="inline-alert"><LoaderCircle className="spin" size={16} /><span>{lockReason === "tts_run_active" ? "Tác vụ audio đang dùng glossary. Editor tạm khóa để giữ artifact nhất quán." : "Pipeline đang tạo lại glossary hoặc bản dịch. Editor tạm khóa để tránh xung đột."}</span></div>}
-      {/* `data` chính là bản mới đã gây ra xung đột, nên nút này không cần tải
-          lại gì — nó chỉ bỏ bản nháp. Đặt tên đúng việc nó làm, thay cho một
-          hộp thoại xác nhận nữa. */}
-      {conflict && <div className="conflict-banner"><AlertTriangle size={19} /><div><strong>Glossary đã thay đổi ở nơi khác</strong><p>Chỉnh sửa của bạn vẫn còn trên màn hình và chưa bị ghi đè. Lưu tạm khóa để không đè lên bản mới.</p></div><button className="secondary-button danger" onClick={() => adopt(data)}><RotateCcw size={16} />Bỏ chỉnh sửa & lấy bản mới</button></div>}
+      {conflict && <div className="conflict-banner"><AlertTriangle size={19} /><div><strong>Glossary đã thay đổi ở nơi khác</strong><p>Chỉnh sửa của bạn vẫn còn trên màn hình và chưa bị ghi đè. Lưu tạm khóa để không đè lên bản mới.</p></div><button className="secondary-button danger" onClick={discardDraft}><RotateCcw size={16} />Bỏ chỉnh sửa & lấy bản mới</button></div>}
 
       <fieldset className="panel-sheet glossary-section" disabled={editorLocked}>
         <div className="section-heading"><div><span className="eyebrow">Translation voice</span><h2>Văn phong</h2><p>Ghim cách kể và đại từ để các batch dịch không tự chọn lại.</p></div></div>

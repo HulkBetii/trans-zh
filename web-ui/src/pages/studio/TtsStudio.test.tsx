@@ -1,6 +1,7 @@
-import { screen, waitFor } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, vi } from "vitest";
+import { queryKeys } from "../../api/queries";
 import type { JobDetail, TtsWorkspace } from "../../api/types";
 import { jsonResponse, renderApp } from "../../test/render";
 import { TtsStudio } from "./TtsStudio";
@@ -326,6 +327,33 @@ test("keeps the local spoken draft when the TTS revision conflicts", async () =>
   expect(await screen.findByText("TTS đã thay đổi ở tab khác")).toBeInTheDocument();
   expect(screen.getByLabelText("Văn bản sẽ đọc")).toHaveValue("Bản đọc ở tab hiện tại");
   expect(screen.getByText(/Dữ liệu đã thay đổi ở một tab khác/)).toBeInTheDocument();
+});
+
+test("discards the TTS draft only when the banner button is pressed", async () => {
+  // Nút này từng là window.location.reload(): nạp lại cả trang để lấy một bản
+  // TTS, kéo theo mọi state chưa lưu ở nơi khác. Giờ nó chỉ bỏ bản nháp TTS.
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse(workspace)));
+  const { queryClient } = renderApp(<TtsStudio job={job} />);
+  const user = userEvent.setup();
+  const editor = await screen.findByLabelText("Văn bản sẽ đọc");
+  await user.clear(editor);
+  await user.type(editor, "Bản nháp chưa lưu");
+
+  act(() => {
+    queryClient.setQueryData(queryKeys.tts(job.job_id), {
+      ...workspace,
+      revision: "tts-rev-9",
+      cues: [{ ...cue, effective_spoken_text: "Bản máy mới" }],
+    });
+  });
+
+  expect(await screen.findByText("TTS đã thay đổi ở tab khác")).toBeInTheDocument();
+  expect(screen.getByLabelText("Văn bản sẽ đọc")).toHaveValue("Bản nháp chưa lưu");
+
+  await user.click(screen.getByRole("button", { name: /Bỏ chỉnh sửa/ }));
+
+  expect(screen.getByLabelText("Văn bản sẽ đọc")).toHaveValue("Bản máy mới");
+  expect(screen.queryByText("TTS đã thay đổi ở tab khác")).not.toBeInTheDocument();
 });
 
 test("saves only the selected cue before preview and keeps other invalid drafts", async () => {

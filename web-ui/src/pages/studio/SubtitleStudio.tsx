@@ -8,6 +8,7 @@ import type { JobDetail, OverrideChange, SubtitleCue, SubtitleWorkspace, TargetL
 import { EmptyState } from "../../components/EmptyState";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useRevisionedDraft } from "../../hooks/useRevisionedDraft";
 import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 import { errorMessage, formatTime } from "../../lib/format";
 import { useSearchParams } from "react-router-dom";
@@ -39,9 +40,7 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
   const [revision, setRevision] = useState(data.revision);
   const [followPlayback, setFollowPlayback] = useState(true);
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const [conflict, setConflict] = useState(false);
   const [followUpError, setFollowUpError] = useState<string | null>(null);
-  const dataRevisionRef = useRef(data.revision);
   const playerRef = useRef<HTMLVideoElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const dirtyCount = Object.keys(changes).length;
@@ -52,26 +51,15 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
   const inspectorRef = useDialogFocus<HTMLElement>(mobileInspector && inspectorOpen, closeInspector);
   useUnsavedChanges(dirty);
 
-  useEffect(() => {
-    // Chỉ `revision` mới nói lên nội dung đã bị ghi đè ở nơi khác. So định danh
-    // object thì `editor_locked` lật lên vì một run TTS, hay `output_stale` lật
-    // sau khi render, cũng bị đọc thành xung đột — rồi banner khuyên reload,
-    // đúng thao tác xóa sạch bản nháp đang có.
-    if (data.revision !== dataRevisionRef.current) {
-      dataRevisionRef.current = data.revision;
-      if (dirty) {
-        setConflict(true);
-        return;
-      }
-      setWorkspace(data);
-      setRevision(data.revision);
-      setConflict(false);
-      return;
-    }
-    // Cùng revision: hấp thụ các trường phụ (khóa editor, cờ output cũ) mà không
-    // đụng tới `changes`.
-    setWorkspace(data);
-  }, [data, dirty]);
+  const adopt = useCallback((next: SubtitleWorkspace) => {
+    setWorkspace(next);
+    setRevision(next.revision);
+    setChanges({});
+  }, []);
+  // Cùng revision: hấp thụ các trường phụ (khóa editor, cờ output cũ) mà không
+  // đụng tới `changes`.
+  const refresh = useCallback((next: SubtitleWorkspace) => setWorkspace(next), []);
+  const { conflict, discardDraft, markSaved, markConflict } = useRevisionedDraft({ data, dirty, onAdopt: adopt, onRefresh: refresh });
 
   const filtered = useMemo(() => workspace.cues.filter((cue) => {
     const query = search.trim().toLocaleLowerCase();
@@ -106,18 +94,15 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
       }
     },
     onSuccess: ({ saved, followUpError: renderError }) => {
-      dataRevisionRef.current = saved.revision;
-      setChanges({});
-      setRevision(saved.revision);
-      setWorkspace(saved);
-      setConflict(false);
+      markSaved(saved);
+      adopt(saved);
       setFollowUpError(renderError);
       queryClient.setQueryData(queryKeys.subtitles(job.job_id, language), saved);
       void queryClient.invalidateQueries({ queryKey: queryKeys.job(job.job_id) });
       void queryClient.invalidateQueries({ queryKey: ["jobs"] });
     },
     onError: (error) => {
-      if (error instanceof ApiError && error.code === "revision_conflict") setConflict(true);
+      if (error instanceof ApiError && error.code === "revision_conflict") markConflict();
     },
   });
 
@@ -171,7 +156,10 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
   return (
     <div className="subtitle-studio">
       {editorLocked && <div className="inline-alert"><LoaderCircle className="spin" size={16} /><span>Pipeline đang có thể ghi lại dữ liệu phụ đề. Editor tạm khóa.</span></div>}
-      {conflict && <div className="conflict-banner"><AlertTriangle size={19} /><div><strong>Phụ đề đã thay đổi ở tab khác</strong><p>Các chỉnh sửa local vẫn còn trên màn hình nhưng chưa được lưu.</p></div><button className="secondary-button" onClick={() => window.location.reload()}><RefreshCcw size={16} />Tải bản mới</button></div>}
+      {/* Trước đây nút này là window.location.reload(): nạp lại cả trang để lấy
+          một bản phụ đề, kéo theo mọi state chưa lưu ở nơi khác. Giờ chỉ bỏ
+          đúng bản nháp của phụ đề. */}
+      {conflict && <div className="conflict-banner"><AlertTriangle size={19} /><div><strong>Phụ đề đã thay đổi ở tab khác</strong><p>Chỉnh sửa của bạn vẫn còn trên màn hình và chưa bị ghi đè. Lưu tạm khóa để không đè lên bản mới.</p></div><button className="secondary-button danger" onClick={discardDraft}><RefreshCcw size={16} />Bỏ chỉnh sửa & lấy bản mới</button></div>}
       {workspace.output_stale && <div className="stale-output-note"><AlertTriangle size={15} />Output hiện tại cũ hơn nội dung đang chỉnh. Render lại sau khi lưu.</div>}
 
       <div className="subtitle-toolbar">
