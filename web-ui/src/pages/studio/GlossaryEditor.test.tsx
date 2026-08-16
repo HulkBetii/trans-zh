@@ -1,6 +1,7 @@
-import { screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
+import { queryKeys } from "../../api/queries";
 import type { JobDetail } from "../../api/types";
 import { jsonResponse, renderApp } from "../../test/render";
 import { GlossaryEditor } from "./GlossaryEditor";
@@ -36,6 +37,67 @@ test("preserves local glossary edits when optimistic revision conflicts", async 
 
   expect(await screen.findByText("Glossary đã thay đổi ở nơi khác")).toBeInTheDocument();
   expect(screen.getByDisplayValue("Minh")).toBeInTheDocument();
+});
+
+const glossaryDoc = (vi_: string) => ({
+  version: 1,
+  terms: [{ zh: "小明", pinyin: "", vi: vi_, en: "", type: "person", keep_source: false, note: "" }],
+  address_terms: [],
+  style: { speech_register: "", narrator_self_vi: "", audience_vi: "", subject_third_person_vi: "" },
+});
+
+test("keeps unsaved glossary edits when the server revision changes", async () => {
+  // Trước đây form khóa theo `key={revision}`, nên server đổi bản là remount và
+  // bản nháp biến mất, không banner, không hỏi han.
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ revision: "rev-1", document: glossaryDoc("Tiểu Minh") })));
+  const { queryClient } = renderApp(<GlossaryEditor job={job} />);
+  const user = userEvent.setup();
+  const input = await screen.findByLabelText("Tiếng Việt 1");
+  await user.clear(input);
+  await user.type(input, "Bản nháp chưa lưu");
+
+  act(() => {
+    queryClient.setQueryData(queryKeys.glossary(job.job_id), {
+      revision: "rev-9", editor_locked: false, document: glossaryDoc("Bản máy mới"),
+    });
+  });
+
+  expect(await screen.findByText("Glossary đã thay đổi ở nơi khác")).toBeInTheDocument();
+  expect(screen.getByLabelText("Tiếng Việt 1")).toHaveValue("Bản nháp chưa lưu");
+});
+
+test("takes the server version only when the discard is asked for", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ revision: "rev-1", document: glossaryDoc("Tiểu Minh") })));
+  const { queryClient } = renderApp(<GlossaryEditor job={job} />);
+  const user = userEvent.setup();
+  const input = await screen.findByLabelText("Tiếng Việt 1");
+  await user.clear(input);
+  await user.type(input, "Bản nháp chưa lưu");
+
+  act(() => {
+    queryClient.setQueryData(queryKeys.glossary(job.job_id), {
+      revision: "rev-9", editor_locked: false, document: glossaryDoc("Bản máy mới"),
+    });
+  });
+  await user.click(await screen.findByRole("button", { name: /Bỏ chỉnh sửa/ }));
+
+  expect(screen.getByLabelText("Tiếng Việt 1")).toHaveValue("Bản máy mới");
+  expect(screen.queryByText("Glossary đã thay đổi ở nơi khác")).not.toBeInTheDocument();
+});
+
+test("keeps the editor lock in sync without a remount", async () => {
+  // Khóa editor đọc thẳng từ props; nếu ai đó đưa nó vào state thì test này đổ.
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ revision: "rev-1", editor_locked: false, document: glossaryDoc("Tiểu Minh") })));
+  const { queryClient } = renderApp(<GlossaryEditor job={job} />);
+  await screen.findByLabelText("Tiếng Việt 1");
+
+  act(() => {
+    queryClient.setQueryData(queryKeys.glossary(job.job_id), {
+      revision: "rev-1", editor_locked: true, lock_reason: "tts_run_active", document: glossaryDoc("Tiểu Minh"),
+    });
+  });
+
+  expect(await screen.findByText(/Tác vụ audio đang dùng glossary/)).toBeInTheDocument();
 });
 
 test("keeps focus while editing the Chinese term used to identify a row", async () => {

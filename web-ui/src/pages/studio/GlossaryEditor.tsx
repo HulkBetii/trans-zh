@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, LoaderCircle, Plus, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, api } from "../../api/client";
 import { queryKeys } from "../../api/queries";
-import type { AddressTerm, GlossaryDocument, GlossaryTerm, JobDetail } from "../../api/types";
+import type { AddressTerm, GlossaryDocument, GlossaryTerm, JobDetail, RevisionedGlossary } from "../../api/types";
 import { EmptyState } from "../../components/EmptyState";
 import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 import { errorMessage } from "../../lib/format";
@@ -15,23 +15,54 @@ export function GlossaryEditor({ job }: { job: JobDetail }) {
   const query = useQuery({ queryKey: queryKeys.glossary(job.job_id), queryFn: () => api.glossary(job.job_id) });
   if (query.isLoading) return <div className="editor-loading"><LoaderCircle className="spin" size={20} />Đang tải glossary…</div>;
   if (query.isError || !query.data) return <EmptyState icon={AlertTriangle} title="Không đọc được glossary" detail={errorMessage(query.error)} action={<button className="secondary-button" onClick={() => void query.refetch()}>Thử lại</button>} />;
-  return <GlossaryForm key={query.data.revision} job={job} initial={query.data.document} revision={query.data.revision} editorLocked={query.data.editor_locked} lockReason={query.data.lock_reason} />;
+  // Khóa theo job, không theo revision: khóa theo revision thì mỗi lần server
+  // đổi bản là form remount và bản nháp chưa lưu biến mất không một lời nào.
+  return <GlossaryForm key={job.job_id} job={job} data={query.data} />;
 }
 
-function GlossaryForm({ job, initial, revision, editorLocked, lockReason }: { job: JobDetail; initial: GlossaryDocument; revision: string; editorLocked: boolean; lockReason?: string | null }) {
+function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary }) {
   const queryClient = useQueryClient();
-  const [document, setDocument] = useState(() => structuredClone(initial));
-  const [baseline, setBaseline] = useState(() => JSON.stringify(initial));
-  const [currentRevision, setCurrentRevision] = useState(revision);
+  const [document, setDocument] = useState(() => structuredClone(data.document));
+  const [baseline, setBaseline] = useState(() => JSON.stringify(data.document));
+  const [currentRevision, setCurrentRevision] = useState(data.revision);
   const [conflict, setConflict] = useState(false);
   const [followUpError, setFollowUpError] = useState<string | null>(null);
-  const nextTermId = useRef(initial.terms.length);
-  const nextAddressId = useRef(initial.address_terms.length);
-  const [termIds, setTermIds] = useState(() => initial.terms.map((_, index) => `term-${index}`));
-  const [addressIds, setAddressIds] = useState(() => initial.address_terms.map((_, index) => `address-${index}`));
+  const dataRevisionRef = useRef(data.revision);
+  const nextTermId = useRef(data.document.terms.length);
+  const nextAddressId = useRef(data.document.address_terms.length);
+  const [termIds, setTermIds] = useState(() => data.document.terms.map((_, index) => `term-${index}`));
+  const [addressIds, setAddressIds] = useState(() => data.document.address_terms.map((_, index) => `address-${index}`));
   const errors = useMemo(() => validateGlossary(document), [document]);
-  const dirty = JSON.stringify(document) !== baseline;
+  const dirty = useMemo(() => JSON.stringify(document) !== baseline, [baseline, document]);
+  // Khóa editor đọc thẳng từ props nên luôn tươi, không cần đồng bộ vào state.
+  const editorLocked = data.editor_locked;
+  const lockReason = data.lock_reason;
   useUnsavedChanges(dirty);
+
+  // Nhận một bản từ server làm bản nền mới. Phải dựng lại termIds/addressIds:
+  // trước đây việc đó do remount lo, giờ không còn remount nữa.
+  const adopt = useCallback((next: RevisionedGlossary) => {
+    dataRevisionRef.current = next.revision;
+    setDocument(structuredClone(next.document));
+    setBaseline(JSON.stringify(next.document));
+    setCurrentRevision(next.revision);
+    setTermIds(next.document.terms.map((_, index) => `term-${index}`));
+    setAddressIds(next.document.address_terms.map((_, index) => `address-${index}`));
+    nextTermId.current = next.document.terms.length;
+    nextAddressId.current = next.document.address_terms.length;
+    setConflict(false);
+  }, []);
+
+  useEffect(() => {
+    if (data.revision === dataRevisionRef.current) return;
+    dataRevisionRef.current = data.revision;
+    // Có bản nháp thì giữ nguyên và báo; người dùng tự quyết bỏ hay không.
+    if (dirty) {
+      setConflict(true);
+      return;
+    }
+    adopt(data);
+  }, [adopt, data, dirty]);
 
   const saveMutation = useMutation({
     mutationFn: async (retranslate: boolean) => {
@@ -45,10 +76,7 @@ function GlossaryForm({ job, initial, revision, editorLocked, lockReason }: { jo
       }
     },
     onSuccess: ({ saved, followUpError: retranslateError }) => {
-      setCurrentRevision(saved.revision);
-      setDocument(structuredClone(saved.document));
-      setBaseline(JSON.stringify(saved.document));
-      setConflict(false);
+      adopt(saved);
       setFollowUpError(retranslateError);
       queryClient.setQueryData(queryKeys.glossary(job.job_id), saved);
       void queryClient.invalidateQueries({ queryKey: queryKeys.job(job.job_id) });
@@ -90,7 +118,10 @@ function GlossaryForm({ job, initial, revision, editorLocked, lockReason }: { jo
   return (
     <div className="glossary-editor">
       {editorLocked && <div className="inline-alert"><LoaderCircle className="spin" size={16} /><span>{lockReason === "tts_run_active" ? "Tác vụ audio đang dùng glossary. Editor tạm khóa để giữ artifact nhất quán." : "Pipeline đang tạo lại glossary hoặc bản dịch. Editor tạm khóa để tránh xung đột."}</span></div>}
-      {conflict && <div className="conflict-banner"><AlertTriangle size={19} /><div><strong>Glossary đã thay đổi ở nơi khác</strong><p>Thay đổi local chưa được ghi đè. Tải bản mới rồi áp dụng lại chỉnh sửa cần thiết.</p></div><button className="secondary-button" onClick={() => void queryClient.invalidateQueries({ queryKey: queryKeys.glossary(job.job_id) })}><RotateCcw size={16} />Tải bản mới</button></div>}
+      {/* `data` chính là bản mới đã gây ra xung đột, nên nút này không cần tải
+          lại gì — nó chỉ bỏ bản nháp. Đặt tên đúng việc nó làm, thay cho một
+          hộp thoại xác nhận nữa. */}
+      {conflict && <div className="conflict-banner"><AlertTriangle size={19} /><div><strong>Glossary đã thay đổi ở nơi khác</strong><p>Chỉnh sửa của bạn vẫn còn trên màn hình và chưa bị ghi đè. Lưu tạm khóa để không đè lên bản mới.</p></div><button className="secondary-button danger" onClick={() => adopt(data)}><RotateCcw size={16} />Bỏ chỉnh sửa & lấy bản mới</button></div>}
 
       <fieldset className="panel-sheet glossary-section" disabled={editorLocked}>
         <div className="section-heading"><div><span className="eyebrow">Translation voice</span><h2>Văn phong</h2><p>Ghim cách kể và đại từ để các batch dịch không tự chọn lại.</p></div></div>
