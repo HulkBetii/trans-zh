@@ -41,6 +41,7 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [conflict, setConflict] = useState(false);
   const [followUpError, setFollowUpError] = useState<string | null>(null);
+  const dataRevisionRef = useRef(data.revision);
   const playerRef = useRef<HTMLVideoElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const dirtyCount = Object.keys(changes).length;
@@ -52,15 +53,25 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
   useUnsavedChanges(dirty);
 
   useEffect(() => {
-    if (data === workspace) return;
-    if (dirty) {
-      setConflict(true);
+    // Chỉ `revision` mới nói lên nội dung đã bị ghi đè ở nơi khác. So định danh
+    // object thì `editor_locked` lật lên vì một run TTS, hay `output_stale` lật
+    // sau khi render, cũng bị đọc thành xung đột — rồi banner khuyên reload,
+    // đúng thao tác xóa sạch bản nháp đang có.
+    if (data.revision !== dataRevisionRef.current) {
+      dataRevisionRef.current = data.revision;
+      if (dirty) {
+        setConflict(true);
+        return;
+      }
+      setWorkspace(data);
+      setRevision(data.revision);
+      setConflict(false);
       return;
     }
+    // Cùng revision: hấp thụ các trường phụ (khóa editor, cờ output cũ) mà không
+    // đụng tới `changes`.
     setWorkspace(data);
-    setRevision(data.revision);
-    setConflict(false);
-  }, [data, dirty, workspace]);
+  }, [data, dirty]);
 
   const filtered = useMemo(() => workspace.cues.filter((cue) => {
     const query = search.trim().toLocaleLowerCase();
@@ -75,6 +86,7 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
   const selected = filtered.find((cue) => cue.segment_id === selectedId) ?? filtered[0] ?? null;
   const virtualizer = useVirtualizer({ count: filtered.length, getScrollElement: () => listRef.current, estimateSize: () => 92, overscan: 8 });
   const hasInvalid = Object.values(changes).some((value) => value !== null && !value.trim());
+  const hasSavedOverrides = workspace.cues.some((cue) => cue.override_state !== "none");
 
   useEffect(() => {
     if (selectedId !== null && filtered.some((cue) => cue.segment_id === selectedId)) return;
@@ -94,6 +106,7 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
       }
     },
     onSuccess: ({ saved, followUpError: renderError }) => {
+      dataRevisionRef.current = saved.revision;
       setChanges({});
       setRevision(saved.revision);
       setWorkspace(saved);
@@ -205,9 +218,11 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
 
       {saveMutation.isError && !conflict && <div className="inline-alert error"><AlertTriangle size={16} /><span>{errorMessage(saveMutation.error)}</span></div>}
       {followUpError && <div className="inline-alert error"><AlertTriangle size={16} /><span>Chỉnh sửa đã lưu, nhưng chưa thể bắt đầu render: {followUpError}</span></div>}
-      {dirty && <div className="sticky-savebar subtitle-savebar dirty">
-        <div><strong>{dirtyCount ? `${dirtyCount} thay đổi chưa lưu` : "Mọi chỉnh sửa đã được lưu"}</strong>{workspace.cues.some((cue) => cue.override_state !== "none") && <button className="text-button" onClick={resetAll} disabled={editorLocked}>Reset toàn bộ</button>}</div>
-        <div><button className="secondary-button" disabled={!dirty || hasInvalid || editorLocked || saveMutation.isPending || conflict} onClick={() => saveMutation.mutate(false)}>{saveMutation.isPending ? <LoaderCircle className="spin" size={16} /> : <Save size={16} />}Lưu</button><button className="primary-button" disabled={!dirty || hasInvalid || editorLocked || saveMutation.isPending || conflict || !job.allowed_actions.includes("render")} onClick={() => saveMutation.mutate(true)}><Sparkles size={16} />Lưu & render lại</button></div>
+      {/* Thanh này phải hiện cả khi sạch: "Reset toàn bộ" nằm trong đó, mà lúc
+          cần nó nhất — có override đã lưu, chưa sửa gì thêm — thì lại không dirty. */}
+      {(dirty || hasSavedOverrides) && <div className={`sticky-savebar subtitle-savebar ${dirty ? "dirty" : "clean"}`}>
+        <div><strong>{dirty ? `${dirtyCount} thay đổi chưa lưu` : "Mọi chỉnh sửa đã được lưu"}</strong>{hasSavedOverrides && <button className="text-button" onClick={resetAll} disabled={editorLocked}>Reset toàn bộ</button>}</div>
+        {dirty && <div><button className="secondary-button" disabled={hasInvalid || editorLocked || saveMutation.isPending || conflict} onClick={() => saveMutation.mutate(false)}>{saveMutation.isPending ? <LoaderCircle className="spin" size={16} /> : <Save size={16} />}Lưu</button><button className="primary-button" disabled={hasInvalid || editorLocked || saveMutation.isPending || conflict || !job.allowed_actions.includes("render")} onClick={() => saveMutation.mutate(true)}><Sparkles size={16} />Lưu & render lại</button></div>}
       </div>}
     </div>
   );

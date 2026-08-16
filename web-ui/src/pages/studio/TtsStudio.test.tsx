@@ -5,13 +5,18 @@ import type { JobDetail, TtsWorkspace } from "../../api/types";
 import { jsonResponse, renderApp } from "../../test/render";
 import { TtsStudio } from "./TtsStudio";
 
+const virtualizerMocks = vi.hoisted(() => ({ counts: [] as number[] }));
+
 vi.mock("@tanstack/react-virtual", () => ({
-  useVirtualizer: ({ count }: { count: number }) => ({
-    getTotalSize: () => count * 82,
-    getVirtualItems: () => Array.from({ length: count }, (_, index) => ({ index, start: index * 82, key: index })),
-    measureElement: vi.fn(),
-    scrollToIndex: vi.fn(),
-  }),
+  useVirtualizer: ({ count }: { count: number }) => {
+    virtualizerMocks.counts.push(count);
+    return {
+      getTotalSize: () => count * 82,
+      getVirtualItems: () => Array.from({ length: count }, (_, index) => ({ index, start: index * 82, key: index })),
+      measureElement: vi.fn(),
+      scrollToIndex: vi.fn(),
+    };
+  },
 }));
 
 const job = {
@@ -69,6 +74,7 @@ const workspace: TtsWorkspace = {
 };
 
 afterEach(() => {
+  virtualizerMocks.counts.length = 0;
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -208,6 +214,59 @@ test("asks for every voice source by default", async () => {
   await waitFor(() => expect(
     fetchMock.mock.calls.some(([input]) => String(input).includes("ownership=all")),
   ).toBe(true));
+});
+
+test("waits for typing to stop before asking the provider", async () => {
+  // Tìm kiếm chạy phía nhà cung cấp, nên mỗi ký tự không debounce là một request
+  // thật ra ai33.pro — gõ "duyonyx" thành bảy lần gọi.
+  const noVoiceWorkspace = { ...workspace, voice_id: null, selected_voice: null, calibration: null, allowed_actions: ["calibrate"] as const };
+  const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    if (String(input).includes("/tts/voices")) {
+      return jsonResponse({
+        items: [{ voice_id: "vbee_n_hn_male_duyonyx_oaistable_vc", name: "Duy Onyx", locale: "vi-VN", gender: "male" }],
+        page: 1, page_size: 30, total: 1, has_more: false, credits: null,
+      });
+    }
+    return jsonResponse(noVoiceWorkspace);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  const user = userEvent.setup();
+  renderApp(<TtsStudio job={job} />);
+
+  await user.click(await screen.findByRole("button", { name: "Mở thư viện giọng" }));
+  await screen.findByRole("button", { name: /Duy Onyx/ });
+  await user.type(screen.getByPlaceholderText(/Tìm tên/), "duyonyx");
+
+  const searched = () => fetchMock.mock.calls
+    .map(([input]) => new URL(String(input), "http://localhost").searchParams.get("search"))
+    .filter((value): value is string => value !== null);
+  await waitFor(() => expect(searched()).toEqual(["duyonyx"]));
+});
+
+test("virtualises the voice library instead of mounting every row", async () => {
+  // 1268 giọng, mỗi dòng một thẻ <audio>: dựng hết là trình duyệt ôm hơn một
+  // nghìn player cùng lúc.
+  const noVoiceWorkspace = { ...workspace, voice_id: null, selected_voice: null, calibration: null, allowed_actions: ["calibrate"] as const };
+  vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+    if (String(input).includes("/tts/voices")) {
+      return jsonResponse({
+        items: [
+          { voice_id: "voice-a", name: "Giọng A", locale: "vi-VN", gender: "female" },
+          { voice_id: "voice-b", name: "Giọng B", locale: "vi-VN", gender: "male" },
+          { voice_id: "voice-c", name: "Giọng C", locale: "vi-VN", gender: "male" },
+        ],
+        page: 1, page_size: 30, total: 3, has_more: false, credits: null,
+      });
+    }
+    return jsonResponse(noVoiceWorkspace);
+  }));
+  const user = userEvent.setup();
+  renderApp(<TtsStudio job={job} />);
+
+  await user.click(await screen.findByRole("button", { name: "Mở thư viện giọng" }));
+  await screen.findByRole("button", { name: /Giọng A/ });
+
+  expect(virtualizerMocks.counts).toContain(3);
 });
 
 test("keeps voice setup available before a voice has generated the cue plan", async () => {

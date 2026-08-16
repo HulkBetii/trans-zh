@@ -2,15 +2,32 @@ import { Clapperboard, Menu, PanelLeftOpen, Plus, Settings, X } from "lucide-rea
 import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useDialogFocus } from "../hooks/useDialogFocus";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { JobNavigator } from "./JobNavigator";
 
 const NAVIGATOR_COLLAPSED_KEY = "zhsub.navigator.collapsed";
 
+// Trình duyệt có thể chặn hẳn localStorage (ẩn danh kèm khóa cookie, policy doanh
+// nghiệp). Đọc trần trong initializer thì cả app trắng màn vì một tùy chọn hiển thị.
+function readCollapsed(): boolean {
+  try {
+    return window.localStorage.getItem(NAVIGATOR_COLLAPSED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeCollapsed(collapsed: boolean) {
+  try {
+    window.localStorage.setItem(NAVIGATOR_COLLAPSED_KEY, String(collapsed));
+  } catch {
+    // Không nhớ được giữa các phiên, nhưng trong phiên này vẫn thu gọn được.
+  }
+}
+
 export function AppShell() {
   const [navigatorOpen, setNavigatorOpen] = useState(false);
-  const [navigatorCollapsed, setNavigatorCollapsed] = useState(
-    () => window.localStorage.getItem(NAVIGATOR_COLLAPSED_KEY) === "true",
-  );
+  const [navigatorCollapsed, setNavigatorCollapsed] = useState(readCollapsed);
   const location = useLocation();
   const studioActive = location.pathname === "/" || location.pathname.startsWith("/jobs/");
   const jobRoute = location.pathname.startsWith("/jobs/");
@@ -21,7 +38,7 @@ export function AppShell() {
 
   const setCollapsed = (collapsed: boolean) => {
     setNavigatorCollapsed(collapsed);
-    window.localStorage.setItem(NAVIGATOR_COLLAPSED_KEY, String(collapsed));
+    writeCollapsed(collapsed);
   };
 
   return (
@@ -69,7 +86,9 @@ export function AppShell() {
         <JobNavigator onCollapse={() => setCollapsed(true)} />
       </aside>}
       {jobRoute && navigatorCollapsed && <button className="navigator-expand" onClick={() => setCollapsed(false)} aria-label="Mở cột công việc"><PanelLeftOpen size={18} /></button>}
-      <main className="workspace"><Outlet /></main>
+      {/* Ranh giới thứ hai, bên trong rail: một màn hỏng vẫn để lại điều hướng
+          để đi chỗ khác, thay vì nuốt cả app như ranh giới ở main.tsx. */}
+      <main className="workspace"><ErrorBoundary resetKey={location.pathname}><Outlet /></ErrorBoundary></main>
     </div>
   );
 }

@@ -92,6 +92,43 @@ test("keeps dirty subtitle text when the server revision changes", async () => {
   expect(screen.getByLabelText("Bản hiệu lực")).toHaveValue("Bản local chưa lưu");
 });
 
+test("does not read a lock flip as someone else overwriting the subtitles", async () => {
+  // `editor_locked` lật lên khi một run TTS bắt đầu, `output_stale` lật sau khi
+  // render — cùng revision, không ai ghi đè gì. So định danh object thì cả hai
+  // đều hiện banner xung đột, mà nút duy nhất trong banner là reload: đúng thao
+  // tác xóa sạch bản nháp đang có trên màn hình.
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse(workspace)));
+  const { queryClient } = renderApp(<SubtitleStudio job={job} />);
+  const user = userEvent.setup();
+  const editor = await screen.findByLabelText("Bản hiệu lực");
+  await user.clear(editor);
+  await user.type(editor, "Bản local chưa lưu");
+
+  act(() => {
+    queryClient.setQueryData(queryKeys.subtitles(job.job_id, "vi"), {
+      ...workspace,
+      editor_locked: true,
+      output_stale: true,
+    });
+  });
+
+  expect(await screen.findByText(/Editor tạm khóa/)).toBeInTheDocument();
+  expect(screen.queryByText("Phụ đề đã thay đổi ở tab khác")).not.toBeInTheDocument();
+  expect(screen.getByLabelText("Bản hiệu lực")).toHaveValue("Bản local chưa lưu");
+});
+
+test("offers a reset for saved overrides even with nothing dirty", async () => {
+  // Nút "Reset toàn bộ" từng nằm trong thanh chỉ hiện khi dirty, nên ở đúng
+  // trạng thái cần nó — có override đã lưu, chưa sửa gì thêm — nó không tồn tại.
+  const overridden = { ...workspace, cues: [{ ...workspace.cues[0], effective_text: "Bản chỉnh tay", override_state: "manual" as const, overridden: true }] };
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse(overridden)));
+  renderApp(<SubtitleStudio job={job} />);
+
+  expect(await screen.findByRole("button", { name: "Reset toàn bộ" })).toBeInTheDocument();
+  expect(screen.getByText("Mọi chỉnh sửa đã được lưu")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Lưu" })).not.toBeInTheDocument();
+});
+
 test("asks before changing language while subtitle edits are dirty", async () => {
   const multiLanguageJob = {
     ...job,

@@ -266,6 +266,7 @@ code, time, .mono-input { font-family: "IBM Plex Mono", monospace; }
 .state-page { display: flex; min-height: 70vh; flex-direction: column; align-items: flex-start; justify-content: center; }
 .state-page h1 { margin-top: 13px; }
 .state-page p { margin: 7px 0 18px; color: var(--muted); }
+.state-page-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .inline-alert { margin-bottom: 13px; border-color: rgba(170,107,22,0.25); color: var(--amber); background: rgba(170,107,22,0.05); font-size: 10px; }
 .inline-alert.error { color: var(--red); }
 .connection-banner { display: flex; align-items: center; gap: 8px; margin: 12px clamp(22px, 3.2vw, 46px) 0; padding: 9px 12px; border-left: 2px solid var(--amber); color: var(--amber); background: rgba(143,87,13,.06); font-size: var(--text-micro); }
