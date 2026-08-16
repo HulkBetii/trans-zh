@@ -17,8 +17,10 @@ from zhsub.models import (
     SourceInfo,
     TranslationItem,
     TranslationsDoc,
+    TtsCalibration,
 )
 from zhsub.progress import Cancelled, RunContext
+from zhsub.dub.calibrate import UncalibratedVoiceError
 from zhsub.stages import s6_dub
 
 
@@ -108,6 +110,52 @@ def _config() -> Config:
     return config
 
 
+def _calibration(voice_id: str = "voice-a") -> TtsCalibration:
+    """S6 không còn tự dựng hằng số: người gọi phải nói rõ số đo của giọng nào."""
+    return TtsCalibration(
+        voice_id=voice_id,
+        overhead_sec=0.15,
+        sec_per_syllable=0.217,
+        samples_hash="test",
+        created_at="2026-01-01T00:00:00Z",
+    )
+
+
+def test_render_refuses_a_voice_that_has_never_been_measured(tmp_path, fake_tts):
+    """Từ chối TRƯỚC khi tiêu tiền, không phải sau."""
+    work_dir = tmp_path / "work" / "job"
+    _write_base(work_dir)
+
+    with pytest.raises(UncalibratedVoiceError, match="chưa có số đo"):
+        s6_dub.run(work_dir, _config(), "vi", tmp_path / "output")
+
+    assert fake_tts.calls == []
+    assert not list((work_dir / "dub").rglob("*.mp3"))
+
+
+def test_render_refuses_a_calibration_measured_on_another_voice(tmp_path, fake_tts):
+    """Hồi quy cho lỗi gốc.
+
+    `_legacy_calibration` từng dựng hằng số từ zhsub.toml rồi ĐÓNG DẤU voice_id là
+    giọng đang chọn, nên phép kiểm ngay dưới nó không bao giờ bắt được gì: số đo
+    của một giọng được áp lặng lẽ cho mọi giọng khác, sai ~21% tốc độ đọc.
+    """
+    work_dir = tmp_path / "work" / "job"
+    _write_base(work_dir)
+
+    with pytest.raises(UncalibratedVoiceError) as excinfo:
+        s6_dub.run(
+            work_dir,
+            _config(),
+            "vi",
+            tmp_path / "output",
+            calibration=_calibration("voice-b"),
+        )
+
+    assert "voice-a" in str(excinfo.value) and "voice-b" in str(excinfo.value)
+    assert fake_tts.calls == []
+
+
 def test_full_tts_uses_source_media_duration_and_writes_report(tmp_path, fake_tts, monkeypatch):
     work_dir = tmp_path / "work" / "job"
     _write_base(work_dir)
@@ -122,7 +170,7 @@ def test_full_tts_uses_source_media_duration_and_writes_report(tmp_path, fake_tt
         destination.write_bytes(b"mp3")
 
     monkeypatch.setattr(s6_dub, "assemble", fake_assemble)
-    destination = s6_dub.run(work_dir, _config(), "vi", tmp_path / "output")
+    destination = s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", calibration=_calibration())
 
     report = (work_dir / "tts_report.vi.json").read_text(encoding="utf-8")
     assert destination.name == "job.vi.mp3"
@@ -139,8 +187,8 @@ def test_preview_and_full_render_share_the_same_cue_cache(
     _write_base(work_dir)
     monkeypatch.setattr(s6_dub, "assemble", lambda *args: None)
 
-    preview = s6_dub.preview_cue(work_dir, _config(), 1)
-    s6_dub.run(work_dir, _config(), "vi", tmp_path / "output")
+    preview = s6_dub.preview_cue(work_dir, _config(), 1, calibration=_calibration())
+    s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", calibration=_calibration())
 
     assert preview.is_file()
     assert len(fake_tts.calls) == 4
@@ -153,7 +201,7 @@ def test_editing_one_spoken_cue_invalidates_only_that_cache_entry(
     _write_base(work_dir)
     monkeypatch.setattr(s6_dub, "assemble", lambda *args: None)
 
-    s6_dub.run(work_dir, _config(), "vi", tmp_path / "output")
+    s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", calibration=_calibration())
     revision = get_speech_state(work_dir).revision
     apply_spoken_changes(
         work_dir,
@@ -161,7 +209,7 @@ def test_editing_one_spoken_cue_invalidates_only_that_cache_entry(
         revision,
         [{"segment_id": 2, "text": "Câu hai đọc khác"}],
     )
-    s6_dub.run(work_dir, _config(), "vi", tmp_path / "output")
+    s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", calibration=_calibration())
 
     assert fake_tts.calls.count("Câu hai đọc khác") == 1
     assert len(fake_tts.calls) == 5
@@ -182,7 +230,7 @@ def test_cancel_stops_dispatching_new_paid_cues_and_keeps_in_flight_cache(
     ctx = RunContext(on_progress=on_progress, cancel=cancel)
 
     with pytest.raises(Cancelled):
-        s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", ctx=ctx)
+        s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", ctx=ctx, calibration=_calibration())
 
     assert 1 <= len(fake_tts.calls) <= 2
     assert list((work_dir / "dub" / "vi").glob("*.mp3"))
@@ -209,7 +257,7 @@ def test_cancel_during_pcm_decode_skips_assembly_and_report(
     ctx = RunContext(cancel=cancel)
 
     with pytest.raises(Cancelled):
-        s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", ctx=ctx)
+        s6_dub.run(work_dir, _config(), "vi", tmp_path / "output", ctx=ctx, calibration=_calibration())
 
     assert not (work_dir / "tts_report.vi.json").exists()
 
@@ -230,6 +278,6 @@ def test_first_terminal_provider_failure_stops_new_paid_dispatch(
     monkeypatch.setattr(s6_dub, "_fetch_clip", fail_fetch)
 
     with pytest.raises(RuntimeError, match="1/4 cue failed"):
-        s6_dub.run(work_dir, config, "vi", tmp_path / "output")
+        s6_dub.run(work_dir, config, "vi", tmp_path / "output", calibration=_calibration())
 
     assert len(fake_tts.calls) == 1

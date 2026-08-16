@@ -17,6 +17,7 @@ from zhsub.models import (
     SourceInfo,
     TranslationItem,
     TranslationsDoc,
+    TtsCalibration,
 )
 from zhsub.overrides import (
     OverrideConflictError,
@@ -26,6 +27,17 @@ from zhsub.overrides import (
     get_override_state,
 )
 from zhsub.stages import s5_render, s6_dub
+
+
+def _dub_calibration() -> TtsCalibration:
+    """S6 từ chối đoán hằng số, nên test phải nói rõ số đo thuộc giọng nào."""
+    return TtsCalibration(
+        voice_id="voice",
+        overhead_sec=0.15,
+        sec_per_syllable=0.217,
+        samples_hash="test",
+        created_at="2026-01-01T00:00:00Z",
+    )
 
 
 def _write_base(work_dir: Path) -> None:
@@ -281,8 +293,8 @@ def test_dub_cache_invalidates_only_the_edited_cue(
     config.dub.voice_id = "voice"
     config.dub.concurrency = 1
 
-    s6_dub.run(work_dir, config, "vi", tmp_path / "output")
+    s6_dub.run(work_dir, config, "vi", tmp_path / "output", calibration=_dub_calibration())
     _save(work_dir, [{"segment_id": 1, "text": "Bản sửa tay"}])
-    s6_dub.run(work_dir, config, "vi", tmp_path / "output")
+    s6_dub.run(work_dir, config, "vi", tmp_path / "output", calibration=_dub_calibration())
 
     assert synthesized == ["Câu một", "Câu hai", "Bản sửa tay"]

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from ..config import Config
-from ..dub.calibrate import calibrate_voice
+from ..dub.calibrate import VOICE_NOT_CALIBRATED, calibrate_voice
 from ..dub.client import SpeechClient
 from ..dub.spoken import (
     SpeechConflictError,
@@ -110,8 +110,8 @@ class TtsService:
 
     def seed_config_calibration(self) -> None:
         """Make the measured legacy voice available to the new shared library."""
-        voice_id = self.config.dub.voice_id.strip()
-        if not voice_id or voice_id == "SET_ME":
+        voice_id = self.config.dub.configured_voice_id()
+        if voice_id is None:
             return
         if self.store.get_voice_calibration(PROVIDER, voice_id) is None:
             self.store.save_voice_calibration(
@@ -237,8 +237,7 @@ class TtsService:
             client.close()
 
     def _fallback_voice(self, job: Job) -> str | None:
-        configured = self.config.dub.voice_id.strip()
-        return configured if configured and configured != "SET_ME" else None
+        return self.config.dub.configured_voice_id()
 
     def _state(self, job: Job):
         return get_speech_state(job.work_dir, self._fallback_voice(job))
@@ -329,54 +328,91 @@ class TtsService:
             Path(job.work_dir) / "translations.vi.json"
         ).is_file():
             try:
-                plan = self._plan(job, voice_id, calibration)
                 segments = read_doc(Path(job.work_dir) / "segments.json", SegmentsDoc)
                 segment_by_id = {segment.id: segment for segment in segments.segments}
                 rows = {row.segment_id: row for row in effective_spoken_items(job.work_dir)}
-                for cue in plan.cues:
-                    row = rows[cue.segment_id]
-                    segment = segment_by_id[cue.segment_id]
+                clips_dir = Path(job.work_dir) / "dub" / LANGUAGE
+
+                def _override_state(segment_id: int) -> str:
                     evaluation = state and next(
-                        (item for item in state.evaluations if item.segment_id == cue.segment_id),
+                        (item for item in state.evaluations if item.segment_id == segment_id),
                         None,
                     )
-                    status = {
+                    return {
                         None: "none",
                         "valid": "manual",
                         "base_changed": "base_changed",
                         "stale": "stale",
                     }.get(evaluation.status if evaluation else None, "none")
-                    calibration_overhead = plan.calibration.overhead_sec
-                    calibration_slope = plan.calibration.sec_per_syllable
-                    predicted = calibration_overhead + len(cue.text.split()) * calibration_slope
-                    preview_state = "current" if cue.clip_path.is_file() and cue.clip_path.stat().st_size > 0 else "missing"
-                    if preview_state == "missing" and any(
-                        cue.clip_path.parent.glob(f"{cue.segment_id:05d}-*.mp3")
-                    ):
-                        preview_state = "stale"
-                    if preview_state != "current":
-                        uncached += 1
-                    cues.append(
-                        TtsCueResponse(
-                            segment_id=cue.segment_id,
-                            start=cue.start_sec,
-                            end=segment.end,
-                            subtitle_text=row.subtitle_text,
-                            default_spoken_text=row.base_spoken_text,
-                            effective_spoken_text=row.effective_spoken_text,
-                            override_state=status,  # type: ignore[arg-type]
-                            room_seconds=cue.room_sec,
-                            predicted_duration=predicted,
-                            overflow_seconds=max(0.0, predicted - cue.room_sec),
-                            speed=cue.speed,
-                            preview_state=preview_state,  # type: ignore[arg-type]
-                            preview_url=(
-                                f"/api/v1/jobs/{job.job_id}/tts/vi/previews/{cue.segment_id}"
-                                if preview_state == "current"
-                                else None
-                            ),
+
+                if calibration is not None:
+                    plan = self._plan(job, voice_id, calibration)
+                    for cue in plan.cues:
+                        row = rows[cue.segment_id]
+                        segment = segment_by_id[cue.segment_id]
+                        calibration_overhead = plan.calibration.overhead_sec
+                        calibration_slope = plan.calibration.sec_per_syllable
+                        predicted = calibration_overhead + len(cue.text.split()) * calibration_slope
+                        preview_state = "current" if cue.clip_path.is_file() and cue.clip_path.stat().st_size > 0 else "missing"
+                        if preview_state == "missing" and any(
+                            cue.clip_path.parent.glob(f"{cue.segment_id:05d}-*.mp3")
+                        ):
+                            preview_state = "stale"
+                        if preview_state != "current":
+                            uncached += 1
+                        cues.append(
+                            TtsCueResponse(
+                                segment_id=cue.segment_id,
+                                start=cue.start_sec,
+                                end=segment.end,
+                                subtitle_text=row.subtitle_text,
+                                default_spoken_text=row.base_spoken_text,
+                                effective_spoken_text=row.effective_spoken_text,
+                                override_state=_override_state(cue.segment_id),  # type: ignore[arg-type]
+                                room_seconds=cue.room_sec,
+                                predicted_duration=predicted,
+                                overflow_seconds=max(0.0, predicted - cue.room_sec),
+                                speed=cue.speed,
+                                preview_state=preview_state,  # type: ignore[arg-type]
+                                preview_url=(
+                                    f"/api/v1/jobs/{job.job_id}/tts/vi/previews/{cue.segment_id}"
+                                    if preview_state == "current"
+                                    else None
+                                ),
+                            )
                         )
-                    )
+                else:
+                    # Chưa hiệu chuẩn thì không có ước tính thời lượng — và không
+                    # bịa ra bằng hằng số của giọng khác, đó chính là lỗi cũ. Vẫn
+                    # phải liệt kê đủ cue, vì nút "Hiệu chuẩn 8 mẫu" chỉ mở khi
+                    # đếm được từ 8 cue trở lên.
+                    for draft in s6_dub.build_draft(
+                        job.work_dir, self.config, LANGUAGE, voice_id=voice_id
+                    ):
+                        row = rows[draft.segment_id]
+                        segment = segment_by_id[draft.segment_id]
+                        uncached += 1
+                        cues.append(
+                            TtsCueResponse(
+                                segment_id=draft.segment_id,
+                                start=draft.start_sec,
+                                end=segment.end,
+                                subtitle_text=row.subtitle_text,
+                                default_spoken_text=row.base_spoken_text,
+                                effective_spoken_text=row.effective_spoken_text,
+                                override_state=_override_state(draft.segment_id),  # type: ignore[arg-type]
+                                room_seconds=draft.room_sec,
+                                predicted_duration=None,
+                                overflow_seconds=None,
+                                speed=self.config.dub.base_speed,
+                                preview_state=(
+                                    "stale"
+                                    if any(clips_dir.glob(f"{draft.segment_id:05d}-*.mp3"))
+                                    else "missing"
+                                ),
+                                preview_url=None,
+                            )
+                        )
             except (OSError, ValueError, SpeechValidationError, KeyError) as exc:
                 plan = None
                 artifacts_invalid = True
@@ -434,7 +470,10 @@ class TtsService:
         if active_locked and active_tts is not None:
             allowed.append("cancel")
         elif not active_locked:
-            if voice_id and self.provider_ready and cues:
+            # Nghe thử cần hiệu chuẩn: không có số đo thì không tính được tốc độ,
+            # và S6 từ chối trước khi tổng hợp. Nút mờ hơn là một run chắc chắn
+            # hỏng — muốn nghe giọng thì thư viện giọng đã có mẫu miễn phí.
+            if voice_id and self.provider_ready and cues and calibration_record is not None:
                 allowed.append("preview")
             if voice_id and self.provider_ready and len(cues) >= CALIBRATION_SAMPLES:
                 allowed.append("calibrate")
@@ -592,6 +631,12 @@ class TtsService:
             raise RuntimeError(
                 "Voice calibration changed after the run was queued; retry the action"
             )
+        # Chặn ngay ở cửa, trước khi vào stage: hỏng ở đây là một câu tiếng Việt
+        # đọc được, hỏng sâu bên trong là một ValueError giữa thanh tiến độ.
+        if calibration is None and run.kind in {"tts_preview", "tts_render"}:
+            raise RuntimeError(
+                VOICE_NOT_CALIBRATED.format(voice=voice_id, job=job.job_id)
+            )
         if run.kind == "tts_preview":
             ctx = RunContext(job.job_id, on_progress, cancel, stages=["tts_preview"])
             ctx.enter_stage("tts_preview")
@@ -647,8 +692,6 @@ class TtsService:
         approved, subtitle_signature = self._subtitle_approved(job)
         if not approved or payload.get("subtitle_approval_signature") != subtitle_signature:
             raise RuntimeError("Subtitle approval is no longer current; approve subtitles again")
-        if calibration is None:
-            raise RuntimeError("Selected voice has no shared calibration")
         ctx = RunContext(job.job_id, on_progress, cancel, stages=["tts_render"])
         ctx.enter_stage("tts_render")
         cfg = config.model_copy(deep=True)

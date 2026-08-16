@@ -16,7 +16,12 @@ from typing import Any, Mapping
 from ..config import Config
 from ..dub import SpeechClient, assemble, decode_pcm, speech_bounds
 from ..dub.audio import AudioPlacement
-from ..dub.calibrate import calibration_hash
+from ..dub.calibrate import (
+    VOICE_CALIBRATION_MISMATCH,
+    VOICE_NOT_CALIBRATED,
+    UncalibratedVoiceError,
+    calibration_hash,
+)
 from ..dub.spoken import (
     effective_spoken_hash,
     effective_spoken_items,
@@ -93,33 +98,109 @@ def _rooms(segments: list, total_sec: float) -> list[float]:
     ]
 
 
-def _legacy_calibration(cfg: Config, voice_id: str) -> TtsCalibration:
-    return TtsCalibration(
-        voice_id=voice_id,
-        overhead_sec=cfg.dub.overhead_sec,
-        sec_per_syllable=cfg.dub.sec_per_syllable,
-        samples_hash="legacy-config",
-        created_at="legacy-config",
-        points=[],
+def _coerce_calibration(
+    calibration: TtsCalibration | Mapping[str, Any] | None,
+    voice_id: str,
+    job_name: str,
+) -> TtsCalibration:
+    """Nhận đúng số đo của đúng giọng, không thì từ chối.
+
+    Trước đây `None` được thay bằng hằng số trong zhsub.toml, ĐÓNG DẤU voice_id là
+    giọng đang chọn — nên phép kiểm ngay dưới không bao giờ bắt được gì, và số đo
+    của một giọng lặng lẽ được áp cho mọi giọng khác. Không có fallback ở đây nữa:
+    ai muốn dùng hằng số TOML thì phải tự dựng TtsCalibration và tự chịu trách
+    nhiệm về việc nó thuộc giọng nào (xem `_resolve_dub_calibration` trong cli).
+    """
+    if calibration is None:
+        raise UncalibratedVoiceError(
+            VOICE_NOT_CALIBRATED.format(voice=voice_id, job=job_name)
+        )
+    result = (
+        calibration
+        if isinstance(calibration, TtsCalibration)
+        else TtsCalibration.model_validate(calibration)
+    )
+    if result.voice_id != voice_id:
+        raise UncalibratedVoiceError(
+            VOICE_CALIBRATION_MISMATCH.format(
+                selected=voice_id, configured=result.voice_id, job=job_name
+            )
+        )
+    return result
+
+
+@dataclass(frozen=True, slots=True)
+class CueDraft:
+    """Một cue trước khi biết hiệu chuẩn: đủ để hiển thị, chưa đủ để tổng hợp."""
+
+    segment_id: int
+    start_sec: float
+    room_sec: float
+    text: str
+
+
+@dataclass(frozen=True, slots=True)
+class _Draft:
+    voice_id: str
+    state: Any
+    rows: list
+    segments: list
+    total_sec: float
+    rooms: list[float]
+
+
+def _draft_cues(root: Path, cfg: Config, lang: str, voice_id: str | None) -> _Draft:
+    """Phần của build_plan không cần biết hiệu chuẩn là gì."""
+    if lang != "vi":
+        raise ValueError("TTS currently supports Vietnamese only")
+    selected_voice = resolve_voice_id(
+        root,
+        cfg.dub.configured_voice_id(),
+        override_voice_id=voice_id,
+    )
+    rows = effective_spoken_items(root, selected_voice)
+    segments = read_doc(root / "segments.json", SegmentsDoc).segments
+    total_sec = _source_duration(root, segments)
+    return _Draft(
+        voice_id=selected_voice,
+        state=get_speech_state(root, selected_voice),
+        rows=rows,
+        segments=segments,
+        total_sec=total_sec,
+        rooms=_rooms(segments, total_sec),
     )
 
 
-def _coerce_calibration(
-    calibration: TtsCalibration | Mapping[str, Any] | None,
+def build_draft(
+    work_dir: str | Path,
     cfg: Config,
-    voice_id: str,
-) -> TtsCalibration:
-    if calibration is None:
-        result = _legacy_calibration(cfg, voice_id)
-    elif isinstance(calibration, TtsCalibration):
-        result = calibration
-    else:
-        result = TtsCalibration.model_validate(calibration)
-    if result.voice_id != voice_id:
-        raise ValueError(
-            f"calibration belongs to voice {result.voice_id!r}, expected {voice_id!r}"
+    lang: str = "vi",
+    *,
+    voice_id: str | None = None,
+) -> tuple[CueDraft, ...]:
+    """Liệt kê cue cho một giọng CHƯA hiệu chuẩn.
+
+    Bắt buộc phải có, không phải tiện ích: nút "Hiệu chuẩn 8 mẫu" chỉ mở khi
+    workspace đếm được từ 8 cue trở lên. Nếu chưa hiệu chuẩn mà workspace rỗng
+    thì nút biến mất đúng với những giọng cần nó nhất — chưa đo thành không thể đo.
+    """
+    root = Path(work_dir)
+    draft = _draft_cues(root, cfg, lang, voice_id)
+    row_by_id = {row.segment_id: row for row in draft.rows}
+    cues: list[CueDraft] = []
+    for segment, room in zip(draft.segments, draft.rooms):
+        row = row_by_id.get(segment.id)
+        if row is None:
+            raise ValueError(f"missing effective spoken text for segment {segment.id}")
+        cues.append(
+            CueDraft(
+                segment_id=segment.id,
+                start_sec=segment.start,
+                room_sec=room,
+                text=row.effective_spoken_text,
+            )
         )
-    return result
+    return tuple(cues)
 
 
 def _source_duration(work_dir: Path, segments: list) -> float:
@@ -142,24 +223,16 @@ def build_plan(
     calibration: TtsCalibration | Mapping[str, Any] | None = None,
 ) -> TtsPlan:
     """Build the immutable cue/input plan shared by preview and full render."""
-    if lang != "vi":
-        raise ValueError("TTS currently supports Vietnamese only")
     root = Path(work_dir)
-    configured_voice = (
-        cfg.dub.voice_id if cfg.dub.voice_id and cfg.dub.voice_id != "SET_ME" else None
-    )
-    selected_voice = resolve_voice_id(
-        root,
-        configured_voice,
-        override_voice_id=voice_id,
-    )
-    state = get_speech_state(root, selected_voice)
-    spoken_rows = effective_spoken_items(root, selected_voice)
+    draft = _draft_cues(root, cfg, lang, voice_id)
+    selected_voice = draft.voice_id
+    state = draft.state
+    spoken_rows = draft.rows
     row_by_id = {row.segment_id: row for row in spoken_rows}
-    segments = read_doc(root / "segments.json", SegmentsDoc).segments
-    total_sec = _source_duration(root, segments)
-    rooms = _rooms(segments, total_sec)
-    selected_calibration = _coerce_calibration(calibration, cfg, selected_voice)
+    segments = draft.segments
+    total_sec = draft.total_sec
+    rooms = draft.rooms
+    selected_calibration = _coerce_calibration(calibration, selected_voice, root.name)
     selected_calibration_hash = calibration_hash(selected_calibration)
     clips_dir = root / "dub" / "vi"
     clips_dir.mkdir(parents=True, exist_ok=True)
@@ -227,12 +300,9 @@ def _persist_selected_voice(
     cfg: Config,
     voice_id: str | None,
 ) -> str:
-    configured_voice = (
-        cfg.dub.voice_id if cfg.dub.voice_id and cfg.dub.voice_id != "SET_ME" else None
-    )
     selected_voice = resolve_voice_id(
         work_dir,
-        configured_voice,
+        cfg.dub.configured_voice_id(),
         override_voice_id=voice_id,
     )
     ensure_speech_doc(work_dir, selected_voice)

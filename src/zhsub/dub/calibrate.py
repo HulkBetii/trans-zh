@@ -36,6 +36,27 @@ MIN_SAMPLES = 3  # Legacy export; shared calibration itself always uses eight.
 CALIBRATION_SAMPLE_COUNT = 8
 
 
+class UncalibratedVoiceError(ValueError):
+    """S6 từ chối đoán hằng số tốc độ đọc cho một giọng chưa được đo.
+
+    Kế thừa ValueError có chủ đích: các `except ValueError` sẵn có ở tầng web vẫn
+    bắt được, nên chỗ nào chưa kịp xử lý riêng thì vẫn xuống nhẹ nhàng thay vì 500.
+    """
+
+
+VOICE_NOT_CALIBRATED = (
+    "Giọng {voice!r} chưa có số đo tốc độ đọc. Phải đo trước khi lồng tiếng: "
+    "chạy `zhsub dub-calibrate {job}`, hoặc bấm 'Hiệu chuẩn 8 mẫu' trong Studio."
+)
+
+VOICE_CALIBRATION_MISMATCH = (
+    "Job đang dùng giọng {selected!r}, nhưng overhead_sec/sec_per_syllable trong "
+    "[dub] là số đo của giọng {configured!r}. Dùng chéo hai giọng thì S6 tính sai "
+    "tốc độ đọc mà không báo lỗi gì. Đo lại cho giọng đang dùng: "
+    "`zhsub dub-calibrate {job}`."
+)
+
+
 def pick_samples(texts: list[str], count: int) -> list[str]:
     """Chọn câu trải đều theo số âm tiết, để phép khớp có đòn bẩy ở cả hai đầu.
 
@@ -132,7 +153,7 @@ def calibrate_voice(
     else:
         selected_voice = resolve_voice_id(
             work_dir,
-            cfg.dub.voice_id if cfg.dub.voice_id != "SET_ME" else None,
+            cfg.dub.configured_voice_id(),
         )
     if sample_texts is None:
         rows = effective_spoken_items(work_dir, selected_voice)

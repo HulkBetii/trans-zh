@@ -276,13 +276,15 @@ class DubConfig(BaseModel):
             raise RuntimeError(f"Chưa có API key cho {self.api_key_env}.")
         return key
 
-    def require_voice(self) -> str:
-        if not self.voice_id or self.voice_id == _PLACEHOLDER:
-            raise RuntimeError(
-                f"Chưa đặt voice_id cho [dub] trong zhsub.toml (đang là {_PLACEHOLDER!r}). "
-                f"Xem danh sách: GET /v3/voices?provider=vbee"
-            )
-        return self.voice_id
+    def configured_voice_id(self) -> str | None:
+        """Giọng ghi trong zhsub.toml, hoặc None khi còn là placeholder.
+
+        Trả None thay vì ném lỗi vì mọi nơi gọi đều muốn "không có thì lấy giọng
+        đã lưu của job" — một hàm require_voice() ném lỗi từng tồn tại ở đây và
+        không nơi nào dùng được, nên năm chỗ tự viết lại phép kiểm placeholder.
+        """
+        voice = self.voice_id.strip()
+        return voice if voice and voice != _PLACEHOLDER else None
 
 
 class Config(BaseModel):

@@ -392,6 +392,71 @@ def test_tts_activity_controls_job_sort_order(tmp_path: Path) -> None:
     }
 
 
+def test_an_uncalibrated_voice_still_lists_cues_so_it_can_be_calibrated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Chưa hiệu chuẩn phải là trạng thái đọc được, không phải job hỏng.
+
+    Nút "Hiệu chuẩn 8 mẫu" chỉ mở khi đếm được từ 8 cue. Nếu workspace rỗng vì
+    chưa có số đo thì nút biến mất đúng với giọng cần nó — chưa đo thành không
+    thể đo.
+    """
+    monkeypatch.setenv(API_KEY_ENV, "test-key")
+    with _client(tmp_path) as client:
+        created, _, _ = _create_completed_job(client, tmp_path)
+        selected = _select_voice(client, created["job_id"])
+
+        assert selected["total_cues"] == 8
+        assert selected["calibration"] is None
+        assert "voice_uncalibrated" in selected["attention_reasons"]
+        assert "calibrate" in selected["allowed_actions"]
+        assert "preview" not in selected["allowed_actions"]
+        assert "render" not in selected["allowed_actions"]
+        # Không có số đo thì không bịa ước tính — đó chính là lỗi cũ.
+        assert all(cue["predicted_duration"] is None for cue in selected["cues"])
+        assert all(cue["overflow_seconds"] is None for cue in selected["cues"])
+
+
+def test_preview_is_rejected_until_the_voice_is_calibrated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(API_KEY_ENV, "test-key")
+    with _client(tmp_path) as client:
+        created, _, _ = _create_completed_job(client, tmp_path)
+        _select_voice(client, created["job_id"])
+
+        preview = client.post(
+            f"/api/v1/jobs/{created['job_id']}/tts/vi/preview",
+            json={"segment_id": 0},
+        )
+
+        assert preview.status_code == 409, preview.text
+
+
+def test_workspace_never_borrows_another_voices_calibration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Chính lỗi đã báo, diễn đạt ở tầng HTTP.
+
+    Số đo của giọng khác nằm sẵn trong kho; giọng đang chọn thì chưa đo. Trước
+    đây S6 lặng lẽ mượn hằng số trong zhsub.toml và đóng dấu tên giọng đang chọn.
+    """
+    monkeypatch.setenv(API_KEY_ENV, "test-key")
+    with _client(tmp_path) as client:
+        created, _, store = _create_completed_job(client, tmp_path)
+        store.save_voice_calibration(
+            TTS_PROVIDER, "voice-vi-b", 9.0, 9.0, sample_count=8, source_job_id=created["job_id"]
+        )
+        selected = _select_voice(client, created["job_id"])
+
+        assert selected["voice_id"] == VOICE_ID
+        assert selected["calibration"] is None
+        assert all(cue["predicted_duration"] is None for cue in selected["cues"])
+
+
 def test_tts_workspace_settings_and_spoken_override_conflicts(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -451,6 +516,8 @@ def test_preview_and_calibration_are_allowed_before_subtitle_approval(
     monkeypatch.setenv(API_KEY_ENV, "test-key")
     with _client(tmp_path) as client:
         created, _, store = _create_completed_job(client, tmp_path)
+        # Nghe thử giờ đòi hiệu chuẩn: không có số đo thì không tính được tốc độ.
+        _save_calibration(store, created["job_id"])
         selected = _select_voice(client, created["job_id"])
         assert selected["subtitle_approved"] is False
         assert {"preview", "calibrate"} <= set(selected["allowed_actions"])
@@ -469,6 +536,7 @@ def test_preview_and_calibration_are_allowed_before_subtitle_approval(
             "lang": "vi",
             "voice_id": VOICE_ID,
             "speech_revision": selected["revision"],
+            "calibration_revision": selected["calibration"]["revision"],
             "segment_id": 0,
         }
         client.post(f"/api/v1/runs/{preview.json()['run_id']}/cancel")
@@ -562,9 +630,21 @@ def test_preview_download_resolves_only_the_current_cue_cache(
     monkeypatch.setenv(API_KEY_ENV, "test-key")
     config = _config(tmp_path)
     with _client(tmp_path, config) as client:
-        created, work_dir, _ = _create_completed_job(client, tmp_path)
+        created, work_dir, store = _create_completed_job(client, tmp_path)
+        _save_calibration(store, created["job_id"])
         selected = _select_voice(client, created["job_id"])
-        plan = s6_dub.build_plan(work_dir, config, voice_id=VOICE_ID)
+        plan = s6_dub.build_plan(
+            work_dir,
+            config,
+            voice_id=VOICE_ID,
+            calibration=TtsCalibration(
+                voice_id=VOICE_ID,
+                overhead_sec=0.15,
+                sec_per_syllable=0.217,
+                samples_hash="test",
+                created_at="2026-01-01T00:00:00Z",
+            ),
+        )
         plan.cues[0].clip_path.write_bytes(b"preview-audio")
 
         current = client.get(
