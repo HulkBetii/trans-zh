@@ -120,3 +120,28 @@ test("keeps focus while editing the Chinese term used to identify a row", async 
   expect(input).toHaveValue("小明");
   expect(input).toHaveFocus();
 });
+
+test("flags an address pair that is missing one of its two sides", async () => {
+  // Nhánh "address" của ValidationError có từ đầu nhưng chưa bao giờ được ghi vào.
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({
+    revision: "rev-1",
+    document: {
+      ...glossaryDoc("Tiểu Minh"),
+      address_terms: [{ speaker: "A", addressee: "", vi_self: "tôi", vi_other: "anh", basis: "" }],
+    },
+  })));
+  renderApp(<GlossaryEditor job={job} />);
+
+  expect(await screen.findByText(/Cần cả người nói và người nghe/)).toBeInTheDocument();
+});
+
+test("flags two rows pinning the same speaker and addressee", async () => {
+  const pair = { speaker: "A", addressee: "B", vi_self: "tôi", vi_other: "anh", basis: "" };
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({
+    revision: "rev-1",
+    document: { ...glossaryDoc("Tiểu Minh"), address_terms: [pair, { ...pair, vi_self: "em" }] },
+  })));
+  renderApp(<GlossaryEditor job={job} />);
+
+  expect(await screen.findByText(/Trùng cặp xưng hô/)).toBeInTheDocument();
+});

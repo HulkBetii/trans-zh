@@ -16,7 +16,10 @@ function DialogHarness() {
 }
 
 test("traps focus and restores it after closing the file browser", async () => {
-  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse([{ label: "Media", path: "D:\\Media" }])));
+  // Hình dạng thật của API: FileRootsResponse.roots là required trong schema.
+  // Fixture cũ trả mảng trần và chỉ chạy được nhờ một nhánh phòng thủ trong
+  // client — nhánh đó che mất việc fixture không khớp API.
+  vi.stubGlobal("fetch", vi.fn(async () => jsonResponse({ roots: [{ label: "Media", path: "D:\\Media" }] })));
   const user = userEvent.setup();
   renderApp(<DialogHarness />);
 

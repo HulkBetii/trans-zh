@@ -66,11 +66,20 @@ export function useTestCredential() {
   });
 }
 
-export function useJobs(filters: { search?: string; execution?: string; quality?: string; lane?: "pipeline" | "tts" | "any"; page?: number }) {
+/**
+ * Chỉ màn hình thực sự theo dõi tiến độ mới cần poll. Ba nơi gọi useJobs với ba
+ * bộ filter khác nhau là ba queryKey, tức ba vòng poll độc lập 12 giây — cộng
+ * thêm SSE invalidate ["jobs"] mỗi lần đổi stage. Trang tạo job chỉ cần 4 gợi ý
+ * "Gần đây", còn HomeRoute chỉ điều hướng đúng một lần.
+ */
+export function useJobs(
+  filters: { search?: string; execution?: string; quality?: string; lane?: "pipeline" | "tts" | "any"; page?: number },
+  options: { poll?: boolean } = {},
+) {
   return useQuery({
     queryKey: queryKeys.jobs(filters),
     queryFn: () => api.jobs(filters),
-    refetchInterval: 12_000,
+    refetchInterval: options.poll === false ? false : 12_000,
   });
 }
 

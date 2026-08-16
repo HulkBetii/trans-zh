@@ -9,7 +9,7 @@ import { errorMessage } from "../lib/format";
 export function NewJobPage() {
   const navigate = useNavigate();
   const meta = useMeta();
-  const recentJobs = useJobs({});
+  const recentJobs = useJobs({}, { poll: false });
   const createJob = useCreateJob();
   const [sourceKind, setSourceKind] = useState<"local" | "url">("local");
   const [source, setSource] = useState("");

@@ -9,23 +9,53 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-export function useDialogFocus<T extends HTMLElement>(open: boolean, onClose: () => void) {
+/** Dialog đang mở, theo thứ tự mở. Chỉ cái trên cùng được nhận Escape. */
+const openDialogs: symbol[] = [];
+
+interface DialogFocusOptions {
+  /**
+   * Selector của phần tử nhận focus đầu tiên. Không đặt thì lấy phần tử focus
+   * được đầu tiên — thường là nút đóng ở header, và điều đó vô hiệu hóa mọi
+   * `autoFocus` trong dialog.
+   */
+  initialFocus?: string;
+}
+
+export function useDialogFocus<T extends HTMLElement>(
+  open: boolean,
+  onClose: () => void,
+  options: DialogFocusOptions = {},
+) {
   const dialogRef = useRef<T>(null);
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  const { initialFocus } = options;
+
+  // Trong effect, không phải giữa render: gán ref lúc render là tác dụng phụ
+  // trong pha lẽ ra phải thuần.
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
 
+    const token = Symbol("dialog");
+    openDialogs.push(token);
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const dialog = dialogRef.current;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusableElements = () => Array.from(dialog?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
-    focusableElements()[0]?.focus();
+    const preferred = initialFocus
+      ? dialog?.querySelector<HTMLElement>(initialFocus) ?? null
+      : null;
+    (preferred ?? focusableElements()[0])?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        // Chỉ dialog trên cùng đóng. Nghe ở cấp document mà không xét thứ tự thì
+        // một phím Escape đóng luôn cả dialog cha bên dưới.
+        if (openDialogs[openDialogs.length - 1] !== token) return;
         event.preventDefault();
         onCloseRef.current();
         return;
@@ -52,10 +82,12 @@ export function useDialogFocus<T extends HTMLElement>(open: boolean, onClose: ()
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      const index = openDialogs.indexOf(token);
+      if (index >= 0) openDialogs.splice(index, 1);
       document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
-  }, [open]);
+  }, [initialFocus, open]);
 
   return dialogRef;
 }

@@ -7,7 +7,6 @@ import type {
   CredentialTestResponse,
   CredentialWriteRequest,
   FileListing,
-  FileRoot,
   FileRootsResponse,
   GlossaryDocument,
   GlossaryResponseDto,
@@ -95,9 +94,16 @@ function apiErrorMessage(body: unknown, status: number): string {
   return `Yêu cầu thất bại (${status})`;
 }
 
-function normalizeJob(item: JobListItem & { status?: JobListItem["execution_status"] }): JobListItem {
-  const executionStatus = item.execution_status ?? item.status ?? "interrupted";
-  const qualityStatus = item.quality_status ?? "needs_review";
+/**
+ * Dựng lane "pipeline" cho các job backend chưa trả `lanes`.
+ *
+ * Chỉ chuẩn hóa những trường schema cho phép vắng mặt. `execution_status` và
+ * `quality_status` là required trong JobSummary, nên fallback cho chúng là code
+ * chết — và code chết thì che mất lỗi thật khi API đổi hình dạng.
+ */
+function normalizeJob(item: JobListItem): JobListItem {
+  const executionStatus = item.execution_status;
+  const qualityStatus = item.quality_status;
   const pipelineLane: JobLaneSummary = {
     id: "pipeline",
     started: true,
@@ -204,10 +210,7 @@ export const api = {
     if (params.quality) query.set("quality", params.quality);
     if (params.lane) query.set("lane", params.lane);
     if (params.page) query.set("page", String(params.page));
-    const result = await request<JobsPage | JobListItem[]>(`/jobs?${query}`);
-    if (Array.isArray(result)) {
-      return { items: result.map(normalizeJob), total: result.length, page: 1, page_size: result.length };
-    }
+    const result = await request<JobsPage>(`/jobs?${query}`);
     return { ...result, items: result.items.map(normalizeJob) };
   },
 
@@ -278,7 +281,7 @@ export const api = {
   unapproveTts: (jobId: string) =>
     request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/unapprove`, { method: "POST" }).then(normalizeTts),
 
-  fileRoots: () => request<FileRootsResponse | FileRoot[]>("/files/roots").then((data) => Array.isArray(data) ? data : data.roots),
+  fileRoots: () => request<FileRootsResponse>("/files/roots").then((data) => data.roots),
   files: (path: string) => request<FileListing>(`/files?path=${encodeURIComponent(path)}`),
 };
 

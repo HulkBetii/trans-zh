@@ -244,6 +244,25 @@ test("waits for typing to stop before asking the provider", async () => {
   await waitFor(() => expect(searched()).toEqual(["duyonyx"]));
 });
 
+test("puts the cursor in the voice search box, not on the close button", async () => {
+  // useDialogFocus focus phần tử focus được đầu tiên (nút đóng ở header), nên
+  // autoFocus trên ô tìm không bao giờ có tác dụng — mở thư viện 1268 giọng ra
+  // vẫn phải bấm chuột trước khi gõ.
+  const noVoiceWorkspace = { ...workspace, voice_id: null, selected_voice: null, calibration: null, allowed_actions: ["calibrate"] as const };
+  vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+    if (String(input).includes("/tts/voices")) {
+      return jsonResponse({ items: [], page: 1, page_size: 30, total: 0, has_more: false, credits: null });
+    }
+    return jsonResponse(noVoiceWorkspace);
+  }));
+  const user = userEvent.setup();
+  renderApp(<TtsStudio job={job} />);
+
+  await user.click(await screen.findByRole("button", { name: "Mở thư viện giọng" }));
+
+  expect(screen.getByPlaceholderText(/Tìm tên/)).toHaveFocus();
+});
+
 test("virtualises the voice library instead of mounting every row", async () => {
   // 1268 giọng, mỗi dòng một thẻ <audio>: dựng hết là trình duyệt ôm hơn một
   // nghìn player cùng lúc.

@@ -573,7 +573,11 @@ function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open
   }
 
   const query = useTtsVoices({ search: debouncedSearch, page: requestedPage, page_size: 30, ownership }, open);
-  const dialogRef = useDialogFocus<HTMLElement>(open, onClose);
+  // Ô tìm là việc đầu tiên người dùng muốn làm trong thư viện 1268 giọng.
+  // Không chỉ định thì hook focus nút đóng ở header và autoFocus vô nghĩa.
+  const dialogRef = useDialogFocus<HTMLElement>(open, onClose, {
+    initialFocus: ".tts-voice-search input",
+  });
   // Cả thư viện là 1268 giọng và mỗi dòng mang một thẻ <audio>; không ảo hóa thì
   // bấm "Tải thêm" đủ nhiều là trình duyệt ôm hơn một nghìn player cùng lúc.
   const virtualizer = useVirtualizer({

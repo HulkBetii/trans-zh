@@ -23,7 +23,7 @@ export function GlossaryEditor({ job }: { job: JobDetail }) {
 
 function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary }) {
   const queryClient = useQueryClient();
-  const [document, setDocument] = useState(() => structuredClone(data.document));
+  const [doc, setDoc] = useState(() => structuredClone(data.document));
   const [baseline, setBaseline] = useState(() => JSON.stringify(data.document));
   const [currentRevision, setCurrentRevision] = useState(data.revision);
   const [followUpError, setFollowUpError] = useState<string | null>(null);
@@ -31,8 +31,8 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
   const nextAddressId = useRef(data.document.address_terms.length);
   const [termIds, setTermIds] = useState(() => data.document.terms.map((_, index) => `term-${index}`));
   const [addressIds, setAddressIds] = useState(() => data.document.address_terms.map((_, index) => `address-${index}`));
-  const errors = useMemo(() => validateGlossary(document), [document]);
-  const dirty = useMemo(() => JSON.stringify(document) !== baseline, [baseline, document]);
+  const errors = useMemo(() => validateGlossary(doc), [doc]);
+  const dirty = useMemo(() => JSON.stringify(doc) !== baseline, [baseline, doc]);
   // Khóa editor đọc thẳng từ props nên luôn tươi, không cần đồng bộ vào state.
   const editorLocked = data.editor_locked;
   const lockReason = data.lock_reason;
@@ -41,7 +41,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
   // Nhận một bản từ server làm bản nền mới. Phải dựng lại termIds/addressIds:
   // trước đây việc đó do remount lo, giờ không còn remount nữa.
   const adopt = useCallback((next: RevisionedGlossary) => {
-    setDocument(structuredClone(next.document));
+    setDoc(structuredClone(next.document));
     setBaseline(JSON.stringify(next.document));
     setCurrentRevision(next.revision);
     setTermIds(next.document.terms.map((_, index) => `term-${index}`));
@@ -54,7 +54,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
 
   const saveMutation = useMutation({
     mutationFn: async (retranslate: boolean) => {
-      const saved = await api.saveGlossary(job.job_id, currentRevision, document);
+      const saved = await api.saveGlossary(job.job_id, currentRevision, doc);
       if (!retranslate) return { saved, followUpError: null };
       try {
         await api.retranslate(job.job_id);
@@ -76,31 +76,31 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
     },
   });
 
-  const updateTerm = (index: number, patch: Partial<GlossaryTerm>) => setDocument((current) => ({
+  const updateTerm = (index: number, patch: Partial<GlossaryTerm>) => setDoc((current) => ({
     ...current,
     terms: current.terms.map((term, termIndex) => termIndex === index ? { ...term, ...patch } : term),
   }));
-  const updateAddress = (index: number, patch: Partial<AddressTerm>) => setDocument((current) => ({
+  const updateAddress = (index: number, patch: Partial<AddressTerm>) => setDoc((current) => ({
     ...current,
     address_terms: current.address_terms.map((term, termIndex) => termIndex === index ? { ...term, ...patch } : term),
   }));
   const addTerm = () => {
     const id = `term-${nextTermId.current++}`;
     setTermIds((current) => [...current, id]);
-    setDocument((current) => ({ ...current, terms: [...current.terms, { ...emptyTerm }] }));
+    setDoc((current) => ({ ...current, terms: [...current.terms, { ...emptyTerm }] }));
   };
   const removeTerm = (index: number) => {
     setTermIds((current) => current.filter((_, termIndex) => termIndex !== index));
-    setDocument((current) => ({ ...current, terms: current.terms.filter((_, termIndex) => termIndex !== index) }));
+    setDoc((current) => ({ ...current, terms: current.terms.filter((_, termIndex) => termIndex !== index) }));
   };
   const addAddress = () => {
     const id = `address-${nextAddressId.current++}`;
     setAddressIds((current) => [...current, id]);
-    setDocument((current) => ({ ...current, address_terms: [...current.address_terms, { ...emptyAddress }] }));
+    setDoc((current) => ({ ...current, address_terms: [...current.address_terms, { ...emptyAddress }] }));
   };
   const removeAddress = (index: number) => {
     setAddressIds((current) => current.filter((_, termIndex) => termIndex !== index));
-    setDocument((current) => ({ ...current, address_terms: current.address_terms.filter((_, termIndex) => termIndex !== index) }));
+    setDoc((current) => ({ ...current, address_terms: current.address_terms.filter((_, termIndex) => termIndex !== index) }));
   };
   const canSave = dirty && errors.length === 0 && !saveMutation.isPending && !editorLocked && !conflict;
 
@@ -112,10 +112,10 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
       <fieldset className="panel-sheet glossary-section" disabled={editorLocked}>
         <div className="section-heading"><div><span className="eyebrow">Translation voice</span><h2>Văn phong</h2><p>Ghim cách kể và đại từ để các batch dịch không tự chọn lại.</p></div></div>
         <div className="style-grid">
-          <TextField label="Sắc thái lời thoại" value={document.style.speech_register} placeholder="Tự nhiên, gần gũi…" onChange={(value) => setDocument((current) => ({ ...current, style: { ...current.style, speech_register: value } }))} />
-          <TextField label="Người kể tự xưng" value={document.style.narrator_self_vi} placeholder="tôi / mình" onChange={(value) => setDocument((current) => ({ ...current, style: { ...current.style, narrator_self_vi: value } }))} />
-          <TextField label="Gọi khán giả" value={document.style.audience_vi} placeholder="các bạn / quý vị" onChange={(value) => setDocument((current) => ({ ...current, style: { ...current.style, audience_vi: value } }))} />
-          <TextField label="Đại từ chủ thể" value={document.style.subject_third_person_vi} placeholder="anh ấy / cô ấy" onChange={(value) => setDocument((current) => ({ ...current, style: { ...current.style, subject_third_person_vi: value } }))} />
+          <TextField label="Sắc thái lời thoại" value={doc.style.speech_register} placeholder="Tự nhiên, gần gũi…" onChange={(value) => setDoc((current) => ({ ...current, style: { ...current.style, speech_register: value } }))} />
+          <TextField label="Người kể tự xưng" value={doc.style.narrator_self_vi} placeholder="tôi / mình" onChange={(value) => setDoc((current) => ({ ...current, style: { ...current.style, narrator_self_vi: value } }))} />
+          <TextField label="Gọi khán giả" value={doc.style.audience_vi} placeholder="các bạn / quý vị" onChange={(value) => setDoc((current) => ({ ...current, style: { ...current.style, audience_vi: value } }))} />
+          <TextField label="Đại từ chủ thể" value={doc.style.subject_third_person_vi} placeholder="anh ấy / cô ấy" onChange={(value) => setDoc((current) => ({ ...current, style: { ...current.style, subject_third_person_vi: value } }))} />
         </div>
       </fieldset>
 
@@ -124,8 +124,8 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
         <div className="glossary-table-wrap">
           <div className="glossary-table term-table">
             <div className="glossary-head"><span>中文 *</span><span>Pinyin</span><span>Tiếng Việt</span><span>English</span><span>Loại</span><span>Giữ gốc</span><span /></div>
-            {document.terms.length === 0 && <div className="table-empty">Chưa có thuật ngữ. Đây là trạng thái hợp lệ; chỉ thêm những mục thực sự cần ghim.</div>}
-            {document.terms.map((term, index) => (
+            {doc.terms.length === 0 && <div className="table-empty">Chưa có thuật ngữ. Đây là trạng thái hợp lệ; chỉ thêm những mục thực sự cần ghim.</div>}
+            {doc.terms.map((term, index) => (
               <div className={`glossary-row ${errors.some((error) => error.index === index && error.scope === "term") ? "invalid" : ""}`} key={termIds[index]}>
                 <label className="glossary-cell"><span>中文 *</span><input aria-label={`Thuật ngữ Trung ${index + 1}`} value={term.zh} onChange={(event) => updateTerm(index, { zh: event.target.value })} /></label>
                 <label className="glossary-cell"><span>Pinyin</span><input aria-label={`Pinyin ${index + 1}`} value={term.pinyin} onChange={(event) => updateTerm(index, { pinyin: event.target.value })} /></label>
@@ -144,8 +144,8 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
       <fieldset className="panel-sheet glossary-section" disabled={editorLocked}>
         <div className="section-heading"><div><span className="eyebrow">Relationships</span><h2>Cách xưng hô</h2><p>Quan hệ theo từng cặp người nói — người nghe. Danh sách rỗng hoàn toàn hợp lệ.</p></div><button className="secondary-button compact" onClick={addAddress} type="button"><Plus size={16} />Thêm</button></div>
         <div className="address-list">
-          {document.address_terms.map((term, index) => (
-            <div className="address-row" key={addressIds[index]}>
+          {doc.address_terms.map((term, index) => (
+            <div className={`address-row ${errors.some((error) => error.scope === "address" && error.index === index) ? "invalid" : ""}`} key={addressIds[index]}>
               <TextField label="Người nói" value={term.speaker} onChange={(value) => updateAddress(index, { speaker: value })} />
               <TextField label="Người nghe" value={term.addressee} onChange={(value) => updateAddress(index, { addressee: value })} />
               <TextField label="Tự xưng" value={term.vi_self} onChange={(value) => updateAddress(index, { vi_self: value })} />
@@ -153,8 +153,9 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
               <button className="icon-button" type="button" onClick={() => removeAddress(index)} aria-label={`Xóa cách xưng hô ${index + 1}`}><Trash2 size={16} /></button>
             </div>
           ))}
-          {document.address_terms.length === 0 && <div className="table-empty">Chưa có quan hệ xưng hô cần ghim.</div>}
+          {doc.address_terms.length === 0 && <div className="table-empty">Chưa có quan hệ xưng hô cần ghim.</div>}
         </div>
+        {errors.filter((error) => error.scope === "address").map((error) => <p className="validation-line" key={`address-${error.index}-${error.message}`}><AlertTriangle size={14} />Dòng {(error.index ?? 0) + 1}: {error.message}</p>)}
       </fieldset>
 
       {saveMutation.isError && !conflict && <div className="inline-alert error"><AlertTriangle size={16} /><span>{errorMessage(saveMutation.error)}</span></div>}
@@ -173,15 +174,37 @@ function TextField({ label, value, placeholder, onChange }: { label: string; val
 
 interface ValidationError { scope: "term" | "address"; index?: number; message: string }
 
-function validateGlossary(document: GlossaryDocument): ValidationError[] {
+function validateGlossary(doc: GlossaryDocument): ValidationError[] {
   const errors: ValidationError[] = [];
   const seen = new Map<string, number>();
-  document.terms.forEach((term, index) => {
+  doc.terms.forEach((term, index) => {
     const zh = term.zh.trim();
     if (!zh) errors.push({ scope: "term", index, message: "中文 không được để trống." });
     if (zh && seen.has(zh)) errors.push({ scope: "term", index, message: `Trùng chính xác với dòng ${(seen.get(zh) ?? 0) + 1}.` });
     if (zh) seen.set(zh, index);
     if (term.keep_source && (term.vi.trim() || term.en.trim())) errors.push({ scope: "term", index, message: "Mục giữ nguyên nguồn không được có bản dịch." });
+  });
+  // Nhánh "address" của ValidationError tồn tại từ đầu nhưng chưa từng có ai
+  // ghi vào: một cặp xưng hô thiếu người nói hoặc người nghe thì không ghim được
+  // gì, và hai dòng cùng một cặp thì dòng sau lặng lẽ vô hiệu.
+  const pairs = new Map<string, number>();
+  doc.address_terms.forEach((term, index) => {
+    const speaker = term.speaker.trim();
+    const addressee = term.addressee.trim();
+    if (!speaker || !addressee) {
+      errors.push({ scope: "address", index, message: "Cần cả người nói và người nghe." });
+      return;
+    }
+    const key = `${speaker} ${addressee}`;
+    if (pairs.has(key)) {
+      errors.push({
+        scope: "address",
+        index,
+        message: `Trùng cặp xưng hô với dòng ${(pairs.get(key) ?? 0) + 1}.`,
+      });
+    } else {
+      pairs.set(key, index);
+    }
   });
   return errors;
 }
