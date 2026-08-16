@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { ConfirmProvider } from "../components/ConfirmDialog";
 
 export function renderApp(ui: ReactElement, route: string | string[] = "/") {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
@@ -12,7 +13,9 @@ export function renderApp(ui: ReactElement, route: string | string[] = "/") {
   });
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <ConfirmProvider>
+        <RouterProvider router={router} />
+      </ConfirmProvider>
     </QueryClientProvider>,
   );
   return { ...result, queryClient, router };

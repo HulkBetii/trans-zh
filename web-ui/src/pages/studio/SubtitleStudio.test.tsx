@@ -137,7 +137,6 @@ test("asks before changing language while subtitle edits are dirty", async () =>
   } satisfies JobDetail;
   const fetchMock = vi.fn(async () => jsonResponse(workspace));
   vi.stubGlobal("fetch", fetchMock);
-  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
   const user = userEvent.setup();
   renderApp(<SubtitleStudio job={multiLanguageJob} />);
 
@@ -145,8 +144,9 @@ test("asks before changing language while subtitle edits are dirty", async () =>
   await user.clear(editor);
   await user.type(editor, "Bản local chưa lưu");
   await user.click(screen.getByRole("button", { name: "EN" }));
+  expect(await screen.findByText(/Bỏ 1 thay đổi chưa lưu/)).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Hủy" }));
 
-  expect(confirm).toHaveBeenCalledOnce();
   expect(screen.getByLabelText("Bản hiệu lực")).toHaveValue("Bản local chưa lưu");
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });

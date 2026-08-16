@@ -114,13 +114,13 @@ test("allows a paid cue preview before subtitle approval but gates full render",
     return jsonResponse(workspace);
   });
   vi.stubGlobal("fetch", fetchMock);
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   const user = userEvent.setup();
   renderApp(<TtsStudio job={job} />);
 
   expect(await screen.findByText("Phụ đề chưa được duyệt")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Tạo MP3 lồng tiếng" })).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "Nghe thử · tốn 1 lượt TTS" }));
+  await user.click(await screen.findByRole("button", { name: "Nghe thử" }));
 
   await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
     "/api/v1/jobs/job-tts/tts/vi/preview",
@@ -389,7 +389,6 @@ test("saves only the selected cue before preview and keeps other invalid drafts"
     return jsonResponse(twoCueWorkspace);
   });
   vi.stubGlobal("fetch", fetchMock);
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   const user = userEvent.setup();
   renderApp(<TtsStudio job={job} />);
 
@@ -400,6 +399,7 @@ test("saves only the selected cue before preview and keeps other invalid drafts"
   await user.clear(editor);
   await user.type(editor, "Cách đọc cue một");
   await user.click(screen.getByRole("button", { name: "Lưu cue này & nghe thử · tốn 1 lượt TTS" }));
+  await user.click(await screen.findByRole("button", { name: "Nghe thử" }));
 
   await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
     "/api/v1/jobs/job-tts/tts/vi/preview",

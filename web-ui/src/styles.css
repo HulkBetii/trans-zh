@@ -809,3 +809,11 @@ code, time, .mono-input { font-family: "IBM Plex Mono", monospace; }
 .text-input, .stacked-field input, .glossary-table input, .glossary-table select,
 .effective-editor textarea, .subtitle-search input, .tts-voice-search input,
 .credential-editor input { font-size: var(--text-editor); }
+
+.confirm-dialog { width: min(430px, 100%); display: grid; gap: 11px; padding: 20px; background: var(--stone-0); box-shadow: 0 30px 90px rgba(0,0,0,.25); }
+.confirm-head { display: flex; align-items: center; gap: 9px; }
+.confirm-head h2 { font-size: 15px; }
+.confirm-head .confirm-danger { color: var(--red); }
+.confirm-detail { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.confirm-cost { display: flex; align-items: center; gap: 7px; padding: 8px 10px; color: var(--amber); background: rgba(170,107,22,0.06); font-size: 11px; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }

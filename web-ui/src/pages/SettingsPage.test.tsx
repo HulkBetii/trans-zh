@@ -123,11 +123,11 @@ test("deletes a stored credential with the current revision", async () => {
     return jsonResponse({ detail: "not found" }, 404);
   });
   vi.stubGlobal("fetch", fetchMock);
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   const user = userEvent.setup();
   renderApp(<App />, "/settings");
 
   await user.click(await screen.findByRole("button", { name: "Xóa" }));
+  await user.click(await screen.findByRole("button", { name: "Xóa khóa" }));
 
   const call = await waitFor(() => {
     const found = fetchMock.mock.calls.find(([url, init]) => String(url).endsWith("/credentials/openai") && init?.method === "DELETE");

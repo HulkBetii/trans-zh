@@ -5,23 +5,19 @@ import {
   AudioLines,
   Check,
   CheckCircle2,
-  ChevronRight,
   CircleDollarSign,
-  Clock3,
   Info,
   LoaderCircle,
-  Play,
   RefreshCcw,
   Search,
   Settings2,
   Square,
   Volume2,
-  X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ApiError, api, apiUrl } from "../../api/client";
-import { queryKeys, useTts, useTtsRunEvents, useTtsVoices } from "../../api/queries";
+import { queryKeys, useTts, useTtsRunEvents } from "../../api/queries";
 import type {
   JobDetail,
   RunRecord,
@@ -29,18 +25,22 @@ import type {
   TtsExecutionStatus,
   TtsVoice,
   TtsWorkspace,
-  VoiceOwnership,
 } from "../../api/types";
+import { useConfirm } from "../../hooks/useConfirm";
 import { EmptyState } from "../../components/EmptyState";
-import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
-import { useRevisionedDraft } from "../../hooks/useRevisionedDraft";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useRevisionedDraft } from "../../hooks/useRevisionedDraft";
 import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
-import { errorMessage, formatBytes, formatDate, formatTime } from "../../lib/format";
+import { errorMessage, formatDate } from "../../lib/format";
+import { TtsExecutionBadge, TtsQualityBadge } from "./tts/TtsBadges";
+import { TtsCueEditor, TtsCueRow, TtsInspector } from "./tts/TtsCuePanes";
+import { TtsOutput, TtsRunPanel } from "./tts/TtsRunPanel";
+import { VoiceLibraryDialog } from "./tts/VoiceLibraryDialog";
+import { effectiveSpoken, ttsRenderHint, voiceMeta, type DraftChanges } from "./tts/labels";
 
 type CueFilter = "all" | "edited" | "tight" | "preview";
-type DraftChanges = Record<number, string | null>;
+
 type SaveRequest = { scope: "voice" | "all" } | { scope: "cue"; segmentId: number };
 
 const terminalRunStatuses = new Set(["completed", "cancelled", "failed", "interrupted"]);
@@ -56,24 +56,6 @@ class PartialTtsSaveError extends Error {
     this.name = "PartialTtsSaveError";
   }
 }
-
-const ttsExecutionLabels: Record<TtsExecutionStatus, string> = {
-  not_started: "Chưa chạy",
-  queued: "Đang chờ",
-  running: "Đang chạy",
-  cancelling: "Đang dừng an toàn",
-  cancelled: "Đã hủy",
-  failed: "Thất bại",
-  interrupted: "Bị gián đoạn",
-  completed: "Hoàn tất",
-};
-
-const overrideLabels = {
-  none: "Tự động",
-  manual: "Đã chỉnh tay",
-  base_changed: "Nền đã đổi",
-  stale: "Override lỗi thời",
-} as const;
 
 export function TtsStudio({ job }: { job: JobDetail }) {
   const query = useTts(job.job_id);
@@ -96,6 +78,7 @@ export function TtsStudio({ job }: { job: JobDetail }) {
 
 function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const [workspace, setWorkspace] = useState(data);
   const [revision, setRevision] = useState(data.revision);
   const [draftVoiceId, setDraftVoiceId] = useState(data.voice_id ?? "");
@@ -170,6 +153,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
     overscan: 8,
   });
   const hasInvalid = Object.values(changes).some((value) => value !== null && !value.trim());
+  const hasSavedOverrides = workspace.cues.some((cue) => cue.override_state !== "none");
   const activeRun = workspace.active_run ?? lastQueuedRun;
   const connectionStatus = useTtsRunEvents(job.job_id, activeRun?.run_id);
   const selectedInvalid = Boolean(selected && Object.hasOwn(changes, selected.segment_id) && changes[selected.segment_id] !== null && !changes[selected.segment_id]?.trim());
@@ -328,8 +312,14 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       return next;
     });
   };
-  const resetAll = () => {
-    if (!window.confirm("Đặt lại toàn bộ văn bản đọc thủ công về bản tự động?")) return;
+  const resetAll = async () => {
+    const ok = await confirm({
+      title: "Đặt lại toàn bộ văn bản đọc?",
+      detail: "Mọi chỉnh sửa thủ công cho lời đọc sẽ về bản tự động. Phụ đề không đổi.",
+      confirmLabel: "Đặt lại toàn bộ",
+      tone: "danger",
+    });
+    if (!ok) return;
     const next: DraftChanges = {};
     workspace.cues.forEach((cue) => {
       if (cue.override_state !== "none") next[cue.segment_id] = null;
@@ -352,8 +342,13 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
   const askPreview = async () => {
     if (!selected || !canPreview || preview.isPending || saveDrafts.isPending) return;
     if (selected.preview_state === "current" && !selectedDraft && selected.preview_url) return;
-    const cost = "Tác vụ này có thể tiêu tốn 1 lượt TTS của nhà cung cấp. Tiếp tục?";
-    if (!window.confirm(cost)) return;
+    const ok = await confirm({
+      title: "Nghe thử cue này?",
+      detail: "Tổng hợp một cue để nghe trước khi tạo cả timeline.",
+      cost: "Tốn 1 lượt TTS của nhà cung cấp.",
+      confirmLabel: "Nghe thử",
+    });
+    if (!ok) return;
     if (selectedDraft) {
       try {
         await saveDrafts.mutateAsync({ scope: "cue", segmentId: selected.segment_id });
@@ -363,18 +358,34 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
     }
     preview.mutate(selected.segment_id);
   };
-  const askCalibrate = () => {
+  const askCalibrate = async () => {
     if (!workspace.allowed_actions.includes("calibrate") || voiceDirty || runAction.isPending) return;
-    if (!window.confirm("Hiệu chuẩn dùng 8 mẫu giọng và có thể tiêu tốn 8 lượt TTS. Tiếp tục?")) return;
+    const measured = Boolean(workspace.calibration);
+    const ok = await confirm({
+      title: measured ? "Đo lại giọng này?" : "Hiệu chuẩn giọng này?",
+      detail: measured
+        ? "Đã có số đo cho giọng này. Đo lại sẽ tổng hợp 8 mẫu mới và ghi đè số cũ."
+        : "Đo tốc độ đọc trên 8 câu dài ngắn khác nhau. Một lần cho mỗi giọng, dùng lại cho các job sau.",
+      cost: measured
+        ? "Tốn 8 lượt TTS."
+        : "Tốn tối đa 8 lượt TTS; mẫu đã có trên đĩa được dùng lại.",
+      confirmLabel: measured ? "Đo lại" : "Hiệu chuẩn",
+    });
+    if (!ok) return;
     runAction.mutate("calibrate");
   };
-  const askRender = () => {
+  const askRender = async () => {
     if (!canRender || runAction.isPending) return;
     const uncached = workspace.uncached_cues;
-    const detail = uncached > 0
-      ? `Cần tạo ${uncached} cue mới, có thể phát sinh ${uncached} lượt TTS. Tiếp tục?`
-      : "Các cue đã có cache; chỉ ráp lại timeline MP3. Tiếp tục?";
-    if (!window.confirm(detail)) return;
+    const ok = await confirm({
+      title: "Tạo MP3 lồng tiếng?",
+      detail: "Ráp toàn bộ cue theo mốc thời gian của ASR.",
+      cost: uncached > 0
+        ? `Cần tổng hợp ${uncached} cue mới: tốn ${uncached} lượt TTS.`
+        : "Mọi cue đã có sẵn — chỉ ráp lại timeline, không tốn lượt nào.",
+      confirmLabel: "Tạo MP3",
+    });
+    if (!ok) return;
     runAction.mutate("render");
   };
   const runBusy = saveDrafts.isPending || preview.isPending || runAction.isPending || cancelRun.isPending || approval.isPending;
@@ -418,7 +429,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
             ) : (
               <div className="tts-calibration-copy"><strong className="tts-warning"><AlertTriangle size={15} />{voiceDirty ? "Lưu giọng mới để kiểm tra hiệu chuẩn" : workspace.calibration?.voice_id === workspace.voice_id ? `Mới có ${workspace.calibration?.sample_count ?? 0}/8 mẫu` : "Chưa có số đo cho giọng này"}</strong><small>Hiệu chuẩn một lần, dùng lại cho các job sau.</small></div>
             )}
-            {workspace.allowed_actions.includes("calibrate") && <button className="secondary-button compact" disabled={runBusy || !draftVoiceId || voiceDirty} title={voiceDirty ? "Lưu giọng mới trước khi hiệu chuẩn" : undefined} onClick={askCalibrate}><CircleDollarSign size={15} />Hiệu chuẩn 8 mẫu</button>}
+            {workspace.allowed_actions.includes("calibrate") && <button className="secondary-button compact" disabled={runBusy || !draftVoiceId || voiceDirty} title={voiceDirty ? "Lưu giọng mới trước khi hiệu chuẩn" : undefined} onClick={() => void askCalibrate()}><CircleDollarSign size={15} />Hiệu chuẩn 8 mẫu</button>}
           </div>
           <div className="tts-provider">
             <span className="tts-label">Nhà cung cấp</span>
@@ -471,225 +482,60 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       </div>
 
       <div className={`sticky-savebar subtitle-savebar tts-savebar ${dirty ? "dirty" : "clean"}`}>
-        <div><strong>{dirty ? `${dirtyCount + (voiceDirty ? 1 : 0)} thay đổi TTS chưa lưu` : "Thiết lập TTS đã được lưu"}</strong><small className={canRender ? "tts-ready" : "tts-render-hint"}>{renderHint}</small>{workspace.cues.some((cue) => cue.override_state !== "none") && <button className="text-button" onClick={resetAll} disabled={editorLocked}>Reset toàn bộ</button>}</div>
-        <div>{dirty && <button className="secondary-button" disabled={hasInvalid || editorLocked || saveDrafts.isPending || conflict} onClick={() => saveDrafts.mutate({ scope: "all" })}>{saveDrafts.isPending ? <LoaderCircle className="spin" size={16} /> : <Check size={16} />}Lưu</button>}<button className="primary-button" disabled={!canRender || runBusy || conflict} title={!canRender ? renderHint : undefined} onClick={askRender}><AudioLines size={16} />Tạo MP3 lồng tiếng</button>{workspace.allowed_actions.includes("approve") && <button className="secondary-button" disabled={runBusy || outputStale || dirty || conflict} onClick={() => approval.mutate("approve")}><CheckCircle2 size={16} />Duyệt audio</button>}{workspace.allowed_actions.includes("unapprove") && <button className="secondary-button" disabled={runBusy || dirty || conflict} onClick={() => approval.mutate("unapprove")}><Square size={15} />Bỏ duyệt audio</button>}</div>
+        <div>
+          <strong>
+            {dirty
+              ? `${dirtyCount + (voiceDirty ? 1 : 0)} thay đổi TTS chưa lưu`
+              : "Thiết lập TTS đã được lưu"}
+          </strong>
+          <small className={canRender ? "tts-ready" : "tts-render-hint"}>{renderHint}</small>
+          {hasSavedOverrides && (
+            <button className="text-button" onClick={() => void resetAll()} disabled={editorLocked}>
+              Reset toàn bộ
+            </button>
+          )}
+        </div>
+        <div>
+          {dirty && (
+            <button
+              className="secondary-button"
+              disabled={hasInvalid || editorLocked || saveDrafts.isPending || conflict}
+              onClick={() => saveDrafts.mutate({ scope: "all" })}
+            >
+              {saveDrafts.isPending ? <LoaderCircle className="spin" size={16} /> : <Check size={16} />}
+              Lưu
+            </button>
+          )}
+          <button
+            className="primary-button"
+            disabled={!canRender || runBusy || conflict}
+            title={!canRender ? renderHint : undefined}
+            onClick={() => void askRender()}
+          >
+            <AudioLines size={16} />Tạo MP3 lồng tiếng
+          </button>
+          {workspace.allowed_actions.includes("approve") && (
+            <button
+              className="secondary-button"
+              disabled={runBusy || outputStale || dirty || conflict}
+              onClick={() => approval.mutate("approve")}
+            >
+              <CheckCircle2 size={16} />Duyệt audio
+            </button>
+          )}
+          {workspace.allowed_actions.includes("unapprove") && (
+            <button
+              className="secondary-button"
+              disabled={runBusy || dirty || conflict}
+              onClick={() => approval.mutate("unapprove")}
+            >
+              <Square size={15} />Bỏ duyệt audio
+            </button>
+          )}
+        </div>
       </div>
 
       <VoiceLibraryDialog open={voiceDialogOpen} selectedVoiceId={draftVoiceId} onClose={() => setVoiceDialogOpen(false)} onSelect={(voice) => { setDraftVoiceId(voice.voice_id); setDraftVoice(voice); setVoiceDialogOpen(false); }} />
     </div>
   );
-}
-
-function TtsRunPanel({ run, onCancel, pending }: { run: RunRecord; onCancel: () => void; pending: boolean }) {
-  const terminal = ["completed", "cancelled", "failed", "interrupted"].includes(run.status);
-  const kindLabel = run.kind === "tts_preview" ? "nghe thử" : run.kind === "tts_calibrate" ? "hiệu chuẩn giọng" : "MP3 timeline";
-  const title = terminal ? `${ttsExecutionLabels[run.status as TtsExecutionStatus]} · ${kindLabel}` : `Đang tạo ${kindLabel}`;
-  return (
-    <section className="tts-run-panel" aria-live="polite">
-      <div className="tts-run-head"><div><span className={terminal ? "run-state-dot" : "pulse-dot"} /><strong>{title}</strong><code>{run.run_id}</code></div>{!terminal && <button className="secondary-button compact danger" disabled={pending} onClick={onCancel}>{pending ? <LoaderCircle className="spin" size={14} /> : <Square size={14} />}Dừng an toàn</button>}</div>
-      <p>{run.message || ttsExecutionLabels[run.status as TtsExecutionStatus]}</p>
-      <div className="progress-track" role="progressbar" aria-label={`Tiến độ ${kindLabel}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((run.progress ?? 0) * 100)}><i style={{ width: `${Math.round((run.progress ?? 0) * 100)}%` }} /></div>
-      <div className="tts-run-meta"><span>{Math.round((run.progress ?? 0) * 100)}%</span>{run.queue_position ? <span>Vị trí hàng đợi {run.queue_position}</span> : null}<span>{formatDate(run.started_at ?? run.created_at)}</span>{terminal && <span>Kết thúc {formatDate(run.finished_at)}</span>}{run.error && <span className="tts-danger">{run.error}</span>}</div>
-    </section>
-  );
-}
-
-function TtsOutput({ output, stale }: { output: NonNullable<TtsWorkspace["output"]>; stale: boolean }) {
-  const href = output.download_url ?? undefined;
-  const available = output.state !== "missing" && Boolean(href);
-  const visibleState = output.state === "missing" ? "missing" : stale ? "stale" : output.state;
-  return (
-    <section className={`tts-output panel-sheet ${stale || output.state !== "current" ? "stale" : ""}`}>
-      <div className="tts-output-heading"><div><span className="eyebrow">Timeline deliverable</span><h2>Audio lồng tiếng tiếng Việt</h2><p>{stale || output.state !== "current" ? "Output không còn khớp với văn bản hiện tại; cần tạo lại." : "MP3 đã ráp theo mốc thời gian ASR."}</p></div>{available && <a className="secondary-button compact" href={href} download><AudioLines size={15} />Tải MP3</a>}</div>
-      {!available ? <p className="tts-danger">{output.state === "missing" ? "File không còn trên đĩa." : "Không có đường dẫn tải an toàn cho file này."}</p> : <audio className="tts-timeline-audio" src={href} controls preload="metadata" aria-label="Nghe audio lồng tiếng tiếng Việt" />}
-      <div className="tts-output-meta"><span>{output.name}</span><span>{formatBytes(output.size_bytes)}</span><span>{formatDate(output.created_at)}</span><TtsOutputState state={visibleState} /></div>
-    </section>
-  );
-}
-
-function TtsCueRow({ cue, effective, selected, dirty, onSelect }: { cue: TtsCue; effective: string; selected: boolean; dirty: boolean; onSelect: () => void }) {
-  const tight = (cue.overflow_seconds ?? 0) > 0;
-  return (
-    <button className={`cue-row tts-cue-row ${selected ? "selected" : ""}`} aria-pressed={selected} onClick={onSelect}>
-      <span className="cue-row-head"><code>{String(cue.segment_id).padStart(4, "0")}</code><time>{formatTime(cue.start).slice(3, -1)}</time>{tight && <AlertTriangle size={13} />}{(dirty || cue.override_state !== "none") && <i title="Đã chỉnh sửa" />}{cue.preview_state === "current" && <Check size={12} aria-label="Có bản nghe thử" />}</span>
-      <span className="cue-source">{cue.subtitle_text}</span>
-      <span className="cue-target">{effective}</span>
-    </button>
-  );
-}
-
-function TtsCueEditor({ cue, effective, dirty, locked, voiceDirty, inspectorOpen, onChange, onReset, onOpenInspector, onPreview, previewPending, canPreview }: { cue: TtsCue; effective: string; dirty: boolean; locked: boolean; voiceDirty: boolean; inspectorOpen: boolean; onChange: (value: string) => void; onReset: () => void; onOpenInspector: () => void; onPreview: () => void; previewPending: boolean; canPreview: boolean }) {
-  const hasPreview = cue.preview_state === "current" && Boolean(cue.preview_url) && !dirty && !voiceDirty;
-  return (
-    <div className="tts-translation-editor">
-      <div className="editor-cue-head"><code>#{String(cue.segment_id).padStart(4, "0")}</code><span><Clock3 size={14} />{formatTime(cue.start)} <ChevronRight size={12} /> {formatTime(cue.end)}</span><button className="text-button inspector-trigger" aria-expanded={inspectorOpen} onClick={onOpenInspector}><Info size={14} />Timing</button></div>
-      <div className="tts-subtitle-copy"><span>Phụ đề (chỉ đọc)</span><p>{cue.subtitle_text}</p></div>
-      <div className="tts-auto-copy"><span>Tự động chuẩn hóa để đọc</span><p>{cue.default_spoken_text}</p></div>
-      <label className="effective-editor tts-spoken-editor"><span>Văn bản sẽ đọc</span><textarea aria-label="Văn bản sẽ đọc" value={effective} disabled={locked} onChange={(event) => onChange(event.target.value)} rows={4} /></label>
-      {effective.trim().length === 0 && <p className="field-error"><AlertTriangle size={14} />Văn bản đọc không được để trống.</p>}
-      <div className="tts-editor-actions"><span>{dirty ? "Bản thay đổi chưa lưu" : "Override chỉ ảnh hưởng audio, không sửa phụ đề."}</span><button className="text-button" disabled={locked || (!dirty && cue.override_state === "none")} onClick={onReset}><RefreshCcw size={14} />Về tự động</button></div>
-      <div className="tts-preview-row">
-        {hasPreview ? <audio src={cue.preview_url ?? undefined} controls preload="metadata" aria-label={`Nghe thử cue ${cue.segment_id}`} /> : <button className="secondary-button" disabled={!canPreview || previewPending || locked} title={voiceDirty ? "Lưu giọng mới trước khi nghe thử" : undefined} onClick={onPreview}>{previewPending ? <LoaderCircle className="spin" size={16} /> : <Play size={16} />} {dirty ? "Lưu cue này & nghe thử · tốn 1 lượt TTS" : "Nghe thử · tốn 1 lượt TTS"}</button>}
-        {cue.preview_state === "stale" && <span className="tts-warning"><AlertTriangle size={14} />Bản nghe thử cũ</span>}
-        {voiceDirty && <span className="tts-warning"><AlertTriangle size={14} />Lưu giọng mới để tạo đúng bản nghe thử</span>}
-      </div>
-    </div>
-  );
-}
-
-function TtsInspector({ cue, dirty, onClose }: { cue: TtsCue; dirty: boolean; onClose: () => void }) {
-  const overflow = cue.overflow_seconds ?? 0;
-  return (
-    <div className="inspector-inner">
-      <div className="pane-title"><span>Timing inspector</span><button className="icon-button inspector-close" onClick={onClose} aria-label="Đóng inspector"><X size={17} /></button></div>
-      <dl className="cue-metrics tts-metrics"><div><dt>Khoảng đọc</dt><dd>{cue.room_seconds.toFixed(2)}s</dd></div><div><dt>Ước tính</dt><dd>{cue.predicted_duration == null ? "—" : `${cue.predicted_duration.toFixed(2)}s`}</dd></div><div><dt>Tốc độ</dt><dd>{cue.speed.toFixed(2)}x</dd></div></dl>
-      <div className="provenance"><span>Văn bản đọc</span><strong className={`override-${cue.override_state}`}>{dirty ? "Chưa lưu" : overrideLabels[cue.override_state]}</strong></div>
-      <div className="warning-stack"><span>Nhịp timeline</span>{overflow > 0 ? <div className="cue-warning"><AlertTriangle size={14} /><div><strong>Có thể lấn cue sau</strong><p>Dự kiến dư {overflow.toFixed(2)} giây. Đây là cảnh báo căn timeline, không phải đánh giá bản dịch.</p></div></div> : <p className="no-warning"><Check size={14} />Có đủ khoảng đọc dự kiến</p>}</div>
-      <div className="provenance"><span>Bản nghe thử</span><strong>{cue.preview_state === "current" ? "Đã có" : cue.preview_state === "stale" ? "Cần tạo lại" : "Chưa có"}</strong></div>
-    </div>
-  );
-}
-
-function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open: boolean; selectedVoiceId: string; onClose: () => void; onSelect: (voice: TtsVoice) => void }) {
-  const [search, setSearch] = useState("");
-  const [ownership, setOwnership] = useState<VoiceOwnership>("all");
-  const [page, setPage] = useState(1);
-  const [voices, setVoices] = useState<TtsVoice[]>([]);
-  const listRef = useRef<HTMLDivElement>(null);
-  // Tìm kiếm do nhà cung cấp thực hiện, nên mỗi phím gõ là một request thật ra
-  // ai33.pro. Chờ người dùng ngừng gõ rồi mới hỏi.
-  const debouncedSearch = useDebouncedValue(search, 300);
-  const filterKey = `${ownership} ${debouncedSearch}`;
-  const [activeFilterKey, setActiveFilterKey] = useState(filterKey);
-
-  // Đổi bộ lọc thì trang tích lũy phải về 1 ngay trong render này. Để cho effect
-  // dọn một nhịp sau là kịp hỏi trang 3 của bộ lọc mới — một request vô nghĩa.
-  let requestedPage = page;
-  if (activeFilterKey !== filterKey) {
-    setActiveFilterKey(filterKey);
-    setPage(1);
-    setVoices([]);
-    requestedPage = 1;
-  }
-
-  const query = useTtsVoices({ search: debouncedSearch, page: requestedPage, page_size: 30, ownership }, open);
-  // Ô tìm là việc đầu tiên người dùng muốn làm trong thư viện 1268 giọng.
-  // Không chỉ định thì hook focus nút đóng ở header và autoFocus vô nghĩa.
-  const dialogRef = useDialogFocus<HTMLElement>(open, onClose, {
-    initialFocus: ".tts-voice-search input",
-  });
-  // Cả thư viện là 1268 giọng và mỗi dòng mang một thẻ <audio>; không ảo hóa thì
-  // bấm "Tải thêm" đủ nhiều là trình duyệt ôm hơn một nghìn player cùng lúc.
-  const virtualizer = useVirtualizer({
-    count: voices.length,
-    getScrollElement: () => listRef.current,
-    estimateSize: () => 64,
-    overscan: 6,
-  });
-  useEffect(() => {
-    if (!open) {
-      setSearch("");
-      setOwnership("all");
-      setPage(1);
-      setVoices([]);
-    }
-  }, [open]);
-  useEffect(() => {
-    if (!query.data) return;
-    setVoices((current) => deduplicateVoices(requestedPage === 1 ? query.data.items : [...current, ...query.data.items]));
-  }, [requestedPage, query.data]);
-  if (!open) return null;
-  return (
-    <div className="modal-layer" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <section ref={dialogRef} className="tts-voice-dialog" role="dialog" aria-modal="true" aria-labelledby="tts-voice-title">
-        <header><div><span className="eyebrow">Voice library · Vbee</span><h2 id="tts-voice-title">Chọn giọng tiếng Việt</h2></div><button className="icon-button" onClick={onClose} aria-label="Đóng thư viện giọng"><X size={19} /></button></header>
-        <div className="tts-voice-filters">
-          <label className="tts-voice-search"><Search size={15} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm tên, vùng, giới tính…" /></label>
-          <div className="tts-voice-ownership" role="group" aria-label="Nguồn giọng">
-            {voiceOwnershipOptions.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className={ownership === option.id ? "active" : ""}
-                aria-pressed={ownership === option.id}
-                onClick={() => setOwnership(option.id)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="tts-voice-list" ref={listRef} aria-live="polite">
-          {query.isLoading && voices.length === 0 && <div className="tts-dialog-message"><LoaderCircle className="spin" size={18} />Đang lấy thư viện giọng…</div>}
-          {query.isError && <div className="tts-dialog-message tts-danger"><AlertTriangle size={18} />{errorMessage(query.error)}</div>}
-          {!query.isLoading && !query.isError && voices.length === 0 && <div className="tts-dialog-message">Không tìm thấy giọng phù hợp.</div>}
-          <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-            {virtualizer.getVirtualItems().map((virtualRow) => {
-              const voice = voices[virtualRow.index];
-              return <div key={voice.voice_id} ref={virtualizer.measureElement} data-index={virtualRow.index} style={{ position: "absolute", width: "100%", transform: `translateY(${virtualRow.start}px)` }}><VoiceRow voice={voice} selected={voice.voice_id === selectedVoiceId} onSelect={() => onSelect(voice)} /></div>;
-            })}
-          </div>
-          {query.data?.has_more && <button className="secondary-button tts-load-more" disabled={query.isFetching} onClick={() => setPage((current) => current + 1)}>{query.isFetching ? <LoaderCircle className="spin" size={15} /> : null}Tải thêm giọng</button>}
-        </div>
-        <footer><span>{query.data?.credits == null ? "Chi phí chỉ phát sinh khi nghe thử, hiệu chuẩn hoặc tạo MP3." : `Còn khoảng ${query.data.credits} lượt TTS.`}</span></footer>
-      </section>
-    </div>
-  );
-}
-
-// Giọng chính hãng chỉ có 25; cả thư viện là 1268. Mặc định "Tất cả" vì giọng dự
-// án đang dùng (Duy Onyx) nằm ở nhóm cộng đồng.
-const voiceOwnershipOptions: { id: VoiceOwnership; label: string }[] = [
-  { id: "all", label: "Tất cả" },
-  { id: "vbee", label: "Vbee" },
-  { id: "community", label: "Cộng đồng" },
-];
-
-function deduplicateVoices(voices: TtsVoice[]): TtsVoice[] {
-  return [...new Map(voices.map((voice) => [voice.voice_id, voice])).values()];
-}
-
-function VoiceRow({ voice, selected, onSelect }: { voice: TtsVoice; selected: boolean; onSelect: () => void }) {
-  return (
-    <div className={`tts-voice-row ${selected ? "selected" : ""}`}>
-      <button className="tts-voice-select" aria-pressed={selected} onClick={onSelect}><span className="tts-voice-mark">{selected ? <Check size={14} /> : <AudioLines size={14} />}</span><span><strong>{voice.name}</strong><small>{voiceMeta(voice)}{voice.calibrated ? " · Đã hiệu chuẩn" : ""}</small>{voice.description && <em>{voice.description}</em>}</span></button>
-      {voice.preview_url && <audio src={voice.preview_url} controls preload="none" aria-label={`Nghe mẫu giọng ${voice.name}`} />}
-    </div>
-  );
-}
-
-function TtsExecutionBadge({ status }: { status: TtsExecutionStatus }) {
-  return <span className={`status-badge status-${status}`}><i aria-hidden="true" />{ttsExecutionLabels[status]}</span>;
-}
-
-function TtsQualityBadge({ status }: { status: TtsWorkspace["quality_status"] }) {
-  const labels = { needs_review: "Cần rà audio", degraded: "Audio có cảnh báo", approved: "Audio đã duyệt" };
-  return <span className={`quality-badge quality-${status}`}>{labels[status]}</span>;
-}
-
-function TtsOutputState({ state }: { state: "current" | "stale" | "missing" }) {
-  return <span className={`tts-output-state tts-output-${state}`}><i />{{ current: "Mới nhất", stale: "Cần tạo lại", missing: "Không còn trên đĩa" }[state]}</span>;
-}
-
-function effectiveSpoken(cue: TtsCue, changes: DraftChanges): string {
-  return Object.hasOwn(changes, cue.segment_id) ? changes[cue.segment_id] ?? cue.default_spoken_text : cue.effective_spoken_text;
-}
-
-function voiceMeta(voice: TtsVoice): string {
-  return [voice.locale, voice.gender, voice.age].filter(Boolean).join(" · ") || "Tiếng Việt";
-}
-
-function ttsRenderHint(workspace: TtsWorkspace, state: { dirty: boolean; hasInvalid: boolean; editorLocked: boolean; voiceDirty: boolean }): string {
-  if (!workspace.provider_ready) return "AI33 / Vbee chưa sẵn sàng.";
-  if (!workspace.voice_id || state.voiceDirty) return "Chọn và lưu một giọng trước khi tạo MP3.";
-  if (!workspace.calibration || workspace.calibration.voice_id !== workspace.voice_id || workspace.calibration.sample_count < 8) return "Cần hiệu chuẩn đủ 8 mẫu cho giọng đang chọn.";
-  if (!workspace.subtitle_approved) return "Cần duyệt phụ đề trước khi tạo MP3 toàn timeline.";
-  if (workspace.attention_reasons.includes("stale_spoken_overrides")) return "Có override văn bản đọc lỗi thời cần xử lý.";
-  if (workspace.attention_reasons.includes("spoken_overrides_base_changed")) return "Có override cần rà lại vì nền phụ đề đã đổi.";
-  if (state.hasInvalid) return "Văn bản đọc không được để trống.";
-  if (state.dirty) return "Lưu các thay đổi TTS trước khi tạo MP3.";
-  if (state.editorLocked) return "Đang có tác vụ TTS sử dụng artifact này.";
-  return workspace.allowed_actions.includes("render")
-    ? "Sẵn sàng tạo MP3 theo timeline ASR."
-    : "Backend chưa cho phép tạo MP3 ở trạng thái hiện tại.";
 }

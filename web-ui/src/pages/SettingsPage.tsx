@@ -23,6 +23,7 @@ import type {
   SettingsCredential,
   SettingsProvider,
 } from "../api/types";
+import { useConfirm } from "../hooks/useConfirm";
 import { EmptyState } from "../components/EmptyState";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { errorMessage } from "../lib/format";
@@ -34,6 +35,7 @@ const credentialOrder: CredentialId[] = ["openai", "anthropic", "ai33"];
 export function SettingsPage() {
   const settingsQuery = useSettings();
   const saveCredential = useSaveCredential();
+  const confirm = useConfirm();
   const deleteCredential = useDeleteCredential();
   const testCredential = useTestCredential();
   const [drafts, setDrafts] = useState<Partial<Record<CredentialId, string>>>({});
@@ -129,7 +131,13 @@ export function SettingsPage() {
   };
 
   const remove = async (credential: SettingsCredential) => {
-    if (!window.confirm(`Xóa khóa ${credential.label} đã lưu khỏi máy này?`)) return;
+    const ok = await confirm({
+      title: `Xóa khóa ${credential.label}?`,
+      detail: "Khóa bị xóa khỏi kho credential của máy này. Các job đang cần nó sẽ dừng.",
+      confirmLabel: "Xóa khóa",
+      tone: "danger",
+    });
+    if (!ok) return;
     setRowFeedback(credential.id, undefined);
     try {
       await deleteCredential.mutateAsync({ credentialId: credential.id, revision: settings.revision });

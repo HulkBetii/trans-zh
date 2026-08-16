@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, api, apiUrl } from "../../api/client";
 import { queryKeys } from "../../api/queries";
 import type { JobDetail, OverrideChange, SubtitleCue, SubtitleWorkspace, TargetLanguage } from "../../api/types";
+import { useConfirm } from "../../hooks/useConfirm";
 import { EmptyState } from "../../components/EmptyState";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -30,6 +31,7 @@ export function SubtitleStudio({ job }: { job: JobDetail }) {
 
 function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: { job: JobDetail; data: SubtitleWorkspace; language: TargetLanguage; languages: TargetLanguage[]; onLanguage: (language: TargetLanguage) => void }) {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const [searchParams] = useSearchParams();
   const requestedFilter = searchParams.get("filter");
   const [filter, setFilter] = useState<CueFilter>(() => isCueFilter(requestedFilter) ? requestedFilter : "all");
@@ -128,8 +130,14 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
     else next[cue.segment_id] = null;
     return next;
   });
-  const resetAll = () => {
-    if (!window.confirm("Đặt lại toàn bộ chỉnh sửa thủ công của ngôn ngữ này về bản máy?")) return;
+  const resetAll = async () => {
+    const ok = await confirm({
+      title: "Đặt lại toàn bộ chỉnh sửa?",
+      detail: `Mọi cue đã chỉnh tay của bản ${language.toUpperCase()} sẽ về bản máy. Timecode không đổi.`,
+      confirmLabel: "Đặt lại toàn bộ",
+      tone: "danger",
+    });
+    if (!ok) return;
     const next: Record<number, null> = {};
     workspace.cues.forEach((cue) => { if (cue.override_state !== "none") next[cue.segment_id] = null; });
     setChanges(next);
@@ -145,9 +153,17 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
     }
   };
 
-  const changeLanguage = (nextLanguage: TargetLanguage) => {
+  const changeLanguage = async (nextLanguage: TargetLanguage) => {
     if (nextLanguage === language) return;
-    if (dirty && !window.confirm("Bạn có thay đổi phụ đề chưa lưu. Đổi ngôn ngữ và bỏ các thay đổi này?")) return;
+    if (dirty) {
+      const ok = await confirm({
+        title: `Bỏ ${dirtyCount} thay đổi chưa lưu?`,
+        detail: `Đổi sang bản ${nextLanguage.toUpperCase()} sẽ bỏ các chỉnh sửa chưa lưu của bản ${language.toUpperCase()}.`,
+        confirmLabel: "Đổi và bỏ thay đổi",
+        tone: "danger",
+      });
+      if (!ok) return;
+    }
     onLanguage(nextLanguage);
   };
 
@@ -163,7 +179,7 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
       {workspace.output_stale && <div className="stale-output-note"><AlertTriangle size={15} />Output hiện tại cũ hơn nội dung đang chỉnh. Render lại sau khi lưu.</div>}
 
       <div className="subtitle-toolbar">
-        <div className="language-switch" aria-label="Ngôn ngữ phụ đề">{languages.map((item) => <button className={language === item ? "active" : ""} aria-pressed={language === item} key={item} onClick={() => changeLanguage(item)}>{item.toUpperCase()}</button>)}</div>
+        <div className="language-switch" aria-label="Ngôn ngữ phụ đề">{languages.map((item) => <button className={language === item ? "active" : ""} aria-pressed={language === item} key={item} onClick={() => void changeLanguage(item)}>{item.toUpperCase()}</button>)}</div>
         <div className="cue-filters" aria-label="Lọc cue">{(["all", "warnings", "edited", "review"] as const).map((item) => <button className={filter === item ? "active" : ""} aria-pressed={filter === item} key={item} onClick={() => setFilter(item)}>{{ all: "Tất cả", warnings: "Cảnh báo", edited: "Đã sửa", review: "Cần rà" }[item]}</button>)}</div>
         <label className="subtitle-search"><Search size={15} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm nội dung hoặc ID" /></label>
       </div>
@@ -209,7 +225,7 @@ function SubtitleWorkspaceView({ job, data, language, languages, onLanguage }: {
       {/* Thanh này phải hiện cả khi sạch: "Reset toàn bộ" nằm trong đó, mà lúc
           cần nó nhất — có override đã lưu, chưa sửa gì thêm — thì lại không dirty. */}
       {(dirty || hasSavedOverrides) && <div className={`sticky-savebar subtitle-savebar ${dirty ? "dirty" : "clean"}`}>
-        <div><strong>{dirty ? `${dirtyCount} thay đổi chưa lưu` : "Mọi chỉnh sửa đã được lưu"}</strong>{hasSavedOverrides && <button className="text-button" onClick={resetAll} disabled={editorLocked}>Reset toàn bộ</button>}</div>
+        <div><strong>{dirty ? `${dirtyCount} thay đổi chưa lưu` : "Mọi chỉnh sửa đã được lưu"}</strong>{hasSavedOverrides && <button className="text-button" onClick={() => void resetAll()} disabled={editorLocked}>Reset toàn bộ</button>}</div>
         {dirty && <div><button className="secondary-button" disabled={hasInvalid || editorLocked || saveMutation.isPending || conflict} onClick={() => saveMutation.mutate(false)}>{saveMutation.isPending ? <LoaderCircle className="spin" size={16} /> : <Save size={16} />}Lưu</button><button className="primary-button" disabled={hasInvalid || editorLocked || saveMutation.isPending || conflict || !job.allowed_actions.includes("render")} onClick={() => saveMutation.mutate(true)}><Sparkles size={16} />Lưu & render lại</button></div>}
       </div>}
     </div>
