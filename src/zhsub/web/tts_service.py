@@ -669,6 +669,10 @@ class TtsService:
                 voice_id=voice_id,
                 sample_texts=[row.effective_spoken_text for row in rows],
                 progress=progress,
+                # Đã có số đo mà vẫn bấm hiệu chuẩn nghĩa là muốn ĐO LẠI, nên
+                # tổng hợp mới. Lần đo đầu (kể cả thử lại sau lỗi) thì dùng lại
+                # probe cũ, khỏi mất thêm lượt.
+                force=calibration_record is not None,
             )
             self.store.save_voice_calibration(
                 PROVIDER,

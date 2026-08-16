@@ -125,6 +125,43 @@ def calibration_hash(calibration: TtsCalibration) -> str:
     )
 
 
+CALIBRATION_PROBE_VERSION = "calibrate-probe-v1"
+
+
+def _probe_path(probe_dir: Path, text: str, voice_id: str) -> Path:
+    """Đặt tên probe theo nội dung, không theo vị trí trong danh sách mẫu.
+
+    Vị trí là thuộc tính của lần CHỌN mẫu, không phải của câu: sửa một lời đọc là
+    thứ tự sắp xếp đổi, và mọi file vẫn còn đúng sẽ trượt cache rồi thành rác. Số
+    âm tiết thì gắn với câu nên ổn định, lại tiện: `ls dub/_calibrate/` hiện ngay
+    dải đòn bẩy mà phép khớp dựa vào — thứ duy nhất giúp chẩn đoán một fit xấu.
+    """
+    digest = sha256_json_canonical(
+        {
+            "text": text,
+            "voice_id": voice_id,
+            # Probe luôn đo ở tốc độ 1.0; ghim vào khóa để bất biến đó thành văn bản.
+            "speed": 1.0,
+            "probe_version": CALIBRATION_PROBE_VERSION,
+        }
+    )[:16]
+    return probe_dir / f"{len(text.split()):03d}-{digest}.mp3"
+
+
+def _fetch_probe(
+    client: SpeechClient, text: str, voice_id: str, path: Path, *, force: bool
+) -> bool:
+    """Trả True khi dùng lại được file cũ. Cùng khuôn với s6_dub._fetch_clip."""
+    if path.is_file() and path.stat().st_size > 0 and not force:
+        return True
+    task_id = client.synthesize(text, voice_id, 1.0)
+    url = client.wait(task_id).get("audio_url")
+    if not url:
+        raise RuntimeError("task xong nhưng không có audio_url")
+    client.download(url, path)
+    return False
+
+
 def calibrate_voice(
     work_dir,
     cfg: Config,
@@ -134,11 +171,15 @@ def calibrate_voice(
     voice_id: str | None = None,
     sample_texts: Sequence[str] | None = None,
     progress: Callable[[float, str], None] | None = None,
+    force: bool = False,
 ) -> TtsCalibration:
     """Measure one voice on exactly eight effective spoken samples.
 
     ``sample_texts`` lets the voice library persist one shared calibration corpus;
     the legacy CLI leaves it unset and derives a spread of samples from the job.
+
+    ``force`` tổng hợp lại cả những mẫu đã có trên đĩa. Mặc định là dùng lại, để
+    một lần thử lại sau lỗi hay sau khi hủy không mất thêm lượt TTS nào.
     """
     if lang != "vi":
         raise ValueError("TTS currently supports Vietnamese only")
@@ -173,15 +214,14 @@ def calibrate_voice(
 
     log.info("Đo giọng %s trên %d câu mẫu", selected_voice, len(texts))
     points: list[tuple[int, float]] = []
+    reused = 0
     try:
         for index, text in enumerate(texts):
             # Luôn ở tốc độ 1.0: hai hằng số này là mốc gốc, mọi tốc độ khác suy ra
             # từ chúng. Đo ở tốc độ khác rồi dùng làm mốc là tự nhân sai số.
-            task_id = client.synthesize(text, selected_voice, 1.0)
-            url = client.wait(task_id).get("audio_url")
-            if not url:
-                raise RuntimeError("task xong nhưng không có audio_url")
-            clip = client.download(url, probe_dir / f"{index:02d}.mp3")
+            clip = _probe_path(probe_dir, text, selected_voice)
+            if _fetch_probe(client, text, selected_voice, clip, force=force):
+                reused += 1
 
             begin, finish = speech_bounds(clip, probe_duration(clip))
             syllables = len(text.split())
@@ -191,6 +231,8 @@ def calibrate_voice(
                 progress((index + 1) / CALIBRATION_SAMPLE_COUNT, f"{index + 1}/8 mẫu")
     finally:
         client.close()
+    if reused:
+        log.info("Dùng lại %d/%d mẫu đã có, không tốn lượt TTS", reused, len(texts))
 
     overhead, per_syllable = fit(points)
     log.info(

@@ -10,6 +10,47 @@ from zhsub.dub.calibrate import calibration_hash, fit, pick_samples
 from zhsub.models import TtsCalibration, TtsCalibrationPoint
 
 
+def _install_fake_client(monkeypatch, calls: list | None = None) -> list:
+    """Nhà cung cấp giả: thời lượng tăng theo số âm tiết, như một giọng thật."""
+    recorded = [] if calls is None else calls
+
+    class FakeSpeechClient:
+        def __init__(self, base_url: str, api_key: str) -> None:
+            pass
+
+        def synthesize(self, text: str, voice_id: str, speed: float) -> str:
+            recorded.append((text, voice_id))
+            return text
+
+        def wait(self, task_id: str) -> dict[str, str]:
+            return {"audio_url": task_id}
+
+        def download(self, url, destination):
+            # url == task_id == chính câu đã tổng hợp, nên độ dài clip giả lập
+            # được theo số âm tiết.
+            destination.write_bytes(b"a" * len(url.split()))
+            return destination
+
+        def close(self) -> None:
+            pass
+
+    monkeypatch.setattr(calibrate, "SpeechClient", FakeSpeechClient)
+    monkeypatch.setattr(
+        calibrate, "probe_duration", lambda path: 0.15 + 0.217 * len(path.read_bytes())
+    )
+    monkeypatch.setattr(calibrate, "speech_bounds", lambda path, duration: (0.0, duration))
+    return recorded
+
+
+def _calibrate_config(monkeypatch, voice_id: str = "job-voice") -> Config:
+    monkeypatch.setenv("TEST_DUB_API_KEY", "secret")
+    cfg = Config()
+    cfg.dub.api_key_env = "TEST_DUB_API_KEY"
+    cfg.dub.voice_id = voice_id
+    return cfg
+
+
+
 def test_samples_span_short_to_long():
     """Lấy toàn câu dài thì ước lượng overhead sai bét — overhead chỉ lộ ra ở câu
     ngắn, nơi nó chiếm phần lớn thời lượng."""
@@ -110,40 +151,8 @@ def test_calibration_hash_ignores_provenance_not_persisted_in_sqlite():
 def test_calibration_accepts_a_voice_override_without_changing_job_voice(
     tmp_path, monkeypatch
 ):
-    calls: list[tuple[str, str]] = []
-
-    class FakeSpeechClient:
-        def __init__(self, base_url: str, api_key: str) -> None:
-            pass
-
-        def synthesize(self, text: str, voice_id: str, speed: float) -> str:
-            calls.append((text, voice_id))
-            return text
-
-        def wait(self, task_id: str) -> dict[str, str]:
-            return {"audio_url": task_id}
-
-        def download(self, url, destination):
-            # url == task_id == chính câu đã tổng hợp, nên độ dài clip giả lập
-            # được theo số âm tiết.
-            destination.write_bytes(b"a" * len(url.split()))
-            return destination
-
-        def close(self) -> None:
-            pass
-
-    monkeypatch.setattr(calibrate, "SpeechClient", FakeSpeechClient)
-    # Thời lượng phải tăng theo số âm tiết. Stub cũ trả cứng 1.0 cho mọi mẫu,
-    # tức một giọng đọc câu 8 âm tiết đúng bằng câu 1 âm tiết — phép khớp trên
-    # dữ liệu đó cho slope bằng 0, thứ mà lớp lưu vẫn luôn từ chối.
-    monkeypatch.setattr(
-        calibrate, "probe_duration", lambda path: 0.15 + 0.217 * len(path.read_bytes())
-    )
-    monkeypatch.setattr(calibrate, "speech_bounds", lambda path, duration: (0.0, duration))
-    monkeypatch.setenv("TEST_DUB_API_KEY", "secret")
-    cfg = Config()
-    cfg.dub.api_key_env = "TEST_DUB_API_KEY"
-    cfg.dub.voice_id = "job-voice"
+    calls = _install_fake_client(monkeypatch)
+    cfg = _calibrate_config(monkeypatch)
     texts = [" ".join(["x"] * size) for size in range(1, 9)]
 
     result = calibrate.calibrate_voice(
@@ -159,3 +168,81 @@ def test_calibration_accepts_a_voice_override_without_changing_job_voice(
     # Hệ số phải qua được đúng cửa mà lớp lưu sẽ dựng lên.
     assert result.overhead_sec >= 0
     assert result.sec_per_syllable > 0
+
+
+def test_probe_files_are_reused_on_a_second_run(tmp_path, monkeypatch):
+    """Thử lại sau lỗi không được tốn thêm lượt TTS nào.
+
+    Lỗi overhead âm từng làm người dùng bấm hiệu chuẩn nhiều lần; mỗi lần là 8
+    lượt đổ sông trong khi 8 file probe vẫn nằm nguyên trên đĩa.
+    """
+    calls = _install_fake_client(monkeypatch)
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+    cfg = _calibrate_config(monkeypatch)
+
+    first = calibrate.calibrate_voice(tmp_path, cfg, voice_id="v", sample_texts=texts)
+    second = calibrate.calibrate_voice(tmp_path, cfg, voice_id="v", sample_texts=texts)
+
+    assert len(calls) == 8
+    assert (first.overhead_sec, first.sec_per_syllable) == (
+        second.overhead_sec,
+        second.sec_per_syllable,
+    )
+
+
+def test_force_remeasures_every_probe(tmp_path, monkeypatch):
+    calls = _install_fake_client(monkeypatch)
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+    cfg = _calibrate_config(monkeypatch)
+
+    calibrate.calibrate_voice(tmp_path, cfg, voice_id="v", sample_texts=texts)
+    calibrate.calibrate_voice(tmp_path, cfg, voice_id="v", sample_texts=texts, force=True)
+
+    assert len(calls) == 16
+
+
+def test_probes_of_two_voices_never_collide(tmp_path, monkeypatch):
+    """Cùng họ lỗi với việc mượn hiệu chuẩn của giọng khác, ở tầng file."""
+    calls = _install_fake_client(monkeypatch)
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+    cfg = _calibrate_config(monkeypatch)
+
+    calibrate.calibrate_voice(tmp_path, cfg, voice_id="voice-a", sample_texts=texts)
+    calibrate.calibrate_voice(tmp_path, cfg, voice_id="voice-b", sample_texts=texts)
+
+    assert len(calls) == 16
+    assert len(list((tmp_path / "dub" / "_calibrate").glob("*.mp3"))) == 16
+
+
+def test_probe_names_expose_the_syllable_spread(tmp_path, monkeypatch):
+    """Tên file phải đọc được: dải số âm tiết là thứ chẩn đoán một fit xấu."""
+    _install_fake_client(monkeypatch)
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+
+    calibrate.calibrate_voice(
+        tmp_path, _calibrate_config(monkeypatch), voice_id="v", sample_texts=texts
+    )
+
+    prefixes = sorted(
+        path.name.split("-")[0] for path in (tmp_path / "dub" / "_calibrate").glob("*.mp3")
+    )
+    assert prefixes == ["001", "002", "003", "004", "005", "006", "007", "008"]
+
+
+def test_an_empty_probe_file_is_downloaded_again(tmp_path, monkeypatch):
+    calls = _install_fake_client(monkeypatch)
+    texts = [" ".join(["x"] * size) for size in range(1, 9)]
+    cfg = _calibrate_config(monkeypatch)
+    calibrate.calibrate_voice(tmp_path, cfg, voice_id="v", sample_texts=texts)
+    next(iter((tmp_path / "dub" / "_calibrate").glob("*.mp3"))).write_bytes(b"")
+
+    calibrate.calibrate_voice(tmp_path, cfg, voice_id="v", sample_texts=texts)
+
+    assert len(calls) == 9
+
+
+def test_pick_samples_keeps_input_order_for_equal_lengths():
+    """Cache chỉ trúng nếu cùng trạng thái job cho ra cùng 8 câu."""
+    texts = ["b b", "a a", "c c", "d"]
+
+    assert calibrate.pick_samples(texts, 8) == ["d", "b b", "a a", "c c"]

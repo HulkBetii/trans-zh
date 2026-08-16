@@ -311,6 +311,7 @@ class RunScheduler:
                 voice_id=str(voice_id) if voice_id else None,
                 sample_texts=sample_texts if isinstance(sample_texts, list) else None,
                 progress=report,
+                force=bool(payload.get("force")),
             )
             self.store.save_voice_calibration(
                 TTS_PROVIDER,
