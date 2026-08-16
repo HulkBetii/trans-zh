@@ -50,7 +50,19 @@ def pick_samples(texts: list[str], count: int) -> list[str]:
 
 
 def fit(points: list[tuple[int, float]]) -> tuple[float, float]:
-    """Khớp bình phương tối thiểu, trả về (overhead_sec, sec_per_syllable)."""
+    """Khớp bình phương tối thiểu, trả về (overhead_sec, sec_per_syllable).
+
+    Overhead không được âm. Có giọng đọc gần như không có phần đầu/cuối nào sau
+    khi cắt lặng, lại ngắt nhịp nhiều hơn ở câu dài — với dữ liệu đó, đường thẳng
+    khớp nhất cắt trục tung dưới 0. Số đo không sai, chỉ là mô hình hai tham số
+    chạm biên miền hợp lệ của nó: overhead âm nghĩa là cue một âm tiết được dự
+    đoán dài âm giây, và mọi phép tính tốc độ phía sau thành vô nghĩa.
+
+    Gặp trường hợp đó thì khớp lại với overhead ghim ở 0, tức đường thẳng qua gốc
+    tọa độ. Phải khớp LẠI slope chứ không phải chỉ ép overhead xuống 0 rồi giữ
+    slope cũ: trên giọng đã gặp, ép suông làm tổng bình phương sai số 1.84 còn
+    khớp lại chỉ 0.65.
+    """
     n = len(points)
     sx = sum(p[0] for p in points)
     sy = sum(p[1] for p in points)
@@ -60,7 +72,18 @@ def fit(points: list[tuple[int, float]]) -> tuple[float, float]:
     if denom == 0:
         raise ValueError("mọi mẫu có cùng số âm tiết — không khớp được")
     slope = (n * sxy - sx * sy) / denom
-    return (sy - slope * sx) / n, slope
+    overhead = (sy - slope * sx) / n
+    if overhead < 0:
+        if sxx == 0:
+            raise ValueError("mọi mẫu rỗng — không khớp được")
+        overhead, slope = 0.0, sxy / sxx
+    if slope <= 0:
+        # Câu dài không hề đọc lâu hơn câu ngắn: mẫu hỏng, không phải giọng lạ.
+        raise ValueError(
+            "thời lượng không tăng theo số âm tiết — mẫu đo hỏng, "
+            "hãy kiểm tra audio trả về từ nhà cung cấp"
+        )
+    return overhead, slope
 
 
 def calibration_hash(calibration: TtsCalibration) -> str:

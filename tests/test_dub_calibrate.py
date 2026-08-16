@@ -48,6 +48,45 @@ def test_fit_needs_samples_of_differing_length():
         fit([(10, 2.3), (10, 2.4), (10, 2.2)])
 
 
+# Số đo thật của giọng "Ngân Kể Chuyện" (vbee), 8 mẫu đã cắt lặng. Đường thẳng
+# khớp nhất cho overhead = -0.426, và lớp lưu chặn lại bằng ValueError — sau khi
+# đã tiêu 8 lượt TTS.
+NGAN_KE_CHUYEN = [
+    (6, 1.34), (9, 2.24), (11, 2.51), (14, 3.55),
+    (16, 4.52), (19, 4.64), (22, 5.64), (31, 8.56),
+]
+
+
+def test_fit_never_returns_a_negative_overhead():
+    overhead, per_syllable = fit(NGAN_KE_CHUYEN)
+
+    assert overhead >= 0
+    assert per_syllable > 0
+
+
+def test_a_pinned_overhead_refits_the_slope_instead_of_keeping_it():
+    """Ép overhead về 0 mà giữ slope cũ thì sai số gấp gần ba lần."""
+    overhead, per_syllable = fit(NGAN_KE_CHUYEN)
+    naive_slope = 0.2844  # slope của phép khớp không ràng buộc
+
+    def rss(slope: float) -> float:
+        return sum((y - (overhead + slope * x)) ** 2 for x, y in NGAN_KE_CHUYEN)
+
+    assert rss(per_syllable) < rss(naive_slope) / 2
+
+
+def test_short_cues_get_a_positive_predicted_duration():
+    """Lý do overhead âm bị cấm: cue một âm tiết dự đoán ra thời lượng âm."""
+    overhead, per_syllable = fit(NGAN_KE_CHUYEN)
+
+    assert overhead + per_syllable * 1 > 0
+
+
+def test_fit_rejects_samples_whose_duration_does_not_grow():
+    with pytest.raises(ValueError, match="không tăng theo số âm tiết"):
+        fit([(5, 4.0), (10, 3.0), (20, 1.0)])
+
+
 def test_calibration_hash_ignores_provenance_not_persisted_in_sqlite():
     original = TtsCalibration(
         voice_id="voice-a",
@@ -85,14 +124,21 @@ def test_calibration_accepts_a_voice_override_without_changing_job_voice(
             return {"audio_url": task_id}
 
         def download(self, url, destination):
-            destination.write_bytes(b"audio")
+            # url == task_id == chính câu đã tổng hợp, nên độ dài clip giả lập
+            # được theo số âm tiết.
+            destination.write_bytes(b"a" * len(url.split()))
             return destination
 
         def close(self) -> None:
             pass
 
     monkeypatch.setattr(calibrate, "SpeechClient", FakeSpeechClient)
-    monkeypatch.setattr(calibrate, "probe_duration", lambda path: 1.0)
+    # Thời lượng phải tăng theo số âm tiết. Stub cũ trả cứng 1.0 cho mọi mẫu,
+    # tức một giọng đọc câu 8 âm tiết đúng bằng câu 1 âm tiết — phép khớp trên
+    # dữ liệu đó cho slope bằng 0, thứ mà lớp lưu vẫn luôn từ chối.
+    monkeypatch.setattr(
+        calibrate, "probe_duration", lambda path: 0.15 + 0.217 * len(path.read_bytes())
+    )
     monkeypatch.setattr(calibrate, "speech_bounds", lambda path, duration: (0.0, duration))
     monkeypatch.setenv("TEST_DUB_API_KEY", "secret")
     cfg = Config()
@@ -110,3 +156,6 @@ def test_calibration_accepts_a_voice_override_without_changing_job_voice(
     assert result.voice_id == "calibration-voice"
     assert len(calls) == 8
     assert {voice for _, voice in calls} == {"calibration-voice"}
+    # Hệ số phải qua được đúng cửa mà lớp lưu sẽ dựng lên.
+    assert result.overhead_sec >= 0
+    assert result.sec_per_syllable > 0
