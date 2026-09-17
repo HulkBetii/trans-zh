@@ -1,0 +1,31 @@
+ZHSUB SUBTITLE PRODUCTION STUDIO
+Copyright (c) 2026 HulkBeoti. All rights reserved.
+
+YEU CAU
+- Windows 10/11 64-bit.
+- Python 3.11 (uv co the tu cai dung phien ban nay).
+- uv: winget install astral-sh.uv
+- FFmpeg: winget install Gyan.FFmpeg
+- GPU NVIDIA duoc khuyen nghi; CPU van chay nhung cham hon.
+- Internet de cai dependency, tai model ASR va dung provider online.
+
+CAI DAT
+1. Giai nen toan bo file ZIP vao mot thu muc rieng.
+2. Chay INSTALL_WINDOWS.cmd.
+3. Chay RUN_STUDIO.cmd.
+4. Studio se mo tai http://127.0.0.1:8756.
+
+CAU HINH
+- File zhsub.toml duoc tao tu zhsub.toml.example trong lan cai dau.
+- Khong ghi API key truc tiep vao zhsub.toml.
+- Nhap API key trong tab Cai dat cua Studio. Key duoc luu trong kho credential
+  cua Windows va khong nam trong thu muc tool.
+- Neu dung ChatGPT Playwright, dang nhap trong cua so Chromium duoc mo lan dau.
+  Profile dang nhap chi duoc tao tren may nguoi dung, khong co trong goi ZIP.
+
+DU LIEU KHONG CO TRONG GOI
+- API key, password, cookie, session va Chrome profile.
+- Video/audio nguon, output, cache, artifact va lich su job.
+- File zhsub.toml dang su dung tren may dong goi.
+
+Luu y: thu vien ben thu ba tiep tuc tuan theo giay phep rieng cua tung thu vien.

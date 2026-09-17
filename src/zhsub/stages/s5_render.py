@@ -176,6 +176,16 @@ def run(
             _write_ass(cues, path)
             outputs.append(str(path))
 
+        if getattr(cfg.render, "render_youtube_kit", True):
+            try:
+                from ..youtube_kit import generate_youtube_kit
+
+                kit_path = out_dir / f"{stem}.{lang}.youtube_upload_kit.txt" if len(langs) > 1 or lang != "vi" else out_dir / f"{stem}.youtube_upload_kit.txt"
+                generate_youtube_kit(work_dir, cues, kit_path, lang=lang)
+                outputs.append(str(kit_path))
+            except Exception as exc:
+                log.warning("Không thể tạo YouTube Upload Kit (%s): %s", lang, exc)
+
     report = RenderReport(
         outputs=outputs,
         warnings=warnings,

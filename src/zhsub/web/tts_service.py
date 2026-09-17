@@ -54,6 +54,16 @@ def _is_vietnamese(item: dict[str, Any]) -> bool:
         for child in item.get("languages") or []
         if isinstance(child, dict)
     )
+
+
+def _is_english(item: dict[str, Any]) -> bool:
+    if str(item.get("language") or "").casefold() == "english":
+        return True
+    return any(
+        str(child.get("locale") or "").casefold().startswith("en")
+        for child in item.get("languages") or []
+        if isinstance(child, dict)
+    ) or str(item.get("locale") or "").casefold().startswith("en")
 CALIBRATION_SAMPLES = 8
 log = logging.getLogger(__name__)
 
@@ -92,39 +102,51 @@ class TtsService:
 
     def seed_config_calibration(self) -> None:
         """Make the measured legacy voice available to the new shared library."""
-        voice_id = self.config.dub.configured_voice_id()
-        if voice_id is None:
-            return
-        if self.store.get_voice_calibration(PROVIDER, voice_id) is None:
-            self.store.save_voice_calibration(
-                PROVIDER,
-                voice_id,
-                self.config.dub.overhead_sec,
-                self.config.dub.sec_per_syllable,
-                sample_count=CALIBRATION_SAMPLES,
-                source_job_id="config",
-                overwrite=False,
-            )
+        for lang in ("vi", "en"):
+            voice_id = self.config.dub.configured_voice_id(lang)
+            if voice_id is None:
+                continue
+            provider = "elevenlabs" if voice_id.startswith("elevenlabs_") else PROVIDER
+            if self.store.get_voice_calibration(provider, voice_id) is None:
+                overhead = (
+                    self.config.dub.overhead_sec_en
+                    if lang == "en"
+                    else self.config.dub.overhead_sec
+                )
+                sec_per_syl = (
+                    self.config.dub.sec_per_syllable_en
+                    if lang == "en"
+                    else self.config.dub.sec_per_syllable
+                )
+                self.store.save_voice_calibration(
+                    provider,
+                    voice_id,
+                    overhead,
+                    sec_per_syl,
+                    sample_count=CALIBRATION_SAMPLES,
+                    source_job_id="config",
+                    overwrite=False,
+                )
 
-    def started(self, job: Job) -> bool:
+    def started(self, job: Job, lang: str = "vi") -> bool:
         work_dir = Path(job.work_dir)
         latest = self.store.latest_run(job.job_id, lane="tts")
-        report = self._report(job)
-        audio_path = self._audio_path(job, report)
+        report = self._report(job, lang=lang)
+        audio_path = self._audio_path(job, report, lang=lang)
         return bool(
             latest
-            or (work_dir / "speech.vi.json").is_file()
-            or (work_dir / "tts_report.vi.json").is_file()
+            or (work_dir / f"speech.{lang}.json").is_file()
+            or (work_dir / f"tts_report.{lang}.json").is_file()
             or audio_path.is_file()
-            or self.store.get_tts_approval(job.job_id, LANGUAGE)
+            or self.store.get_tts_approval(job.job_id, lang)
         )
 
-    def activity_timestamp(self, job: Job) -> float | None:
-        report = self._report(job)
+    def activity_timestamp(self, job: Job, lang: str = "vi") -> float | None:
+        report = self._report(job, lang=lang)
         paths = [
-            Path(job.work_dir) / "speech.vi.json",
-            Path(job.work_dir) / "tts_report.vi.json",
-            self._audio_path(job, report),
+            Path(job.work_dir) / f"speech.{lang}.json",
+            Path(job.work_dir) / f"tts_report.{lang}.json",
+            self._audio_path(job, report, lang=lang),
         ]
         timestamps = [
             path.stat().st_mtime
@@ -134,7 +156,7 @@ class TtsService:
         latest = self.store.latest_run(job.job_id, lane="tts")
         if latest is not None:
             timestamps.append(latest.updated_at)
-        approval = self.store.get_tts_approval(job.job_id, LANGUAGE)
+        approval = self.store.get_tts_approval(job.job_id, lang)
         if approval is not None and approval.approved_at is not None:
             timestamps.append(approval.approved_at)
         return max(timestamps) if timestamps else None
@@ -153,34 +175,31 @@ class TtsService:
         page: int = 1,
         page_size: int = 30,
         ownership: str = "all",
+        provider: str = "vbee",
+        language: str = "Vietnamese",
     ) -> TtsVoicePage:
-        """Một trang thư viện giọng.
-
-        Phân trang và tìm kiếm để nhà cung cấp làm, không làm lại trong bộ nhớ:
-        thư viện có 1268 giọng khi tính cả nhóm cộng đồng, nên cách cũ (lấy 100 mục
-        đầu rồi tự cắt trang) khiến trang thứ tư trở đi luôn rỗng và ô tìm kiếm chỉ
-        soi được trong 100 mục đó.
-        """
+        """Một trang thư viện giọng."""
         if page < 1 or page_size < 1 or page_size > 100:
             raise ValueError("invalid voice page")
         if ownership not in VOICE_OWNERSHIPS:
             raise ValueError(f"invalid voice ownership: {ownership!r}")
         client = self._client()
         try:
+            req_provider = provider if provider in ("vbee", "elevenlabs") else "vbee"
             raw, total = client.voice_page(
-                provider="vbee",
-                language="Vietnamese",
+                provider=req_provider,
+                language=language if language else None,
                 search=search,
                 page=page,
                 page_size=page_size,
                 voice_ownership=ownership,
             )
-            # Chốt chặn cuối: chỉ nhận giọng tiếng Việt. Đã truyền language cho nhà
-            # cung cấp nên bình thường không bỏ gì; nếu có thì trừ khỏi tổng để số
-            # đếm khớp danh sách đang hiện. Trên nhiều trang con số thành xấp xỉ,
-            # nhưng danh sách đúng quan trọng hơn con số đúng — một giọng tiếng Anh
-            # lọt vào sẽ đọc hỏng cả video.
-            rows = [item for item in raw if _is_vietnamese(item)]
+            if language and language.casefold() == "vietnamese":
+                rows = [item for item in raw if _is_vietnamese(item)]
+            elif language and language.casefold() == "english":
+                rows = [item for item in raw if _is_english(item)]
+            else:
+                rows = raw
             total = max(0, total - (len(raw) - len(rows)))
             items = [
                 TtsVoiceResponse(
@@ -195,7 +214,8 @@ class TtsService:
                     preview_url=item.get("preview_url"),
                     avatar_url=item.get("avatar_url"),
                     calibrated=self.store.get_voice_calibration(
-                        PROVIDER, str(item.get("voice_id") or "")
+                        "elevenlabs" if str(item.get("voice_id") or "").startswith("elevenlabs_") else PROVIDER,
+                        str(item.get("voice_id") or ""),
                     )
                     is not None,
                 )
@@ -218,11 +238,11 @@ class TtsService:
         finally:
             client.close()
 
-    def _fallback_voice(self, job: Job) -> str | None:
-        return self.config.dub.configured_voice_id()
+    def _fallback_voice(self, job: Job, lang: str = "vi") -> str | None:
+        return self.config.dub.configured_voice_id(lang)
 
-    def _state(self, job: Job):
-        return get_speech_state(job.work_dir, self._fallback_voice(job))
+    def _state(self, job: Job, lang: str = "vi"):
+        return get_speech_state(job.work_dir, self._fallback_voice(job, lang=lang), lang=lang)
 
     def _subtitle_approved(self, job: Job) -> tuple[bool, str]:
         signature = self.subtitle_signature(job)
@@ -230,7 +250,7 @@ class TtsService:
         completed = job.status == "done" or (latest is not None and latest.status == "completed")
         return bool(completed and job.approved_signature and job.approved_signature == signature), signature
 
-    def _audio_path(self, job: Job, report: TtsReport | None = None) -> Path:
+    def _audio_path(self, job: Job, report: TtsReport | None = None, lang: str = "vi") -> Path:
         snapshot = job.request or {}
         output_dir = Path(snapshot.get("output_dir") or "output").resolve(strict=False)
         if report is not None:
@@ -240,10 +260,10 @@ class TtsService:
             reported = reported.resolve(strict=False)
             if reported == output_dir or reported.is_relative_to(output_dir):
                 return reported
-        return output_dir / f"{Path(job.work_dir).name}.vi.mp3"
+        return output_dir / f"{Path(job.work_dir).name}.{lang}.mp3"
 
-    def _report(self, job: Job) -> TtsReport | None:
-        path = Path(job.work_dir) / "tts_report.vi.json"
+    def _report(self, job: Job, lang: str = "vi") -> TtsReport | None:
+        path = Path(job.work_dir) / f"tts_report.{lang}.json"
         if not path.is_file():
             return None
         try:
@@ -251,16 +271,16 @@ class TtsService:
         except (OSError, ValueError):
             return None
 
-    def _plan(self, job: Job, voice_id: str, calibration: TtsCalibration | None):
+    def _plan(self, job: Job, voice_id: str, calibration: TtsCalibration | None, lang: str = "vi"):
         cfg = self.config.model_copy(deep=True)
         cfg.dub.voice_id = voice_id
         if calibration is not None:
             cfg.dub.overhead_sec = calibration.overhead_sec
             cfg.dub.sec_per_syllable = calibration.sec_per_syllable
-        return s6_dub.build_plan(job.work_dir, cfg, LANGUAGE, voice_id=voice_id, calibration=calibration)
+        return s6_dub.build_plan(job.work_dir, cfg, lang, voice_id=voice_id, calibration=calibration)
 
-    def _output(self, job: Job, plan: Any | None, report: TtsReport | None) -> tuple[ArtifactResponse | None, bool]:
-        path = self._audio_path(job, report)
+    def _output(self, job: Job, plan: Any | None, report: TtsReport | None, lang: str = "vi") -> tuple[ArtifactResponse | None, bool]:
+        path = self._audio_path(job, report, lang=lang)
         if report is None and not path.exists():
             return None, False
         current = bool(
@@ -277,7 +297,7 @@ class TtsService:
             artifact_id=artifact_id,
             name=path.name,
             kind="audio",
-            language=LANGUAGE,
+            language=lang,
             format="mp3",
             size_bytes=stat.st_size if stat else None,
             created_at=_utc_iso(stat.st_mtime) if stat else None,
@@ -285,13 +305,13 @@ class TtsService:
             download_url=(f"/api/v1/jobs/{job.job_id}/artifacts/{artifact_id}" if exists else None),
         ), state != "current"
 
-    def workspace(self, job: Job) -> TtsWorkspaceResponse:
+    def workspace(self, job: Job, lang: str = "vi") -> TtsWorkspaceResponse:
         self.seed_config_calibration()
         voice_id: str | None = None
         state = None
         artifacts_invalid = False
         try:
-            state = self._state(job)
+            state = self._state(job, lang=lang)
             voice_id = state.voice_id
         except SpeechValidationError:
             pass
@@ -299,21 +319,26 @@ class TtsService:
             artifacts_invalid = True
             log.warning("Could not read TTS state for job %s: %s", job.job_id, exc)
 
+        voice_provider = (
+            "elevenlabs"
+            if voice_id and voice_id.startswith("elevenlabs_")
+            else PROVIDER
+        )
         calibration_record = (
-            self.store.get_voice_calibration(PROVIDER, voice_id) if voice_id else None
+            self.store.get_voice_calibration(voice_provider, voice_id) if voice_id else None
         )
         calibration = _calibration_model(calibration_record) if calibration_record else None
         plan = None
         cues: list[TtsCueResponse] = []
         uncached = 0
         if voice_id and (Path(job.work_dir) / "segments.json").is_file() and (
-            Path(job.work_dir) / "translations.vi.json"
+            Path(job.work_dir) / f"translations.{lang}.json"
         ).is_file():
             try:
                 segments = read_doc(Path(job.work_dir) / "segments.json", SegmentsDoc)
                 segment_by_id = {segment.id: segment for segment in segments.segments}
-                rows = {row.segment_id: row for row in effective_spoken_items(job.work_dir)}
-                clips_dir = Path(job.work_dir) / "dub" / LANGUAGE
+                rows = {row.segment_id: row for row in effective_spoken_items(job.work_dir, voice_id=voice_id, lang=lang)}
+                clips_dir = Path(job.work_dir) / "dub" / lang
 
                 def _override_state(segment_id: int) -> str:
                     evaluation = state and next(
@@ -328,7 +353,7 @@ class TtsService:
                     }.get(evaluation.status if evaluation else None, "none")
 
                 if calibration is not None:
-                    plan = self._plan(job, voice_id, calibration)
+                    plan = self._plan(job, voice_id, calibration, lang=lang)
                     for cue in plan.cues:
                         row = rows[cue.segment_id]
                         segment = segment_by_id[cue.segment_id]
@@ -357,7 +382,7 @@ class TtsService:
                                 speed=cue.speed,
                                 preview_state=preview_state,  # type: ignore[arg-type]
                                 preview_url=(
-                                    f"/api/v1/jobs/{job.job_id}/tts/vi/previews/{cue.segment_id}"
+                                    f"/api/v1/jobs/{job.job_id}/tts/{lang}/previews/{cue.segment_id}"
                                     if preview_state == "current"
                                     else None
                                 ),
@@ -369,7 +394,7 @@ class TtsService:
                     # phải liệt kê đủ cue, vì nút "Hiệu chuẩn 8 mẫu" chỉ mở khi
                     # đếm được từ 8 cue trở lên.
                     for draft in s6_dub.build_draft(
-                        job.work_dir, self.config, LANGUAGE, voice_id=voice_id
+                        job.work_dir, self.config, lang, voice_id=voice_id
                     ):
                         row = rows[draft.segment_id]
                         segment = segment_by_id[draft.segment_id]
@@ -401,19 +426,19 @@ class TtsService:
                 log.warning("Could not build TTS workspace for job %s: %s", job.job_id, exc)
 
         subtitle_approved, subtitle_signature = self._subtitle_approved(job)
-        report = self._report(job)
-        output, output_stale = self._output(job, plan, report)
+        report = self._report(job, lang=lang)
+        output, output_stale = self._output(job, plan, report, lang=lang)
         latest = self.store.latest_run(job.job_id, lane="tts")
         active_any = self.store.active_run(job.job_id)
         active_tts = self.store.active_run(job.job_id, lane="tts")
         execution_status = latest.status if latest else "not_started"
-        approval = self.store.get_tts_approval(job.job_id, LANGUAGE)
+        approval = self.store.get_tts_approval(job.job_id, lang)
         current_audio_signature = None
         if plan is not None and report is not None and not output_stale and output is not None:
             current_audio_signature = sha256_json_canonical(
                 {
                     "input_hash": plan.input_hash,
-                    "audio": sha256_file(self._audio_path(job, report)),
+                    "audio": sha256_file(self._audio_path(job, report, lang=lang)),
                 }
             )
         quality = "needs_review"
@@ -474,6 +499,8 @@ class TtsService:
 
         return TtsWorkspaceResponse(
             revision=state.revision if state else sha256_json_canonical({"voice_id": None}),
+            language=lang,
+            provider="elevenlabs" if voice_id and voice_id.startswith("elevenlabs_") else "vbee",
             provider_ready=self.provider_ready,
             voice_id=voice_id,
             selected_voice=(
@@ -488,7 +515,7 @@ class TtsService:
             ),
             calibration=(
                 VoiceCalibrationResponse(
-                    provider="vbee",
+                    provider="elevenlabs" if calibration_record.voice_id.startswith("elevenlabs_") else "vbee",
                     voice_id=calibration_record.voice_id,
                     overhead_sec=calibration_record.overhead_sec,
                     sec_per_syllable=calibration_record.sec_per_syllable,
@@ -534,52 +561,57 @@ class TtsService:
             event_seq=run.event_seq,
         )
 
-    def current_audio_signature(self, job: Job) -> str | None:
-        state = self.workspace(job)
+    def current_audio_signature(self, job: Job, lang: str = "vi") -> str | None:
+        state = self.workspace(job, lang=lang)
         if state.output is None or state.output.state != "current":
             return None
-        report = self._report(job)
+        report = self._report(job, lang=lang)
         if report is None:
             return None
-        path = self._audio_path(job, report)
+        path = self._audio_path(job, report, lang=lang)
         if not path.is_file():
             return None
         return sha256_json_canonical(
             {"input_hash": report.input_hash, "audio": sha256_file(path)}
         )
 
-    def apply_settings(self, job: Job, revision: str, voice_id: str):
-        speech_path = Path(job.work_dir) / "speech.vi.json"
+    def apply_settings(self, job: Job, revision: str, voice_id: str, lang: str = "vi"):
+        speech_path = Path(job.work_dir) / f"speech.{lang}.json"
         if not speech_path.is_file():
-            fallback = self._fallback_voice(job)
+            fallback = self._fallback_voice(job, lang=lang)
             if fallback:
-                ensure_speech_doc(job.work_dir, fallback)
+                ensure_speech_doc(job.work_dir, fallback, lang=lang)
             else:
                 empty_revision = sha256_json_canonical({"voice_id": None})
                 if revision != empty_revision:
                     raise SpeechConflictError(revision, empty_revision)
-                ensure_speech_doc(job.work_dir, voice_id)
-                self.store.set_tts_approval(job.job_id, LANGUAGE, None)
-                return get_speech_state(job.work_dir)
-        result = apply_spoken_changes(job.work_dir, voice_id, revision, [])
-        self.store.set_tts_approval(job.job_id, LANGUAGE, None)
+                ensure_speech_doc(job.work_dir, voice_id, lang=lang)
+                self.store.set_tts_approval(job.job_id, lang, None)
+                return get_speech_state(job.work_dir, lang=lang)
+        result = apply_spoken_changes(job.work_dir, voice_id, revision, [], lang=lang)
+        self.store.set_tts_approval(job.job_id, lang, None)
         return result
 
-    def apply_overrides(self, job: Job, revision: str, changes: list[dict[str, Any]]):
-        state = self._state(job)
-        result = apply_spoken_changes(job.work_dir, state.voice_id, revision, changes)
-        self.store.set_tts_approval(job.job_id, LANGUAGE, None)
+    def apply_overrides(self, job: Job, revision: str, changes: list[dict[str, Any]], lang: str = "vi"):
+        state = self._state(job, lang=lang)
+        result = apply_spoken_changes(job.work_dir, state.voice_id, revision, changes, lang=lang)
+        self.store.set_tts_approval(job.job_id, lang, None)
         return result
 
-    def preview_path(self, job: Job, segment_id: int) -> Path | None:
-        state = self._state(job)
-        calibration_record = self.store.get_voice_calibration(PROVIDER, state.voice_id)
+    def preview_path(self, job: Job, segment_id: int, lang: str = "vi") -> Path | None:
+        state = self._state(job, lang=lang)
+        voice_provider = (
+            "elevenlabs"
+            if state.voice_id and state.voice_id.startswith("elevenlabs_")
+            else PROVIDER
+        )
+        calibration_record = self.store.get_voice_calibration(voice_provider, state.voice_id)
         calibration = _calibration_model(calibration_record) if calibration_record else None
-        plan = self._plan(job, state.voice_id, calibration)
+        plan = self._plan(job, state.voice_id, calibration, lang=lang)
         cue = next((item for item in plan.cues if item.segment_id == segment_id), None)
         if cue is None or not cue.clip_path.is_file() or cue.clip_path.stat().st_size <= 0:
             return None
-        root = (Path(job.work_dir) / "dub" / LANGUAGE).resolve(strict=False)
+        root = (Path(job.work_dir) / "dub" / lang).resolve(strict=False)
         path = cue.clip_path.resolve(strict=False)
         if path != root and not path.is_relative_to(root):
             return None
@@ -597,13 +629,19 @@ class TtsService:
         voice_id = str(payload.get("voice_id") or "").strip()
         if not voice_id:
             raise ValueError("TTS run has no voice_id")
-        state = self._state(job)
+        lang = str(payload.get("lang") or LANGUAGE)
+        state = self._state(job, lang=lang)
         if state.voice_id != voice_id:
             raise RuntimeError("TTS voice changed after the run was queued; retry the action")
         expected_revision = payload.get("speech_revision")
         if expected_revision and state.revision != expected_revision:
             raise RuntimeError("Spoken text changed after the run was queued; reload the workspace")
-        calibration_record = self.store.get_voice_calibration(PROVIDER, voice_id)
+        voice_provider = (
+            "elevenlabs"
+            if voice_id.startswith("elevenlabs_")
+            else PROVIDER
+        )
+        calibration_record = self.store.get_voice_calibration(voice_provider, voice_id)
         calibration = _calibration_model(calibration_record) if calibration_record else None
         expected_calibration = payload.get("calibration_revision")
         current_calibration = (
@@ -613,7 +651,7 @@ class TtsService:
             raise RuntimeError(
                 "Voice calibration changed after the run was queued; retry the action"
             )
-        # Chặn ngay ở cửa, trước khi vào stage: hỏng ở đây là một câu tiếng Việt
+        # Chặn ngay ở cửa, trước khi vào stage: hỏng ở đây là một câu tiếng Việt/Anh
         # đọc được, hỏng sâu bên trong là một ValueError giữa thanh tiến độ.
         if calibration is None and run.kind in {"tts_preview", "tts_render"}:
             raise RuntimeError(
@@ -627,14 +665,14 @@ class TtsService:
                 job.work_dir,
                 config,
                 int(payload["segment_id"]),
-                lang=LANGUAGE,
+                lang=lang,
                 voice_id=voice_id,
                 calibration=calibration,
             )
             ctx.report(1.0, "Nghe thử đã sẵn sàng")
             return
         if run.kind == "tts_calibrate":
-            rows = effective_spoken_items(job.work_dir)
+            rows = effective_spoken_items(job.work_dir, lang=lang)
             if len(rows) < CALIBRATION_SAMPLES:
                 raise ValueError("TTS calibration requires at least 8 subtitle cues")
             ctx = RunContext(job.job_id, on_progress, cancel, stages=["tts_calibrate"])
@@ -646,7 +684,7 @@ class TtsService:
             result = calibrate_voice(
                 job.work_dir,
                 config,
-                LANGUAGE,
+                lang,
                 CALIBRATION_SAMPLES,
                 voice_id=voice_id,
                 sample_texts=[row.effective_spoken_text for row in rows],
@@ -657,7 +695,7 @@ class TtsService:
                 force=calibration_record is not None,
             )
             self.store.save_voice_calibration(
-                PROVIDER,
+                voice_provider,
                 voice_id,
                 result.overhead_sec,
                 result.sec_per_syllable,
@@ -687,7 +725,7 @@ class TtsService:
         return s6_dub.run(
             job.work_dir,
             cfg,
-            LANGUAGE,
+            lang,
             Path((job.request or {}).get("output_dir") or "output"),
             ctx=ctx,
             voice_id=voice_id,

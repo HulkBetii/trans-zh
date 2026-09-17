@@ -217,19 +217,23 @@ def calibration_from_record(record: Any) -> TtsCalibration:
     )
 
 
-def calibration_from_config(cfg: Config) -> TtsCalibration | None:
+def calibration_from_config(cfg: Config, lang: str = "vi") -> TtsCalibration | None:
     """Hai hằng số trong zhsub.toml, gắn với ĐÚNG giọng ghi cùng chỗ.
 
     Không đoán tên giọng: chính chỗ đó là lỗi cũ. Chưa đặt voice_id thì không có
     số đo nào để nói tới.
     """
-    voice_id = cfg.dub.configured_voice_id()
+    voice_id = cfg.dub.configured_voice_id(lang)
     if voice_id is None:
         return None
+    overhead = cfg.dub.overhead_sec_en if lang == "en" else cfg.dub.overhead_sec
+    sec_per_syllable = (
+        cfg.dub.sec_per_syllable_en if lang == "en" else cfg.dub.sec_per_syllable
+    )
     return TtsCalibration(
         voice_id=voice_id,
-        overhead_sec=cfg.dub.overhead_sec,
-        sec_per_syllable=cfg.dub.sec_per_syllable,
+        overhead_sec=overhead,
+        sec_per_syllable=sec_per_syllable,
         samples_hash="config",
         created_at="config",
         points=[],
@@ -255,8 +259,8 @@ def calibrate_voice(
     ``force`` tổng hợp lại cả những mẫu đã có trên đĩa. Mặc định là dùng lại, để
     một lần thử lại sau lỗi hay sau khi hủy không mất thêm lượt TTS nào.
     """
-    if lang != "vi":
-        raise ValueError("TTS currently supports Vietnamese only")
+    if lang not in ("vi", "en"):
+        raise ValueError(f"TTS currently supports 'vi' and 'en' only, got: {lang!r}")
     if samples != CALIBRATION_SAMPLE_COUNT:
         raise ValueError("TTS calibration requires exactly 8 samples")
 
@@ -268,10 +272,11 @@ def calibrate_voice(
     else:
         selected_voice = resolve_voice_id(
             work_dir,
-            cfg.dub.configured_voice_id(),
+            cfg.dub.configured_voice_id(lang),
+            lang=lang,
         )
     if sample_texts is None:
-        rows = effective_spoken_items(work_dir, selected_voice)
+        rows = effective_spoken_items(work_dir, selected_voice, lang=lang)
         texts = pick_samples(
             [item.effective_spoken_text for item in rows], CALIBRATION_SAMPLE_COUNT
         )

@@ -133,6 +133,7 @@ class RenderConfig(BaseModel):
     max_lines: int = 2
     # 42 chars / 21 CPS is a Latin-script convention. Chinese lines need to be far
     # tighter (CJK convention is ~20 chars / 9 CPS) or they overflow in bilingual mode.
+    render_youtube_kit: bool = True
     limits: dict[str, LangLimits] = Field(
         default_factory=lambda: {
             "vi": LangLimits(),
@@ -207,6 +208,7 @@ class ChatGPTWebConfig(BaseModel):
     # profile remembers it, which keeps the ChatGPT password off disk entirely.
     account_file: str = "data/chatgpt_account.json"
     manual_login_timeout_sec: float = 300.0
+    ensure_instant: bool = True
 
 
 class LLMConfig(BaseModel):
@@ -227,6 +229,8 @@ class DubConfig(BaseModel):
     base_url: str = "https://api.ai33.pro"
     api_key_env: str = "AI33_API_KEY"
     voice_id: str = _PLACEHOLDER
+    voice_id_vi: str = "vbee_n_hn_male_duyonyx_oaistable_vc"
+    voice_id_en: str = "elevenlabs_BcJMy2AClTYRAgDaPpgz"
 
     # Tốc độ đọc cho MỌI cue. Nghe thử thì 1.0 vừa tai — cảm giác "gấp" của bản đầu
     # không đến từ tốc độ đọc mà từ chỗ giao giữa các câu bị dán sát (xem min_gap_sec).
@@ -250,6 +254,8 @@ class DubConfig(BaseModel):
     # đổi giọng thì phải đo lại, nếu không phần chỉnh tốc độ sẽ sai.
     overhead_sec: float = 0.15
     sec_per_syllable: float = 0.217
+    overhead_sec_en: float = 0.569
+    sec_per_syllable_en: float = 0.266
 
     sample_rate: int = 24000
 
@@ -284,15 +290,19 @@ class DubConfig(BaseModel):
             raise RuntimeError(f"Chưa có API key cho {self.api_key_env}.")
         return key
 
-    def configured_voice_id(self) -> str | None:
-        """Giọng ghi trong zhsub.toml, hoặc None khi còn là placeholder.
+    def configured_voice_id(self, lang: str = "vi") -> str | None:
+        """Giọng ghi trong zhsub.toml theo ngôn ngữ, hoặc None khi còn là placeholder.
 
         Trả None thay vì ném lỗi vì mọi nơi gọi đều muốn "không có thì lấy giọng
         đã lưu của job" — một hàm require_voice() ném lỗi từng tồn tại ở đây và
         không nơi nào dùng được, nên năm chỗ tự viết lại phép kiểm placeholder.
         """
-        voice = self.voice_id.strip()
-        return voice if voice and voice != _PLACEHOLDER else None
+        if lang == "en":
+            target = (self.voice_id_en or "").strip()
+            if target and target != _PLACEHOLDER:
+                return target
+        target = (self.voice_id or self.voice_id_vi or "").strip()
+        return target if target and target != _PLACEHOLDER else None
 
 
 class Config(BaseModel):

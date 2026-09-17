@@ -19,6 +19,7 @@ test("marks Settings active without marking Studio active", async () => {
   const rail = screen.getByRole("complementary", { name: "Điều hướng chính" });
   expect(within(rail).getByRole("link", { name: "Cài đặt" })).toHaveClass("active");
   expect(within(rail).getByRole("link", { name: "Studio" })).not.toHaveClass("active");
+  expect(within(rail).getByText("© 2026 HulkBeoti")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Mở cài đặt" })).toHaveAttribute("href", "/settings");
 });
 

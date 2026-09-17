@@ -19,6 +19,7 @@ inbox/
 jobs.db
 jobs.db-journal
 jobs.db-wal
+jobs.db-shm
 .cache/
 zhsub.toml
 

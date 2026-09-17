@@ -21,6 +21,7 @@ import { queryKeys, useTts, useTtsRunEvents } from "../../api/queries";
 import type {
   JobDetail,
   RunRecord,
+  TargetLanguage,
   TtsCue,
   TtsExecutionStatus,
   TtsVoice,
@@ -57,8 +58,18 @@ class PartialTtsSaveError extends Error {
   }
 }
 
-export function TtsStudio({ job }: { job: JobDetail }) {
-  const query = useTts(job.job_id);
+export function TtsStudio({ job, languages }: { job: JobDetail; languages?: TargetLanguage[] }) {
+  const ttsLanguages = useMemo(() => {
+    if (languages && languages.length > 0) return languages;
+    const candidates = job.request.targets.filter((t): t is TargetLanguage => t === "vi" || t === "en");
+    return candidates.length > 0 ? candidates : (["vi"] as TargetLanguage[]);
+  }, [job.request.targets, languages]);
+
+  const [language, setLanguage] = useState<TargetLanguage>(() =>
+    ttsLanguages.includes("vi") ? "vi" : (ttsLanguages[0] ?? "vi"),
+  );
+
+  const query = useTts(job.job_id, language);
 
   if (query.isLoading) {
     return <div className="editor-loading"><LoaderCircle className="spin" size={20} />Đang mở không gian lồng tiếng…</div>;
@@ -73,10 +84,31 @@ export function TtsStudio({ job }: { job: JobDetail }) {
       />
     );
   }
-  return <TtsWorkspaceView key={job.job_id} job={job} data={query.data} />;
+  return (
+    <TtsWorkspaceView
+      key={`${job.job_id}_${language}`}
+      job={job}
+      data={query.data}
+      language={language}
+      languages={ttsLanguages}
+      onLanguage={setLanguage}
+    />
+  );
 }
 
-function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace }) {
+function TtsWorkspaceView({
+  job,
+  data,
+  language,
+  languages,
+  onLanguage,
+}: {
+  job: JobDetail;
+  data: TtsWorkspace;
+  language: TargetLanguage;
+  languages: TargetLanguage[];
+  onLanguage: (language: TargetLanguage) => void;
+}) {
   const queryClient = useQueryClient();
   const confirm = useConfirm();
   const [workspace, setWorkspace] = useState(data);
@@ -155,7 +187,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
   const hasInvalid = Object.values(changes).some((value) => value !== null && !value.trim());
   const hasSavedOverrides = workspace.cues.some((cue) => cue.override_state !== "none");
   const activeRun = workspace.active_run ?? lastQueuedRun;
-  const connectionStatus = useTtsRunEvents(job.job_id, activeRun?.run_id);
+  const connectionStatus = useTtsRunEvents(job.job_id, activeRun?.run_id, language);
   const selectedInvalid = Boolean(selected && Object.hasOwn(changes, selected.segment_id) && changes[selected.segment_id] !== null && !changes[selected.segment_id]?.trim());
   const canPreview = Boolean(selected && workspace.allowed_actions.includes("preview") && workspace.provider_ready && !editorLocked && !voiceDirty && !selectedInvalid);
   const calibrationReady = Boolean(workspace.calibration && workspace.calibration.voice_id === workspace.voice_id && workspace.calibration.sample_count >= 8);
@@ -190,8 +222,8 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       });
     }
     setActionError(null);
-    queryClient.setQueryData(queryKeys.tts(job.job_id), saved);
-  }, [job.job_id, markSaved, queryClient]);
+    queryClient.setQueryData(queryKeys.tts(job.job_id, language), saved);
+  }, [job.job_id, language, markSaved, queryClient]);
 
   const saveDrafts = useMutation({
     mutationFn: async (request: SaveRequest) => {
@@ -208,7 +240,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       try {
         if (clearVoice) {
           if (!draftVoiceId.trim()) throw new Error("Hãy chọn một giọng trước khi lưu.");
-          saved = await api.saveTtsSettings(job.job_id, { revision: currentRevision, voice_id: draftVoiceId.trim() });
+          saved = await api.saveTtsSettings(job.job_id, { revision: currentRevision, voice_id: draftVoiceId.trim() }, language);
           currentRevision = saved.revision;
           voiceSaved = true;
         }
@@ -216,7 +248,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
           saved = await api.saveSpokenOverrides(job.job_id, {
             revision: currentRevision,
             changes: spokenEntries.map(([segmentId, text]) => ({ segment_id: Number(segmentId), text })),
-          });
+          }, language);
         }
       } catch (error) {
         if (saved) throw new PartialTtsSaveError(error, saved, voiceSaved, []);
@@ -239,11 +271,11 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
   });
 
   const preview = useMutation({
-    mutationFn: (segmentId: number) => api.previewTts(job.job_id, { segment_id: segmentId }),
+    mutationFn: (segmentId: number) => api.previewTts(job.job_id, { segment_id: segmentId }, language),
     onSuccess: (run) => {
       setLastQueuedRun(run);
       setActionError(null);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.tts(job.job_id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tts(job.job_id, language) });
     },
     onError: (error) => {
       setActionError(errorMessage(error));
@@ -253,13 +285,13 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
 
   const runAction = useMutation({
     mutationFn: async (kind: "calibrate" | "render") => {
-      if (kind === "calibrate") return api.calibrateTts(job.job_id);
-      return api.renderTts(job.job_id);
+      if (kind === "calibrate") return api.calibrateTts(job.job_id, language);
+      return api.renderTts(job.job_id, language);
     },
     onSuccess: (run) => {
       setLastQueuedRun(run);
       setActionError(null);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.tts(job.job_id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tts(job.job_id, language) });
     },
     onError: (error) => setActionError(errorMessage(error)),
   });
@@ -271,15 +303,15 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
     },
     onSuccess: () => {
       setLastQueuedRun(null);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.tts(job.job_id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tts(job.job_id, language) });
     },
     onError: (error) => setActionError(errorMessage(error)),
   });
 
   const approval = useMutation({
     mutationFn: (kind: "approve" | "unapprove") => kind === "approve"
-      ? api.approveTts(job.job_id)
-      : api.unapproveTts(job.job_id),
+      ? api.approveTts(job.job_id, language)
+      : api.unapproveTts(job.job_id, language),
     onSuccess: (saved) => applySaved(saved, { clearVoice: true, clearSpokenIds: Object.keys(changes).map(Number) }),
     onError: (error) => setActionError(errorMessage(error)),
   });
@@ -325,6 +357,19 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       if (cue.override_state !== "none") next[cue.segment_id] = null;
     });
     setChanges(next);
+  };
+  const changeLanguage = async (nextLanguage: TargetLanguage) => {
+    if (nextLanguage === language) return;
+    if (dirty) {
+      const ok = await confirm({
+        title: `Bỏ ${dirtyCount} thay đổi chưa lưu?`,
+        detail: `Đổi sang bản ${nextLanguage.toUpperCase()} sẽ bỏ các chỉnh sửa chưa lưu của bản ${language.toUpperCase()}.`,
+        confirmLabel: "Đổi và bỏ thay đổi",
+        tone: "danger",
+      });
+      if (!ok) return;
+    }
+    onLanguage(nextLanguage);
   };
   const syncPlayback = () => {
     if (!followPlayback || !playerRef.current) return;
@@ -406,7 +451,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
 
       <section className="tts-setup panel-sheet" aria-labelledby="tts-setup-title">
         <div className="tts-setup-heading">
-          <div><span className="eyebrow">Voice & calibration</span><h2 id="tts-setup-title">Chuẩn bị giọng đọc</h2><p>Tiếng Việt · một giọng cho toàn bộ job · MP3 theo timeline ASR.</p></div>
+          <div><span className="eyebrow">Voice & calibration</span><h2 id="tts-setup-title">Chuẩn bị giọng đọc</h2><p>{language === "en" ? "Tiếng Anh" : "Tiếng Việt"} · một giọng cho toàn bộ job · MP3 theo timeline ASR.</p></div>
           <div className="tts-status-line"><TtsExecutionBadge status={(activeRun?.status as TtsExecutionStatus | undefined) ?? workspace.execution_status} />{workspace.quality_status !== "approved" && <TtsQualityBadge status={workspace.quality_status} />}{workspace.quality_status === "approved" && <span className="tts-approved"><CheckCircle2 size={14} />Audio đã duyệt</span>}</div>
         </div>
         <div className="tts-setup-grid">
@@ -414,7 +459,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
             <span className="tts-label">Giọng đang chọn</span>
             {(displayedVoice || workspace.voice_id || draftVoiceId) ? (
               <div className="tts-selected-voice">
-                <div><strong>{displayedVoice?.name ?? (voiceDirty ? draftVoiceId : workspace.voice_id)}</strong><small>{displayedVoice ? voiceMeta(displayedVoice) : "Vbee · mã giọng đã lưu"}</small></div>
+                <div><strong>{displayedVoice?.name ?? (voiceDirty ? draftVoiceId : workspace.voice_id)}</strong><small>{displayedVoice ? voiceMeta(displayedVoice) : (workspace.provider === "elevenlabs" ? "ElevenLabs · mã giọng đã lưu" : "Vbee · mã giọng đã lưu")}</small></div>
                 <button className="secondary-button compact" disabled={runBusy || editorLocked} onClick={() => setVoiceDialogOpen(true)}><Settings2 size={15} />Đổi giọng</button>
               </div>
             ) : (
@@ -433,7 +478,7 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
           </div>
           <div className="tts-provider">
             <span className="tts-label">Nhà cung cấp</span>
-            <strong className={workspace.provider_ready ? "tts-ready" : "tts-danger"}>{workspace.provider_ready ? "AI33 / Vbee sẵn sàng" : "AI33 / Vbee chưa sẵn sàng"}</strong>
+            <strong className={workspace.provider_ready ? "tts-ready" : "tts-danger"}>{workspace.provider === "elevenlabs" ? (workspace.provider_ready ? "AI33 / ElevenLabs sẵn sàng" : "AI33 / ElevenLabs chưa sẵn sàng") : (workspace.provider_ready ? "AI33 / Vbee sẵn sàng" : "AI33 / Vbee chưa sẵn sàng")}</strong>
             {workspace.provider_ready && <small>{displayedVoice?.tier ? `Gói ${displayedVoice.tier}` : "Không lộ API key trong trình duyệt"}</small>}
           </div>
         </div>
@@ -446,7 +491,23 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
       {workspace.output && <TtsOutput output={workspace.output} stale={outputStale} />}
 
       <div className="tts-toolbar">
-        <div className="language-switch"><span className="language-label">VI</span></div>
+        <div className="language-switch" aria-label="Ngôn ngữ TTS">
+          {languages.length > 1 ? (
+            languages.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={language === item ? "active" : ""}
+                aria-pressed={language === item}
+                onClick={() => void changeLanguage(item)}
+              >
+                {item.toUpperCase()}
+              </button>
+            ))
+          ) : (
+            <span className="language-label">{language.toUpperCase()}</span>
+          )}
+        </div>
         <div className="cue-filters" aria-label="Lọc cue TTS">
           {(["all", "edited", "tight", "preview"] as const).map((item) => <button key={item} className={filter === item ? "active" : ""} aria-pressed={filter === item} onClick={() => setFilter(item)}>{{ all: "Tất cả", edited: "Đã sửa", tight: "Chật giờ", preview: "Có nghe thử" }[item]}</button>)}
         </div>
@@ -535,7 +596,18 @@ function TtsWorkspaceView({ job, data }: { job: JobDetail; data: TtsWorkspace })
         </div>
       </div>
 
-      <VoiceLibraryDialog open={voiceDialogOpen} selectedVoiceId={draftVoiceId} onClose={() => setVoiceDialogOpen(false)} onSelect={(voice) => { setDraftVoiceId(voice.voice_id); setDraftVoice(voice); setVoiceDialogOpen(false); }} />
+      <VoiceLibraryDialog
+        open={voiceDialogOpen}
+        selectedVoiceId={draftVoiceId}
+        provider={workspace.provider}
+        language={language === "en" ? "English" : "Vietnamese"}
+        onClose={() => setVoiceDialogOpen(false)}
+        onSelect={(voice) => {
+          setDraftVoiceId(voice.voice_id);
+          setDraftVoice(voice);
+          setVoiceDialogOpen(false);
+        }}
+      />
     </div>
   );
 }

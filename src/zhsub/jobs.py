@@ -343,6 +343,11 @@ class JobStore:
                 "SELECT * FROM voice_calibrations WHERE provider=? AND voice_id=?",
                 (provider, voice_id),
             ).fetchone()
+            if not row:
+                row = conn.execute(
+                    "SELECT * FROM voice_calibrations WHERE voice_id=?",
+                    (voice_id,),
+                ).fetchone()
         return _to_voice_calibration(row) if row else None
 
     def save_voice_calibration(
@@ -759,6 +764,22 @@ class JobStore:
             row = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
         return _to_run(row) if row else None
 
+    def merge_run_payload(self, run_id: str, patch: dict[str, Any]) -> Run | None:
+        """Persist additive run metadata without requiring a schema migration."""
+        now = time.time()
+        with self._conn() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
+            if row is None:
+                return None
+            payload = _load_json(row["payload_json"]) or {}
+            payload.update(patch)
+            conn.execute(
+                "UPDATE runs SET payload_json=?, updated_at=? WHERE run_id=?",
+                (_dump_json(payload), now, run_id),
+            )
+        return self.get_run(run_id)
+
     def latest_run(self, job_id: str, lane: str | None = None) -> Run | None:
         with self._conn() as conn:
             if lane is None:
@@ -945,6 +966,7 @@ class JobStore:
         *,
         error: str | None = None,
         stage: str | None = None,
+        message: str | None = None,
     ) -> Run | None:
         if status not in TERMINAL_RUN_STATUSES:
             raise ValueError(f"Not a terminal run status: {status}")
@@ -962,10 +984,11 @@ class JobStore:
                 short_error = None
             final_stage = stage or row["stage"]
             progress = 1.0 if status == "completed" else float(row["progress"])
+            final_message = message[:2000] if message is not None else row["message"]
             conn.execute(
-                "UPDATE runs SET status=?, stage=?, progress=?, error=?, updated_at=?, "
+                "UPDATE runs SET status=?, stage=?, progress=?, message=?, error=?, updated_at=?, "
                 "ended_at=? WHERE run_id=?",
-                (status, final_stage, progress, short_error, now, now, run_id),
+                (status, final_stage, progress, final_message, short_error, now, now, run_id),
             )
             if row["lane"] == "pipeline":
                 legacy_status = {
@@ -987,6 +1010,7 @@ class JobStore:
                     "status": status,
                     "stage": final_stage,
                     "progress": progress,
+                    "message": final_message,
                     "error": short_error,
                 },
                 now,

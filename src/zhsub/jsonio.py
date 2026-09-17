@@ -12,24 +12,47 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
+import uuid
 from pathlib import Path
 from typing import TypeVar
 
 from pydantic import BaseModel
 
 T = TypeVar("T", bound=BaseModel)
+_WINDOWS_REPLACE_ERRORS = {5, 32}
+_REPLACE_RETRY_DELAYS = (0.05, 0.1, 0.2, 0.4)
+
+
+def replace_file_with_retry(source: str | Path, destination: str | Path) -> None:
+    """Atomically replace a file, tolerating short-lived Windows file locks."""
+    source = Path(source)
+    destination = Path(destination)
+    for attempt in range(len(_REPLACE_RETRY_DELAYS) + 1):
+        try:
+            os.replace(source, destination)
+            return
+        except PermissionError as exc:
+            retryable = getattr(exc, "winerror", None) in _WINDOWS_REPLACE_ERRORS
+            if not retryable or attempt == len(_REPLACE_RETRY_DELAYS):
+                if retryable:
+                    raise OSError(
+                        f"Không thể ghi đè file {destination} sau nhiều lần thử: {exc}"
+                    ) from exc
+                raise
+            time.sleep(_REPLACE_RETRY_DELAYS[attempt])
 
 
 def write_json_atomic(path: str | Path, data: dict | list) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.name + f".tmp{os.getpid()}")
+    tmp = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     try:
         with open(tmp, "w", encoding="utf-8", newline="\n") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
             f.flush()
             os.fsync(f.fileno())
-        os.replace(tmp, path)
+        replace_file_with_retry(tmp, path)
     finally:
         tmp.unlink(missing_ok=True)
 

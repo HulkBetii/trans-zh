@@ -103,7 +103,7 @@ class FakeLocator:
         if self.selector in chat.SEND_BUTTON_SELS:
             self.page.send()
 
-    async def fill(self, value: str) -> None:
+    async def fill(self, value: str, **kwargs) -> None:
         self.page.prompts.append(value)
 
     async def wait_for(self, **kwargs) -> None: ...
@@ -151,7 +151,7 @@ class FakePage:
         self.visited.append(url)
         self.url = url
 
-    async def evaluate(self, script: str) -> None: ...
+    async def evaluate(self, script: str, *args, **kwargs) -> None: ...
 
 
 @pytest.fixture

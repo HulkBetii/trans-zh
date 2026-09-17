@@ -1,5 +1,7 @@
 # zhsub
 
+> Copyright (c) 2026 HulkBeoti. All rights reserved.
+
 Pipeline dịch phụ đề tiếng Trung sang tiếng Việt / tiếng Anh. ASR chạy **local**
 (không upload audio lên cloud), chỉ khâu dịch mới gọi LLM API.
 

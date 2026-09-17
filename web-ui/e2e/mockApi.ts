@@ -32,6 +32,11 @@ interface GlossarySavePayload {
   document: GlossaryDocument;
 }
 
+interface RetranslatePayload {
+  cache_mode: "reuse" | "bypass";
+  confirmed_gpt_units: number;
+}
+
 interface OverrideChangePayload {
   segment_id: number;
   text: string | null;
@@ -88,6 +93,7 @@ export interface MockApiRequests {
   createJob: CreateJobPayload | null;
   glossarySaves: GlossarySavePayload[];
   retranslateCalls: number;
+  retranslatePayloads: RetranslatePayload[];
   overrideSaves: OverrideSavePayload[];
   renderCalls: number;
   artifactDownloads: number;
@@ -147,6 +153,7 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
     createJob: null,
     glossarySaves: [],
     retranslateCalls: 0,
+    retranslatePayloads: [],
     overrideSaves: [],
     renderCalls: 0,
     artifactDownloads: 0,
@@ -288,10 +295,26 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
       return;
     }
 
+    if (method === "POST" && path === `/api/v1/jobs/${jobId}/retranslate/estimate`) {
+      const payload = request.postDataJSON() as Pick<RetranslatePayload, "cache_mode">;
+      const gptUnits = payload.cache_mode === "bypass" || state.glossaryStale ? 2 : 0;
+      await fulfillJson(route, translationSummary(payload.cache_mode, 2 - gptUnits, gptUnits));
+      return;
+    }
+
     if (method === "POST" && path === `/api/v1/jobs/${jobId}/retranslate`) {
+      const payload = request.postDataJSON() as RetranslatePayload;
       requests.retranslateCalls += 1;
+      requests.retranslatePayloads.push(payload);
       state.glossaryStale = false;
-      await fulfillJson(route, actionRun("retranslate", "s4"), 202);
+      await fulfillJson(route, {
+        ...actionRun("retranslate", "s4"),
+        translation_summary: translationSummary(
+          payload.cache_mode,
+          payload.cache_mode === "reuse" ? 2 - payload.confirmed_gpt_units : 0,
+          payload.confirmed_gpt_units,
+        ),
+      }, 202);
       return;
     }
 
@@ -466,6 +489,18 @@ function actionRun(kind: string, fromStage: string) {
     started_at: null,
     finished_at: null,
     event_seq: 1,
+  };
+}
+
+function translationSummary(cacheMode: "reuse" | "bypass", cacheHits: number, gptUnits: number) {
+  return {
+    cache_mode: cacheMode,
+    estimated: true,
+    total_cues: 2,
+    total_units: 2,
+    cache_hits: cacheHits,
+    gpt_units: gptUnits,
+    by_language: [{ language: "vi", total_units: 2, cache_hits: cacheHits, gpt_units: gptUnits }],
   };
 }
 

@@ -13,7 +13,8 @@ import logging
 
 from ...config import ChatGPTWebConfig
 from ..base import LLMError, LLMProvider, NonRetryableLLMError
-from .chat import ChatGPTContentRefusal, ChatGPTResponseError, ask
+from .chat import ChatGPTContentRefusal, ChatGPTRateLimitError, ChatGPTResponseError, ask
+from .login import ChatGPTLoginError
 from .session import BrowserSessionUnavailable, get_session
 
 log = logging.getLogger(__name__)
@@ -70,7 +71,15 @@ class ChatGPTWebProvider(LLMProvider):
         try:
             session = get_session(self._web)
             with session.page() as page:
-                text, url = session.run(ask(page, prompt, int(self.timeout_sec), conversation))
+                text, url = session.run(
+                    ask(
+                        page,
+                        prompt,
+                        int(self.timeout_sec),
+                        conversation,
+                        ensure_instant=self._web.ensure_instant,
+                    )
+                )
         except BrowserSessionUnavailable as exc:
             raise LLMError(
                 "ChatGPT Playwright đã dừng; hệ thống sẽ tự khởi động lại và thử tiếp."
@@ -91,6 +100,10 @@ class ChatGPTWebProvider(LLMProvider):
             # Retryable: a slow or truncated answer usually comes back fine on the
             # next attempt. Login and rate-limit errors deliberately propagate as
             # they are, so the job fails fast instead of retrying blind.
+            raise LLMError(f"ChatGPT web: {exc}") from exc
+        except Exception as exc:
+            if isinstance(exc, (ChatGPTRateLimitError, ChatGPTLoginError, NonRetryableLLMError)):
+                raise
             raise LLMError(f"ChatGPT web: {exc}") from exc
 
         if url:

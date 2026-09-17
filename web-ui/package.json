@@ -2,6 +2,8 @@
   "name": "zhsub-studio",
   "private": true,
   "version": "0.1.0",
+  "author": "HulkBeoti",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",

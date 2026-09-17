@@ -3,7 +3,19 @@
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 import typer
 
@@ -220,7 +232,7 @@ def cmd_batch(
         raise typer.Exit(code=1)
 
 
-def _resolve_dub_calibration(work_dir: Path, cfg: Config):
+def _resolve_dub_calibration(work_dir: Path, cfg: Config, lang: str = "vi"):
     """Số đo trong SQLite trước, hằng số TOML sau, không có thì từ chối.
 
     Đây là nơi duy nhất hằng số trong zhsub.toml còn được dùng làm hiệu chuẩn —
@@ -238,12 +250,13 @@ def _resolve_dub_calibration(work_dir: Path, cfg: Config):
     from .dub.spoken import resolve_voice_id
     from .jobs import TTS_PROVIDER, JobStore
 
-    voice_id = resolve_voice_id(work_dir, cfg.dub.configured_voice_id())
-    stored = JobStore(cfg.paths.jobs_db).get_voice_calibration(TTS_PROVIDER, voice_id)
+    voice_id = resolve_voice_id(work_dir, cfg.dub.configured_voice_id(lang), lang=lang)
+    provider = "elevenlabs" if voice_id.startswith("elevenlabs_") else TTS_PROVIDER
+    stored = JobStore(cfg.paths.jobs_db).get_voice_calibration(provider, voice_id)
     if stored is not None:
         return calibration_from_record(stored)
 
-    from_config = calibration_from_config(cfg)
+    from_config = calibration_from_config(cfg, lang=lang)
     if from_config is not None and from_config.voice_id == voice_id:
         return from_config
     if from_config is not None:
@@ -279,7 +292,15 @@ def cmd_dub(
     if not work_dir.is_dir():
         raise typer.BadParameter(f"Không tìm thấy {work_dir}")
 
-    dst = s6_dub.run(work_dir, cfg, lang, out, force=force)
+    from .progress import RunContext
+
+    def _show_progress(p):
+        if p.message:
+            typer.echo(f"[{p.stage_fraction:5.1%}] {p.message}")
+
+    ctx = RunContext(job_id=job_id, on_progress=_show_progress)
+    calibration = _resolve_dub_calibration(work_dir, cfg, lang=lang)
+    dst = s6_dub.run(work_dir, cfg, lang, out, force=force, ctx=ctx, calibration=calibration)
     typer.echo(f"xong -> {dst}")
 
 
@@ -358,8 +379,9 @@ def cmd_dub_calibrate(
         raise typer.BadParameter(f"Không tìm thấy {work_dir}")
 
     result = calibrate_voice(work_dir, cfg, lang, force=force)
+    provider = "elevenlabs" if result.voice_id.startswith("elevenlabs_") else TTS_PROVIDER
     JobStore(cfg.paths.jobs_db).save_voice_calibration(
-        TTS_PROVIDER,
+        provider,
         result.voice_id,
         result.overhead_sec,
         result.sec_per_syllable,
@@ -387,8 +409,13 @@ def cmd_chatgpt_login(
     from .llm.chatgpt_web.session import get_session
 
     cfg = Config.load(config)
-    get_session(cfg.llm.chatgpt_web)
-    typer.echo(f"Đã đăng nhập. Profile: {Path(cfg.llm.chatgpt_web.profile_dir).resolve()}")
+    session = get_session(cfg.llm.chatgpt_web)
+    typer.echo(f"Đã mở profile: {Path(cfg.llm.chatgpt_web.profile_dir).resolve()}")
+    try:
+        typer.echo("Trình duyệt ChatGPT đang mở trên màn hình. Nhấn [Enter] để đóng trình duyệt khi xong...")
+        input()
+    finally:
+        session.stop()
 
 
 @app.command("jobs")

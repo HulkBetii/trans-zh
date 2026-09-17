@@ -40,8 +40,8 @@ _locks_guard = Lock()
 _locks: dict[Path, RLock] = {}
 
 
-def _speech_path(work_dir: str | Path) -> Path:
-    return Path(work_dir) / "speech.vi.json"
+def _speech_path(work_dir: str | Path, lang: str = "vi") -> Path:
+    return Path(work_dir) / f"speech.{lang}.json"
 
 
 def _speech_lock(path: Path) -> RLock:
@@ -50,17 +50,21 @@ def _speech_lock(path: Path) -> RLock:
         return _locks.setdefault(key, RLock())
 
 
-def _load_doc(work_dir: str | Path, fallback_voice_id: str | None = None) -> SpeechDoc:
-    path = _speech_path(work_dir)
+def _load_doc(
+    work_dir: str | Path,
+    fallback_voice_id: str | None = None,
+    lang: str = "vi",
+) -> SpeechDoc:
+    path = _speech_path(work_dir, lang=lang)
     if path.is_file():
         return read_doc(path, SpeechDoc)
     if fallback_voice_id is None or not fallback_voice_id.strip():
-        raise SpeechValidationError("Vietnamese speech voice has not been selected")
+        raise SpeechValidationError(f"{lang.upper()} speech voice has not been selected")
     return SpeechDoc(voice_id=fallback_voice_id)
 
 
-def load_speech_doc(work_dir: str | Path) -> SpeechDoc | None:
-    path = _speech_path(work_dir)
+def load_speech_doc(work_dir: str | Path, lang: str = "vi") -> SpeechDoc | None:
+    path = _speech_path(work_dir, lang=lang)
     if not path.is_file():
         return None
     return read_doc(path, SpeechDoc)
@@ -71,9 +75,10 @@ def resolve_voice_id(
     fallback_voice_id: str | None = None,
     *,
     override_voice_id: str | None = None,
+    lang: str = "vi",
 ) -> str:
     """Resolve the immutable job voice, accepting a fallback for legacy jobs."""
-    stored = load_speech_doc(work_dir)
+    stored = load_speech_doc(work_dir, lang=lang)
     if stored is not None:
         if override_voice_id is not None and override_voice_id.strip() != stored.voice_id:
             raise SpeechValidationError(
@@ -82,13 +87,17 @@ def resolve_voice_id(
         return stored.voice_id
     selected = (override_voice_id or fallback_voice_id or "").strip()
     if not selected:
-        raise SpeechValidationError("Vietnamese speech voice has not been selected")
+        raise SpeechValidationError(f"{lang.upper()} speech voice has not been selected")
     return selected
 
 
-def ensure_speech_doc(work_dir: str | Path, voice_id: str) -> SpeechDoc:
+def ensure_speech_doc(
+    work_dir: str | Path,
+    voice_id: str,
+    lang: str = "vi",
+) -> SpeechDoc:
     """Persist the legacy config voice once, without replacing a job selection."""
-    path = _speech_path(work_dir)
+    path = _speech_path(work_dir, lang=lang)
     with _speech_lock(path):
         if path.is_file():
             return read_doc(path, SpeechDoc)
@@ -97,16 +106,16 @@ def ensure_speech_doc(work_dir: str | Path, voice_id: str) -> SpeechDoc:
         return doc
 
 
-def _base_items(work_dir: str | Path) -> list[EffectiveSpokenItem]:
+def _base_items(work_dir: str | Path, lang: str = "vi") -> list[EffectiveSpokenItem]:
     return [
         EffectiveSpokenItem(
             segment_id=item.segment_id,
             source_text=item.source_text,
             subtitle_text=item.effective_text,
-            base_spoken_text=normalize_for_speech(item.effective_text),
-            effective_spoken_text=normalize_for_speech(item.effective_text),
+            base_spoken_text=normalize_for_speech(item.effective_text, lang=lang),
+            effective_spoken_text=normalize_for_speech(item.effective_text, lang=lang),
         )
-        for item in effective_items(work_dir, SPEECH_LANG)
+        for item in effective_items(work_dir, lang)
     ]
 
 
@@ -141,9 +150,10 @@ def _revision(doc: SpeechDoc, base_items: list[EffectiveSpokenItem]) -> str:
 def get_speech_state(
     work_dir: str | Path,
     voice_id: str | None = None,
+    lang: str = "vi",
 ) -> SpeechState:
-    doc = _load_doc(work_dir, voice_id)
-    base_items = _base_items(work_dir)
+    doc = _load_doc(work_dir, voice_id, lang=lang)
+    base_items = _base_items(work_dir, lang=lang)
     source_by_id = {item.segment_id: item.source_text for item in base_items}
     base_by_id = {item.segment_id: item.base_spoken_text for item in base_items}
     evaluations = [
@@ -169,9 +179,10 @@ def get_speech_state(
 def effective_spoken_items(
     work_dir: str | Path,
     voice_id: str | None = None,
+    lang: str = "vi",
 ) -> list[EffectiveSpokenItem]:
-    doc = _load_doc(work_dir, voice_id)
-    rows = _base_items(work_dir)
+    doc = _load_doc(work_dir, voice_id, lang=lang)
+    rows = _base_items(work_dir, lang=lang)
     overrides = {item.segment_id: item for item in doc.overrides}
 
     result: list[EffectiveSpokenItem] = []
@@ -225,14 +236,15 @@ def apply_spoken_changes(
     voice_id: str,
     base_revision: str,
     changes: Iterable[SpeechChange | Mapping[str, object]],
+    lang: str = "vi",
 ) -> SpeechState:
     """Atomically update the job voice and spoken overrides."""
-    path = _speech_path(work_dir)
+    path = _speech_path(work_dir, lang=lang)
     parsed_changes = _coerce_changes(changes)
 
     with _speech_lock(path):
-        doc = _load_doc(work_dir, voice_id)
-        base_items = _base_items(work_dir)
+        doc = _load_doc(work_dir, voice_id, lang=lang)
+        base_items = _base_items(work_dir, lang=lang)
         current_revision = _revision(doc, base_items)
         if base_revision != current_revision:
             raise SpeechConflictError(base_revision, current_revision)
@@ -272,7 +284,7 @@ def apply_spoken_changes(
                 overrides=sorted(overrides.values(), key=lambda item: item.segment_id),
             )
             write_doc(path, doc)
-        return get_speech_state(work_dir)
+        return get_speech_state(work_dir, lang=lang)
 
 
 def save_speech(
@@ -280,5 +292,6 @@ def save_speech(
     voice_id: str,
     revision: str,
     changes: Iterable[SpeechChange | Mapping[str, object]],
+    lang: str = "vi",
 ) -> SpeechState:
-    return apply_spoken_changes(work_dir, voice_id, revision, changes)
+    return apply_spoken_changes(work_dir, voice_id, revision, changes, lang=lang)

@@ -145,3 +145,25 @@ test("flags two rows pinning the same speaker and addressee", async () => {
 
   expect(await screen.findByText(/Trùng cặp xưng hô/)).toBeInTheDocument();
 });
+
+test("keeps the saved glossary when translation confirmation is cancelled", async () => {
+  const onUpdateTranslations = vi.fn(async () => null);
+  vi.stubGlobal("fetch", vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+    if (init?.method === "PUT") {
+      const payload = JSON.parse(String(init.body));
+      return jsonResponse({ revision: "rev-2", editor_locked: false, document: payload.document });
+    }
+    return jsonResponse({ revision: "rev-1", editor_locked: false, document: glossaryDoc("Tiểu Minh") });
+  }));
+  const user = userEvent.setup();
+  renderApp(<GlossaryEditor job={job} onUpdateTranslations={onUpdateTranslations} />);
+
+  const input = await screen.findByLabelText("Tiếng Việt 1");
+  await user.clear(input);
+  await user.type(input, "Minh đã ghim");
+  await user.click(screen.getByRole("button", { name: "Lưu & cập nhật bản dịch" }));
+
+  expect(onUpdateTranslations).toHaveBeenCalledOnce();
+  expect(screen.getByLabelText("Tiếng Việt 1")).toHaveValue("Minh đã ghim");
+  expect(screen.queryByRole("button", { name: "Lưu & cập nhật bản dịch" })).not.toBeInTheDocument();
+});

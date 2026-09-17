@@ -11,9 +11,15 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+from zhsub.api import (
+    JobResult,
+    TranslationLanguageSummary,
+    TranslationRunSummary,
+)
 from zhsub.config import Config
 from zhsub.jobs import JobStore
 from zhsub.jsonio import read_doc, sha256_json_canonical, write_doc
+from zhsub.llm.cache import TranslationCache
 from zhsub.models import (
     GlossaryDoc,
     GlossaryTerm,
@@ -539,6 +545,124 @@ def test_retranslate_forces_the_translate_stage(tmp_path):
     assert response.status_code == 200
     assert queued.from_stage == "translate"  # type: ignore[union-attr]
     assert queued.force is True  # type: ignore[union-attr]
+
+
+def test_retranslate_estimates_cache_and_requires_explicit_gpt_confirmation(tmp_path):
+    source = tmp_path / "movie.mp4"
+    source.write_bytes(b"media")
+    with _client(tmp_path) as client:
+        created = _create(client, source)
+        client.post(f"/api/v1/runs/{created['run_id']}/cancel")
+        store = JobStore(tmp_path / "jobs.db")
+        job = store.get(created["job_id"])
+        work_dir = Path(job.work_dir)  # type: ignore[union-attr]
+        output = Path(job.request["output_dir"]) / "movie.vi.srt"  # type: ignore[index,union-attr]
+        _write_subtitle_artifacts(work_dir, output)
+
+        glossary = read_doc(work_dir / "glossary.json", GlossaryDoc)
+        glossary_hash = sha256_json_canonical(
+            glossary.model_dump(by_alias=True, mode="json")
+        )
+        cache = TranslationCache(tmp_path / "cache")
+        key = cache.make_key("你好", "vi", "fake", glossary_hash, Config().translate.prompt_version)
+        cache.put(key, "Xin chào")
+        cache.flush()
+
+        reuse = client.post(
+            f"/api/v1/jobs/{created['job_id']}/retranslate/estimate",
+            json={"cache_mode": "reuse"},
+        )
+        bypass = client.post(
+            f"/api/v1/jobs/{created['job_id']}/retranslate/estimate",
+            json={"cache_mode": "bypass"},
+        )
+        before = len(store.list_runs(created["job_id"]))
+        rejected = client.post(
+            f"/api/v1/jobs/{created['job_id']}/retranslate",
+            json={"cache_mode": "reuse", "confirmed_gpt_units": 0},
+        )
+        accepted = client.post(
+            f"/api/v1/jobs/{created['job_id']}/retranslate",
+            json={"cache_mode": "reuse", "confirmed_gpt_units": 1},
+        )
+
+    assert reuse.status_code == 200
+    assert reuse.json() == {
+        "cache_mode": "reuse",
+        "estimated": True,
+        "total_cues": 2,
+        "total_units": 2,
+        "cache_hits": 1,
+        "gpt_units": 1,
+        "by_language": [
+            {
+                "language": "vi",
+                "total_units": 2,
+                "cache_hits": 1,
+                "gpt_units": 1,
+            }
+        ],
+    }
+    assert bypass.json()["cache_hits"] == 0
+    assert bypass.json()["gpt_units"] == 2
+    assert rejected.status_code == 409
+    assert rejected.json()["detail"]["code"] == "gpt_confirmation_required"
+    assert len(store.list_runs(created["job_id"])) == before + 1
+    assert accepted.status_code == 200
+    queued = store.get_run(accepted.json()["run_id"])
+    assert queued.payload["cache_mode"] == "reuse"  # type: ignore[index,union-attr]
+    assert queued.payload["confirmed_gpt_units"] == 1  # type: ignore[index,union-attr]
+
+
+def test_retranslate_summary_survives_refresh_and_restart(tmp_path):
+    source = tmp_path / "movie.mp4"
+    source.write_bytes(b"media")
+    with _client(tmp_path) as client:
+        created = _create(client, source)
+        client.post(f"/api/v1/runs/{created['run_id']}/cancel")
+        job = JobStore(tmp_path / "jobs.db").get(created["job_id"])
+        work_dir = Path(job.work_dir)  # type: ignore[union-attr]
+        output = Path(job.request["output_dir"]) / "movie.vi.srt"  # type: ignore[index,union-attr]
+        _write_subtitle_artifacts(work_dir, output)
+
+    def runner(_source, **kwargs):
+        assert kwargs["translation_cache_mode"] == "bypass"
+        return JobResult(
+            job_id=created["job_id"],
+            work_dir=work_dir,
+            translation_summary=TranslationRunSummary(
+                cache_mode="bypass",
+                total_cues=2,
+                total_units=2,
+                cache_hits=0,
+                gpt_units=2,
+                by_language=[
+                    TranslationLanguageSummary(
+                        language="vi",
+                        total_units=2,
+                        cache_hits=0,
+                        gpt_units=2,
+                    )
+                ],
+            ),
+        )
+
+    with _client(tmp_path, runner=runner, start_scheduler=True) as client:
+        response = client.post(
+            f"/api/v1/jobs/{created['job_id']}/retranslate",
+            json={"cache_mode": "bypass", "confirmed_gpt_units": 2},
+        )
+        completed = _wait_for(client, response.json()["run_id"], "completed")
+        detail = client.get(f"/api/v1/jobs/{created['job_id']}").json()
+
+    with _client(tmp_path) as restarted:
+        restored = restarted.get(f"/api/v1/jobs/{created['job_id']}").json()
+
+    assert completed["translation_summary"]["estimated"] is False
+    assert completed["translation_summary"]["gpt_units"] == 2
+    assert completed["message"] == "Dịch mới bằng GPT hoàn tất: 0 từ cache, 2 bằng GPT."
+    assert detail["lanes"][0]["latest_run"]["translation_summary"] == completed["translation_summary"]
+    assert restored["lanes"][0]["latest_run"]["translation_summary"] == completed["translation_summary"]
 
 
 def test_media_range_and_artifact_ownership(tmp_path):

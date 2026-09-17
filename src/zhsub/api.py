@@ -10,10 +10,11 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 from .config import Config
 from .jobs import JobStore
-from .models import GlossaryDoc, RenderReport, SegmentsDoc
+from .models import GlossaryDoc, RenderReport, SegmentsDoc, TranslationsDoc
 from .pipeline import RunRequest, run_job
 from .progress import Canceller, ProgressCallback, RunContext
 
@@ -30,6 +31,25 @@ class JobResult:
     #: Path the user can hand-edit before re-running from ``translate``. Surfacing
     #: it here is the point — correcting names is how the translation gets good.
     glossary_path: Path | None = None
+    translation_summary: TranslationRunSummary | None = None
+
+
+@dataclass(slots=True)
+class TranslationLanguageSummary:
+    language: str
+    total_units: int
+    cache_hits: int
+    gpt_units: int
+
+
+@dataclass(slots=True)
+class TranslationRunSummary:
+    cache_mode: Literal["reuse", "bypass"]
+    total_cues: int
+    total_units: int
+    cache_hits: int
+    gpt_units: int
+    by_language: list[TranslationLanguageSummary] = field(default_factory=list)
 
 
 def translate_video(
@@ -43,6 +63,7 @@ def translate_video(
     formats: tuple[str, ...] = ("srt", "ass"),
     from_stage: str = "ingest",
     force: bool = False,
+    translation_cache_mode: Literal["reuse", "bypass"] = "reuse",
     on_progress: ProgressCallback | None = None,
     cancel: Canceller | None = None,
     track_job: bool = True,
@@ -77,15 +98,20 @@ def translate_video(
         from_stage=from_stage,
         force=force,
         formats=formats,
+        translation_cache_mode=translation_cache_mode,
     )
     ctx = RunContext(on_progress=on_progress, cancel=cancel)
     store = JobStore(cfg.paths.jobs_db) if track_job else None
 
     work_dir = run_job(req, cfg, store, ctx=ctx)
-    return _collect(work_dir)
+    return _collect(work_dir, targets, translation_cache_mode)
 
 
-def _collect(work_dir: Path) -> JobResult:
+def _collect(
+    work_dir: Path,
+    targets: list[str] | None = None,
+    cache_mode: Literal["reuse", "bypass"] = "reuse",
+) -> JobResult:
     """Read back what the run produced. Missing files mean a partial run, not an error."""
     result = JobResult(job_id=work_dir.name, work_dir=work_dir)
 
@@ -103,6 +129,35 @@ def _collect(work_dir: Path) -> JobResult:
     glossary_path = work_dir / "glossary.json"
     if glossary_path.is_file():
         result.glossary_path = glossary_path
+
+    language_summaries: list[TranslationLanguageSummary] = []
+    for lang in targets or []:
+        translation_path = work_dir / f"translations.{lang}.json"
+        if not translation_path.is_file():
+            continue
+        doc = TranslationsDoc.model_validate(
+            json.loads(translation_path.read_text(encoding="utf-8"))
+        )
+        hits = sum(1 for item in doc.items if item.cache_hit)
+        language_summaries.append(
+            TranslationLanguageSummary(
+                language=lang,
+                total_units=len(doc.items),
+                cache_hits=hits,
+                gpt_units=len(doc.items) - hits,
+            )
+        )
+    if language_summaries:
+        total_units = sum(item.total_units for item in language_summaries)
+        cache_hits = sum(item.cache_hits for item in language_summaries)
+        result.translation_summary = TranslationRunSummary(
+            cache_mode=cache_mode,
+            total_cues=max(item.total_units for item in language_summaries),
+            total_units=total_units,
+            cache_hits=cache_hits,
+            gpt_units=total_units - cache_hits,
+            by_language=language_summaries,
+        )
     return result
 
 

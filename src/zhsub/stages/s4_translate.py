@@ -14,7 +14,9 @@ from __future__ import annotations
 
 import json
 import logging
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from ..config import Config
 from ..jsonio import read_doc, sha256_json_canonical, write_doc
@@ -29,6 +31,25 @@ log = logging.getLogger(__name__)
 PROMPT_VERSION = 1
 
 LANG_NAMES = {"vi": "tiếng Việt", "en": "tiếng Anh"}
+TranslationCacheMode = Literal["reuse", "bypass"]
+
+
+@dataclass(frozen=True, slots=True)
+class TranslationLanguageStats:
+    language: str
+    total_units: int
+    cache_hits: int
+    gpt_units: int
+
+
+@dataclass(frozen=True, slots=True)
+class TranslationStats:
+    cache_mode: TranslationCacheMode
+    total_cues: int
+    total_units: int
+    cache_hits: int
+    gpt_units: int
+    by_language: tuple[TranslationLanguageStats, ...]
 
 
 class TranslationFailure(RuntimeError):
@@ -67,6 +88,64 @@ def compute_segments_hash(segments_doc: SegmentsDoc) -> str:
     re-render.
     """
     return sha256_json_canonical([[s.id, s.text_zh] for s in segments_doc.segments])
+
+
+def estimate_translation_cache(
+    work_dir: str | Path,
+    cfg: Config,
+    langs: list[str],
+    cache_mode: TranslationCacheMode = "reuse",
+) -> TranslationStats:
+    """Count translation units that can be reused without calling the provider."""
+    work_dir = Path(work_dir)
+    segments_doc = read_doc(work_dir / "segments.json", SegmentsDoc)
+    glossary_path = work_dir / "glossary.json"
+    glossary = read_doc(glossary_path, GlossaryDoc) if glossary_path.is_file() else GlossaryDoc()
+    glossary_hash = sha256_json_canonical(glossary.model_dump(by_alias=True, mode="json"))
+    model = cfg.llm.translate.model
+    if not model or model == "SET_ME":
+        for lang in langs:
+            existing_path = work_dir / f"translations.{lang}.json"
+            if existing_path.is_file():
+                model = read_doc(existing_path, TranslationsDoc).model
+                break
+        else:
+            model = cfg.llm.translate.require_model("translate")
+    cache = TranslationCache(cfg.paths.cache_dir)
+    language_stats: list[TranslationLanguageStats] = []
+
+    for lang in langs:
+        hits = 0
+        if cache_mode == "reuse":
+            for segment in segments_doc.segments:
+                key = cache.make_key(
+                    segment.text_zh,
+                    lang,
+                    model,
+                    glossary_hash,
+                    cfg.translate.prompt_version,
+                )
+                hits += int(cache.contains(key))
+        total = len(segments_doc.segments)
+        language_stats.append(
+            TranslationLanguageStats(
+                language=lang,
+                total_units=total,
+                cache_hits=hits,
+                gpt_units=total - hits,
+            )
+        )
+
+    total_units = sum(item.total_units for item in language_stats)
+    cache_hits = sum(item.cache_hits for item in language_stats)
+    return TranslationStats(
+        cache_mode=cache_mode,
+        total_cues=len(segments_doc.segments),
+        total_units=total_units,
+        cache_hits=cache_hits,
+        gpt_units=total_units - cache_hits,
+        by_language=tuple(language_stats),
+    )
 
 
 def _glossary_block(glossary: GlossaryDoc, lang: str) -> str:
@@ -407,6 +486,7 @@ def translate_segments(
     cfg: Config,
     cache: TranslationCache | None = None,
     glossary_hash: str = "",
+    cache_mode: TranslationCacheMode = "reuse",
     ctx: RunContext | None = None,
 ) -> list[TranslationItem]:
     ctx = ensure_context(ctx)
@@ -419,7 +499,7 @@ def translate_segments(
     pending: list[Segment] = []
     for seg in segments:
         cached = None
-        if cache is not None:
+        if cache is not None and cache_mode == "reuse":
             key = cache.make_key(seg.text_zh, lang, provider.model, glossary_hash, cfg.translate.prompt_version)
             cached = cache.get(key)
         if cached is not None:
@@ -516,8 +596,14 @@ def translate_segments(
     return [results[i] for i in sorted(results)]
 
 
-def run(work_dir, cfg: Config, langs: list[str], force: bool = False,
-        ctx: RunContext | None = None) -> dict[str, TranslationsDoc]:
+def run(
+    work_dir,
+    cfg: Config,
+    langs: list[str],
+    force: bool = False,
+    cache_mode: TranslationCacheMode = "reuse",
+    ctx: RunContext | None = None,
+) -> dict[str, TranslationsDoc]:
     work_dir = Path(work_dir)
     segments_doc = read_doc(work_dir / "segments.json", SegmentsDoc)
     glossary_path = work_dir / "glossary.json"
@@ -549,7 +635,15 @@ def run(work_dir, cfg: Config, langs: list[str], force: bool = False,
             log.info("S4[%s]: %s đã đổi — dịch lại", lang, " và ".join(stale))
 
         items = translate_segments(
-            segments_doc.segments, lang, provider, glossary, cfg, cache, glossary_hash, ctx=ctx
+            segments_doc.segments,
+            lang,
+            provider,
+            glossary,
+            cfg,
+            cache,
+            glossary_hash,
+            cache_mode=cache_mode,
+            ctx=ctx,
         )
         doc = TranslationsDoc(
             lang=lang,

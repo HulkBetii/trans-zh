@@ -8,7 +8,21 @@ import { useDialogFocus } from "../../../hooks/useDialogFocus";
 import { errorMessage } from "../../../lib/format";
 import { voiceMeta } from "./labels";
 
-export function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }: { open: boolean; selectedVoiceId: string; onClose: () => void; onSelect: (voice: TtsVoice) => void }) {
+export function VoiceLibraryDialog({
+  open,
+  selectedVoiceId,
+  onClose,
+  onSelect,
+  provider = "vbee",
+  language = "Vietnamese",
+}: {
+  open: boolean;
+  selectedVoiceId: string;
+  onClose: () => void;
+  onSelect: (voice: TtsVoice) => void;
+  provider?: string;
+  language?: string;
+}) {
   const [search, setSearch] = useState("");
   const [ownership, setOwnership] = useState<VoiceOwnership>("all");
   const [page, setPage] = useState(1);
@@ -17,7 +31,7 @@ export function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }:
   // Tìm kiếm do nhà cung cấp thực hiện, nên mỗi phím gõ là một request thật ra
   // ai33.pro. Chờ người dùng ngừng gõ rồi mới hỏi.
   const debouncedSearch = useDebouncedValue(search, 300);
-  const filterKey = `${ownership} ${debouncedSearch}`;
+  const filterKey = `${provider} ${language} ${ownership} ${debouncedSearch}`;
   const [activeFilterKey, setActiveFilterKey] = useState(filterKey);
 
   // Đổi bộ lọc thì trang tích lũy phải về 1 ngay trong render này. Để cho effect
@@ -30,7 +44,17 @@ export function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }:
     requestedPage = 1;
   }
 
-  const query = useTtsVoices({ search: debouncedSearch, page: requestedPage, page_size: 30, ownership }, open);
+  const query = useTtsVoices(
+    {
+      search: debouncedSearch,
+      page: requestedPage,
+      page_size: 30,
+      ownership,
+      provider,
+      language,
+    },
+    open,
+  );
   // Ô tìm là việc đầu tiên người dùng muốn làm trong thư viện 1268 giọng.
   // Không chỉ định thì hook focus nút đóng ở header và autoFocus vô nghĩa.
   const dialogRef = useDialogFocus<HTMLElement>(open, onClose, {
@@ -60,22 +84,30 @@ export function VoiceLibraryDialog({ open, selectedVoiceId, onClose, onSelect }:
   return (
     <div className="modal-layer" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section ref={dialogRef} className="tts-voice-dialog" role="dialog" aria-modal="true" aria-labelledby="tts-voice-title">
-        <header><div><span className="eyebrow">Voice library · Vbee</span><h2 id="tts-voice-title">Chọn giọng tiếng Việt</h2></div><button className="icon-button" onClick={onClose} aria-label="Đóng thư viện giọng"><X size={19} /></button></header>
+        <header>
+          <div>
+            <span className="eyebrow">Voice library · {provider === "elevenlabs" ? "ElevenLabs" : "Vbee"}</span>
+            <h2 id="tts-voice-title">Chọn giọng {language.toLowerCase() === "english" ? "tiếng Anh" : "tiếng Việt"}</h2>
+          </div>
+          <button className="icon-button" onClick={onClose} aria-label="Đóng thư viện giọng"><X size={19} /></button>
+        </header>
         <div className="tts-voice-filters">
           <label className="tts-voice-search"><Search size={15} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm tên, vùng, giới tính…" /></label>
-          <div className="tts-voice-ownership" role="group" aria-label="Nguồn giọng">
-            {voiceOwnershipOptions.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className={ownership === option.id ? "active" : ""}
-                aria-pressed={ownership === option.id}
-                onClick={() => setOwnership(option.id)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+          {provider === "vbee" && (
+            <div className="tts-voice-ownership" role="group" aria-label="Nguồn giọng">
+              {voiceOwnershipOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={ownership === option.id ? "active" : ""}
+                  aria-pressed={ownership === option.id}
+                  onClick={() => setOwnership(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="tts-voice-list" ref={listRef} aria-live="polite">
           {query.isLoading && voices.length === 0 && <div className="tts-dialog-message"><LoaderCircle className="spin" size={18} />Đang lấy thư viện giọng…</div>}

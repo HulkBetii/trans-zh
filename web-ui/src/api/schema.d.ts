@@ -142,6 +142,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/jobs/{job_id}/retranslate/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Estimate Retranslate */
+        post: operations["estimate_retranslate_api_v1_jobs__job_id__retranslate_estimate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/jobs/{job_id}/retranslate": {
         parameters: {
             query?: never;
@@ -262,7 +279,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi": {
+    "/api/v1/jobs/{job_id}/tts/{lang}": {
         parameters: {
             query?: never;
             header?: never;
@@ -270,7 +287,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Tts Workspace */
-        get: operations["get_tts_workspace_api_v1_jobs__job_id__tts_vi_get"];
+        get: operations["get_tts_workspace_api_v1_jobs__job_id__tts__lang__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -279,7 +296,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/settings": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -288,7 +305,7 @@ export interface paths {
         };
         get?: never;
         /** Put Tts Settings */
-        put: operations["put_tts_settings_api_v1_jobs__job_id__tts_vi_settings_put"];
+        put: operations["put_tts_settings_api_v1_jobs__job_id__tts__lang__settings_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -296,7 +313,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/spoken-overrides": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/spoken-overrides": {
         parameters: {
             query?: never;
             header?: never;
@@ -305,7 +322,7 @@ export interface paths {
         };
         get?: never;
         /** Put Tts Spoken Overrides */
-        put: operations["put_tts_spoken_overrides_api_v1_jobs__job_id__tts_vi_spoken_overrides_put"];
+        put: operations["put_tts_spoken_overrides_api_v1_jobs__job_id__tts__lang__spoken_overrides_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -313,7 +330,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/preview": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/preview": {
         parameters: {
             query?: never;
             header?: never;
@@ -323,14 +340,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Preview Tts */
-        post: operations["preview_tts_api_v1_jobs__job_id__tts_vi_preview_post"];
+        post: operations["preview_tts_api_v1_jobs__job_id__tts__lang__preview_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/calibrate": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/calibrate": {
         parameters: {
             query?: never;
             header?: never;
@@ -340,14 +357,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Calibrate Tts */
-        post: operations["calibrate_tts_api_v1_jobs__job_id__tts_vi_calibrate_post"];
+        post: operations["calibrate_tts_api_v1_jobs__job_id__tts__lang__calibrate_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/render": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/render": {
         parameters: {
             query?: never;
             header?: never;
@@ -357,14 +374,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Render Tts */
-        post: operations["render_tts_api_v1_jobs__job_id__tts_vi_render_post"];
+        post: operations["render_tts_api_v1_jobs__job_id__tts__lang__render_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/approve": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -374,14 +391,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Approve Tts */
-        post: operations["approve_tts_api_v1_jobs__job_id__tts_vi_approve_post"];
+        post: operations["approve_tts_api_v1_jobs__job_id__tts__lang__approve_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/unapprove": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/unapprove": {
         parameters: {
             query?: never;
             header?: never;
@@ -391,14 +408,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Unapprove Tts */
-        post: operations["unapprove_tts_api_v1_jobs__job_id__tts_vi_unapprove_post"];
+        post: operations["unapprove_tts_api_v1_jobs__job_id__tts__lang__unapprove_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/jobs/{job_id}/tts/vi/previews/{segment_id}": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/previews/{segment_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -406,7 +423,7 @@ export interface paths {
             cookie?: never;
         };
         /** Download Tts Preview */
-        get: operations["download_tts_preview_api_v1_jobs__job_id__tts_vi_previews__segment_id__get"];
+        get: operations["download_tts_preview_api_v1_jobs__job_id__tts__lang__previews__segment_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -992,6 +1009,29 @@ export interface components {
             /** Detail */
             detail?: string | null;
         };
+        /** RetranslateEstimateRequest */
+        RetranslateEstimateRequest: {
+            /**
+             * Cache Mode
+             * @default reuse
+             * @enum {string}
+             */
+            cache_mode: "reuse" | "bypass";
+        };
+        /** RetranslateRequest */
+        RetranslateRequest: {
+            /**
+             * Cache Mode
+             * @default reuse
+             * @enum {string}
+             */
+            cache_mode: "reuse" | "bypass";
+            /**
+             * Confirmed Gpt Units
+             * @default 0
+             */
+            confirmed_gpt_units: number;
+        };
         /** RunResponse */
         RunResponse: {
             /** Run Id */
@@ -1036,6 +1076,7 @@ export interface components {
              * @default 0
              */
             event_seq: number;
+            translation_summary?: components["schemas"]["TranslationSummary"] | null;
         };
         /** SettingsCredentialResponse */
         SettingsCredentialResponse: {
@@ -1243,6 +1284,43 @@ export interface components {
             /** Limit */
             limit: number;
         };
+        /** TranslationLanguageSummary */
+        TranslationLanguageSummary: {
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "vi" | "en";
+            /** Total Units */
+            total_units: number;
+            /** Cache Hits */
+            cache_hits: number;
+            /** Gpt Units */
+            gpt_units: number;
+        };
+        /** TranslationSummary */
+        TranslationSummary: {
+            /**
+             * Cache Mode
+             * @enum {string}
+             */
+            cache_mode: "reuse" | "bypass";
+            /**
+             * Estimated
+             * @default false
+             */
+            estimated: boolean;
+            /** Total Cues */
+            total_cues: number;
+            /** Total Units */
+            total_units: number;
+            /** Cache Hits */
+            cache_hits: number;
+            /** Gpt Units */
+            gpt_units: number;
+            /** By Language */
+            by_language: components["schemas"]["TranslationLanguageSummary"][];
+        };
         /** TtsCueResponse */
         TtsCueResponse: {
             /** Segment Id */
@@ -1348,15 +1426,15 @@ export interface components {
             /**
              * Language
              * @default vi
-             * @constant
+             * @enum {string}
              */
-            language: "vi";
+            language: "vi" | "en";
             /**
              * Provider
              * @default vbee
-             * @constant
+             * @enum {string}
              */
-            provider: "vbee";
+            provider: "vbee" | "elevenlabs";
             /**
              * Provider Ready
              * @default false
@@ -1427,9 +1505,9 @@ export interface components {
             /**
              * Provider
              * @default vbee
-             * @constant
+             * @enum {string}
              */
-            provider: "vbee";
+            provider: "vbee" | "elevenlabs";
             /** Voice Id */
             voice_id: string;
             /** Overhead Sec */
@@ -1606,6 +1684,8 @@ export interface operations {
                 page?: number;
                 page_size?: number;
                 ownership?: "all" | "vbee" | "community";
+                provider?: string;
+                language?: string;
             };
             header?: never;
             path?: never;
@@ -1764,6 +1844,41 @@ export interface operations {
             };
         };
     };
+    estimate_retranslate_api_v1_jobs__job_id__retranslate_estimate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetranslateEstimateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     retranslate_job_api_v1_jobs__job_id__retranslate_post: {
         parameters: {
             query?: never;
@@ -1773,7 +1888,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RetranslateRequest"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -2022,12 +2141,13 @@ export interface operations {
             };
         };
     };
-    get_tts_workspace_api_v1_jobs__job_id__tts_vi_get: {
+    get_tts_workspace_api_v1_jobs__job_id__tts__lang__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2053,12 +2173,13 @@ export interface operations {
             };
         };
     };
-    put_tts_settings_api_v1_jobs__job_id__tts_vi_settings_put: {
+    put_tts_settings_api_v1_jobs__job_id__tts__lang__settings_put: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2088,12 +2209,13 @@ export interface operations {
             };
         };
     };
-    put_tts_spoken_overrides_api_v1_jobs__job_id__tts_vi_spoken_overrides_put: {
+    put_tts_spoken_overrides_api_v1_jobs__job_id__tts__lang__spoken_overrides_put: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2123,12 +2245,13 @@ export interface operations {
             };
         };
     };
-    preview_tts_api_v1_jobs__job_id__tts_vi_preview_post: {
+    preview_tts_api_v1_jobs__job_id__tts__lang__preview_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2158,12 +2281,13 @@ export interface operations {
             };
         };
     };
-    calibrate_tts_api_v1_jobs__job_id__tts_vi_calibrate_post: {
+    calibrate_tts_api_v1_jobs__job_id__tts__lang__calibrate_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2189,12 +2313,13 @@ export interface operations {
             };
         };
     };
-    render_tts_api_v1_jobs__job_id__tts_vi_render_post: {
+    render_tts_api_v1_jobs__job_id__tts__lang__render_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2220,12 +2345,13 @@ export interface operations {
             };
         };
     };
-    approve_tts_api_v1_jobs__job_id__tts_vi_approve_post: {
+    approve_tts_api_v1_jobs__job_id__tts__lang__approve_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2251,12 +2377,13 @@ export interface operations {
             };
         };
     };
-    unapprove_tts_api_v1_jobs__job_id__tts_vi_unapprove_post: {
+    unapprove_tts_api_v1_jobs__job_id__tts__lang__unapprove_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
+                lang: string;
             };
             cookie?: never;
         };
@@ -2282,13 +2409,14 @@ export interface operations {
             };
         };
     };
-    download_tts_preview_api_v1_jobs__job_id__tts_vi_previews__segment_id__get: {
+    download_tts_preview_api_v1_jobs__job_id__tts__lang__previews__segment_id__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 job_id: string;
                 segment_id: number;
+                lang: string;
             };
             cookie?: never;
         };

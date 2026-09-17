@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from .config import Config
 from .jobs import STAGES, JobStore
@@ -29,6 +30,7 @@ class RunRequest:
     from_stage: str = "ingest"
     force: bool = False
     formats: tuple[str, ...] = ("srt", "ass")
+    translation_cache_mode: Literal["reuse", "bypass"] = "reuse"
 
 
 def stages_from(start: str) -> list[str]:
@@ -100,10 +102,18 @@ def _run_stage(
     elif stage == "glossary":
         s3_glossary.run(work_dir, cfg, force=force_here, ctx=ctx)
     elif stage == "translate":
-        s4_translate.run(work_dir, cfg, req.targets, force=force_here, ctx=ctx)
+        s4_translate.run(
+            work_dir,
+            cfg,
+            req.targets,
+            force=force_here,
+            cache_mode=req.translation_cache_mode,
+            ctx=ctx,
+        )
     elif stage == "render":
+        target_out = req.out_dir if req.out_dir.name == job_id else req.out_dir / job_id
         s5_render.run(
-            work_dir, cfg, req.targets, req.out_dir,
+            work_dir, cfg, req.targets, target_out,
             bilingual=req.bilingual, formats=req.formats,
         )
     else:  # pragma: no cover - stages_from already validated

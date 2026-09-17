@@ -16,12 +16,15 @@ import type {
   JobLaneSummary,
   OverrideChange,
   RevisionedGlossary,
+  RetranslateRequest,
   RunRecord,
   SettingsResponse,
   StudioMeta,
   SubtitleResponseDto,
   SubtitleWorkspace,
   TargetLanguage,
+  TranslationCacheMode,
+  TranslationSummary,
   TtsPreviewRequest,
   TtsSettingsUpdateRequest,
   TtsVoicePage,
@@ -223,7 +226,16 @@ export const api = {
   },
 
   retry: (jobId: string) => request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/retry`, { method: "POST" }),
-  retranslate: (jobId: string) => request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/retranslate`, { method: "POST" }),
+  estimateRetranslate: (jobId: string, cacheMode: TranslationCacheMode) =>
+    request<TranslationSummary>(`/jobs/${encodeURIComponent(jobId)}/retranslate/estimate`, {
+      method: "POST",
+      body: JSON.stringify({ cache_mode: cacheMode }),
+    }),
+  retranslate: (jobId: string, payload?: RetranslateRequest) =>
+    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/retranslate`, {
+      method: "POST",
+      ...(payload ? { body: JSON.stringify(payload) } : {}),
+    }),
   render: (jobId: string) => request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/render`, { method: "POST" }),
   approve: (jobId: string) => request<JobDetail>(`/jobs/${encodeURIComponent(jobId)}/approve`, { method: "POST" }),
   unapprove: (jobId: string) => request<JobDetail>(`/jobs/${encodeURIComponent(jobId)}/unapprove`, { method: "POST" }),
@@ -246,40 +258,49 @@ export const api = {
     }).then(normalizeSubtitles),
 
   ttsVoices: (
-    params: { search?: string; page?: number; page_size?: number; ownership?: VoiceOwnership } = {},
+    params: {
+      search?: string;
+      page?: number;
+      page_size?: number;
+      ownership?: VoiceOwnership;
+      provider?: string;
+      language?: string;
+    } = {},
   ) => {
     const query = new URLSearchParams();
     if (params.search) query.set("search", params.search);
     if (params.page) query.set("page", String(params.page));
     if (params.page_size) query.set("page_size", String(params.page_size));
     if (params.ownership) query.set("ownership", params.ownership);
+    if (params.provider) query.set("provider", params.provider);
+    if (params.language) query.set("language", params.language);
     return request<TtsVoicePage>(`/tts/voices?${query}`);
   },
-  tts: (jobId: string) =>
-    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/vi`).then(normalizeTts),
-  saveTtsSettings: (jobId: string, payload: TtsSettingsUpdateRequest) =>
-    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/settings`, {
+  tts: (jobId: string, lang = "vi") =>
+    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}`).then(normalizeTts),
+  saveTtsSettings: (jobId: string, payload: TtsSettingsUpdateRequest, lang = "vi") =>
+    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/settings`, {
       method: "PUT",
       body: JSON.stringify(payload),
     }).then(normalizeTts),
-  saveSpokenOverrides: (jobId: string, payload: SpokenOverrideUpdateRequest) =>
-    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/spoken-overrides`, {
+  saveSpokenOverrides: (jobId: string, payload: SpokenOverrideUpdateRequest, lang = "vi") =>
+    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/spoken-overrides`, {
       method: "PUT",
       body: JSON.stringify(payload),
     }).then(normalizeTts),
-  previewTts: (jobId: string, payload: TtsPreviewRequest) =>
-    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/preview`, {
+  previewTts: (jobId: string, payload: TtsPreviewRequest, lang = "vi") =>
+    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/preview`, {
       method: "POST",
       body: JSON.stringify(payload),
     }),
-  calibrateTts: (jobId: string) =>
-    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/calibrate`, { method: "POST" }),
-  renderTts: (jobId: string) =>
-    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/render`, { method: "POST" }),
-  approveTts: (jobId: string) =>
-    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/approve`, { method: "POST" }).then(normalizeTts),
-  unapproveTts: (jobId: string) =>
-    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/vi/unapprove`, { method: "POST" }).then(normalizeTts),
+  calibrateTts: (jobId: string, lang = "vi") =>
+    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/calibrate`, { method: "POST" }),
+  renderTts: (jobId: string, lang = "vi") =>
+    request<RunRecord>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/render`, { method: "POST" }),
+  approveTts: (jobId: string, lang = "vi") =>
+    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/approve`, { method: "POST" }).then(normalizeTts),
+  unapproveTts: (jobId: string, lang = "vi") =>
+    request<TtsWorkspaceDto>(`/jobs/${encodeURIComponent(jobId)}/tts/${lang}/unapprove`, { method: "POST" }).then(normalizeTts),
 
   fileRoots: () => request<FileRootsResponse>("/files/roots").then((data) => data.roots),
   files: (path: string) => request<FileListing>(`/files?path=${encodeURIComponent(path)}`),

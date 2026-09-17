@@ -29,22 +29,39 @@ test("creates a local job, opens its pipeline, and restores its state after refr
   });
 });
 
-test("saves glossary changes before requesting retranslation", async ({ page }) => {
+test("saves glossary changes, confirms GPT misses, then requests retranslation", async ({ page }) => {
   const mock = await installMockApi(page);
   await page.goto("/jobs/job-001/glossary");
 
   await expect(page.getByRole("heading", { name: "Văn phong" })).toBeVisible();
   await page.getByLabel("Sắc thái lời thoại").fill("Tự nhiên, điềm tĩnh");
-  await page.getByRole("button", { name: "Lưu & dịch lại" }).click();
+  await page.getByRole("button", { name: "Lưu & cập nhật bản dịch" }).click();
 
   await expect.poll(() => mock.requests.glossarySaves.length).toBe(1);
+  await expect(page.getByRole("alertdialog")).toContainText("2 lượt cue-ngôn ngữ cần GPT");
+  await page.getByRole("button", { name: "Cập nhật bản dịch", exact: true }).click();
   await expect.poll(() => mock.requests.retranslateCalls).toBe(1);
-  await expect(page.getByRole("button", { name: "Lưu & dịch lại" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Lưu & cập nhật bản dịch" })).toHaveCount(0);
   await expect(page.getByLabel("Sắc thái lời thoại")).toHaveValue("Tự nhiên, điềm tĩnh");
+  expect(mock.requests.retranslatePayloads[0]).toEqual({ cache_mode: "reuse", confirmed_gpt_units: 2 });
   expect(mock.requests.glossarySaves[0]).toMatchObject({
     revision: "glossary-rev-1",
     document: { style: { speech_register: "Tự nhiên, điềm tĩnh" } },
   });
+});
+
+test("requires confirmation before translating every cue freshly with GPT", async ({ page }) => {
+  const mock = await installMockApi(page);
+  await page.goto("/jobs/job-001/pipeline");
+
+  await page.getByRole("button", { name: "Dịch mới bằng GPT" }).click();
+  await expect(page.getByRole("alertdialog")).toContainText("2 lượt cue-ngôn ngữ cần GPT");
+  await expect.poll(() => mock.requests.retranslateCalls).toBe(0);
+  await page.getByRole("button", { name: "Dịch mới", exact: true }).click();
+
+  await expect.poll(() => mock.requests.retranslateCalls).toBe(1);
+  await expect(page.locator(".pipeline-run-heading strong")).toHaveText("Dịch mới bằng GPT");
+  expect(mock.requests.retranslatePayloads[0]).toEqual({ cache_mode: "bypass", confirmed_gpt_units: 2 });
 });
 
 test("saves a cue override, renders, and downloads the current artifact", async ({ page }) => {

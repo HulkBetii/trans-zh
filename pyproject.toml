@@ -2,6 +2,8 @@
 name = "zhsub"
 version = "0.1.0"
 description = "Pipeline dịch phụ đề tiếng Trung sang tiếng Việt / tiếng Anh"
+authors = [{ name = "HulkBeoti" }]
+license = { file = "LICENSE" }
 requires-python = ">=3.11,<3.12"
 dependencies = [
     # ASR — pin >=1.3.29: các bản trước dồn phụ đề tiếng Trung thành một block

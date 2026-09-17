@@ -146,23 +146,35 @@ class SpeechClient:
     def download(self, url: str, dst: Path) -> Path:
         dst.parent.mkdir(parents=True, exist_ok=True)
         tmp = dst.with_name(f"{dst.name}.tmp-{os.getpid()}-{uuid.uuid4().hex}")
-        try:
+        delay = RETRY_BASE_SEC
+        for attempt in range(5):
             try:
-                with self._client.stream("GET", url) as resp:
-                    resp.raise_for_status()
-                    with open(tmp, "wb") as f:
-                        for chunk in resp.iter_bytes():
-                            f.write(chunk)
-                        f.flush()
-                        os.fsync(f.fileno())
-            except httpx.HTTPError as exc:
-                raise DubError(f"không tải được audio từ {url}: {exc}") from exc
-            if not tmp.is_file() or tmp.stat().st_size == 0:
-                raise DubError(f"audio tải về từ {url} bị rỗng")
-            os.replace(tmp, dst)
-            return dst
-        finally:
-            tmp.unlink(missing_ok=True)
+                try:
+                    with self._client.stream("GET", url, follow_redirects=True) as resp:
+                        resp.raise_for_status()
+                        with open(tmp, "wb") as f:
+                            for chunk in resp.iter_bytes():
+                                f.write(chunk)
+                            f.flush()
+                            os.fsync(f.fileno())
+                except httpx.HTTPError as exc:
+                    if attempt + 1 < 5:
+                        time.sleep(delay)
+                        delay = min(delay * 2, RETRY_CAP_SEC)
+                        continue
+                    raise DubError(f"không tải được audio từ {url}: {exc}") from exc
+                if not tmp.is_file() or tmp.stat().st_size == 0:
+                    if attempt + 1 < 5:
+                        time.sleep(delay)
+                        delay = min(delay * 2, RETRY_CAP_SEC)
+                        continue
+                    raise DubError(f"audio tải về từ {url} bị rỗng")
+                os.replace(tmp, dst)
+                return dst
+            finally:
+                if tmp.is_file():
+                    tmp.unlink(missing_ok=True)
+        return dst
 
     def voice_page(
         self,

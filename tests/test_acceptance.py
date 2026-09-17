@@ -169,6 +169,53 @@ def test_cache_key_changes_with_prompt_version(tmp_path: Path):
     assert a != b
 
 
+def test_fresh_translation_bypasses_reads_but_refreshes_cache(tmp_path: Path):
+    segments = _make_segments(6)
+    cfg = Config()
+    cfg.translate.batch_size = 3
+    cfg.translate.review_pass = False
+    cache_dir = tmp_path / "cache"
+
+    first = FakeProvider()
+    translate_segments(
+        segments,
+        "vi",
+        first,
+        GlossaryDoc(),
+        cfg,
+        TranslationCache(cache_dir),
+        "gh",
+    )
+
+    fresh_provider = FakeProvider()
+    fresh = translate_segments(
+        segments,
+        "vi",
+        fresh_provider,
+        GlossaryDoc(),
+        cfg,
+        TranslationCache(cache_dir),
+        "gh",
+        cache_mode="bypass",
+    )
+
+    assert fresh_provider.translated_ids == [segment.id for segment in segments]
+    assert all(not item.cache_hit for item in fresh)
+    persisted = TranslationCache(cache_dir)
+    assert all(
+        persisted.contains(
+            persisted.make_key(
+                segment.text_zh,
+                "vi",
+                "fake-model",
+                "gh",
+                cfg.translate.prompt_version,
+            )
+        )
+        for segment in segments
+    )
+
+
 # ---------------------------------------------------------------------------
 # #4 — a reply missing one id must recover, never crash, never emit a blank line
 # ---------------------------------------------------------------------------

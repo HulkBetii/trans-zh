@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Callable
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -200,11 +201,12 @@ class RunScheduler:
             self.broker.notify(run.run_id)
 
         try:
+            result: Any = None
             if run.lane == "pipeline":
                 assert job.request is not None
                 snapshot = job.request
                 source = snapshot.get("source") or {}
-                self.runner(
+                result = self.runner(
                     source.get("value", job.source_uri),
                     targets=list(snapshot.get("targets") or job.targets or ["vi"]),
                     out_dir=Path(snapshot.get("output_dir") or "output"),
@@ -213,6 +215,7 @@ class RunScheduler:
                     formats=tuple(snapshot.get("formats") or ("srt", "ass")),
                     from_stage=run.from_stage,
                     force=run.force,
+                    translation_cache_mode=str((run.payload or {}).get("cache_mode") or "reuse"),
                     on_progress=on_progress,
                     cancel=cancel_event,
                 )
@@ -233,7 +236,24 @@ class RunScheduler:
         else:
             current = self.store.get_run(run.run_id)
             final_status = "cancelled" if current and current.status == "cancelling" else "completed"
-            self.store.finish_run(run.run_id, final_status)
+            summary = getattr(result, "translation_summary", None)
+            message = None
+            if run.kind == "retranslate" and summary is not None:
+                summary_payload = {**asdict(summary), "estimated": False}
+                self.store.merge_run_payload(
+                    run.run_id,
+                    {"translation_result": summary_payload},
+                )
+                action = (
+                    "Cập nhật theo Glossary"
+                    if summary.cache_mode == "reuse"
+                    else "Dịch mới bằng GPT"
+                )
+                message = (
+                    f"{action} hoàn tất: {summary.cache_hits} từ cache, "
+                    f"{summary.gpt_units} bằng GPT."
+                )
+            self.store.finish_run(run.run_id, final_status, message=message)
         finally:
             with self._cancel_lock:
                 self._cancel_events.pop(run.run_id, None)
@@ -264,7 +284,8 @@ class RunScheduler:
         voice_id = payload.get("voice_id")
         calibration = payload.get("calibration")
         if calibration is None and voice_id:
-            stored = self.store.get_voice_calibration(TTS_PROVIDER, str(voice_id))
+            provider = "elevenlabs" if str(voice_id).startswith("elevenlabs_") else TTS_PROVIDER
+            stored = self.store.get_voice_calibration(provider, str(voice_id))
             if stored is not None:
                 calibration = calibration_from_record(stored)
 
@@ -306,8 +327,13 @@ class RunScheduler:
                 progress=report,
                 force=bool(payload.get("force")),
             )
+            provider = (
+                "elevenlabs"
+                if calibration_result.voice_id.startswith("elevenlabs_")
+                else TTS_PROVIDER
+            )
             self.store.save_voice_calibration(
-                TTS_PROVIDER,
+                provider,
                 calibration_result.voice_id,
                 calibration_result.overhead_sec,
                 calibration_result.sec_per_syllable,

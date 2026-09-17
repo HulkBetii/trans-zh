@@ -74,12 +74,19 @@ def foreign_names(texts: list[str]) -> tuple[list[str], list[str]]:
     return names, acronyms
 
 
-def normalize_for_speech(text: str) -> str:
+def normalize_for_speech(text: str, lang: str = "vi") -> str:
     """Đổi các dạng viết tắt bằng số/ký hiệu thành chữ đọc được.
 
     Thứ tự có ý nghĩa: ngày/tháng/năm phải xử lý trước ngày/tháng, nếu không
     "1/12/1986" bị luật ngày/tháng cắn mất phần đầu.
     """
+    if lang == "en":
+        # Với tiếng Anh trên ElevenLabs, model tự đọc chuẩn ngày/tháng/năm và số.
+        # Chỉ xử lý ngoặc viết tắt trùng lặp và khoảng trắng.
+        text = _ACRONYM_PAREN.sub("", text)
+        text = _PAREN.sub(r" \1", text)
+        return re.sub(r"\s+", " ", text).strip()
+
     text = _DMY.sub(_dmy, text)
     text = _MY.sub(_my, text)
     text = _DM.sub(_dm, text)

@@ -151,19 +151,20 @@ class _Draft:
 
 def _draft_cues(root: Path, cfg: Config, lang: str, voice_id: str | None) -> _Draft:
     """Phần của build_plan không cần biết hiệu chuẩn là gì."""
-    if lang != "vi":
-        raise ValueError("TTS currently supports Vietnamese only")
+    if lang not in ("vi", "en"):
+        raise ValueError(f"TTS currently supports 'vi' and 'en' only, got: {lang!r}")
     selected_voice = resolve_voice_id(
         root,
-        cfg.dub.configured_voice_id(),
+        cfg.dub.configured_voice_id(lang),
         override_voice_id=voice_id,
+        lang=lang,
     )
-    rows = effective_spoken_items(root, selected_voice)
+    rows = effective_spoken_items(root, selected_voice, lang=lang)
     segments = read_doc(root / "segments.json", SegmentsDoc).segments
     total_sec = _source_duration(root, segments)
     return _Draft(
         voice_id=selected_voice,
-        state=get_speech_state(root, selected_voice),
+        state=get_speech_state(root, selected_voice, lang=lang),
         rows=rows,
         segments=segments,
         total_sec=total_sec,
@@ -234,7 +235,7 @@ def build_plan(
     rooms = draft.rooms
     selected_calibration = _coerce_calibration(calibration, selected_voice, root.name)
     selected_calibration_hash = calibration_hash(selected_calibration)
-    clips_dir = root / "dub" / "vi"
+    clips_dir = root / "dub" / lang
     clips_dir.mkdir(parents=True, exist_ok=True)
 
     cues: list[CuePlan] = []
@@ -270,7 +271,7 @@ def build_plan(
     effective_hash = effective_spoken_hash(spoken_rows)
     input_hash = sha256_json_canonical(
         {
-            "lang": "vi",
+            "lang": lang,
             "voice_id": selected_voice,
             "speech_revision": state.revision,
             "effective_spoken_hash": effective_hash,
@@ -284,7 +285,7 @@ def build_plan(
     )
     return TtsPlan(
         work_dir=root,
-        lang="vi",
+        lang=lang,
         voice_id=selected_voice,
         speech_revision=state.revision,
         effective_spoken_hash=effective_hash,
@@ -299,13 +300,15 @@ def _persist_selected_voice(
     work_dir: str | Path,
     cfg: Config,
     voice_id: str | None,
+    lang: str = "vi",
 ) -> str:
     selected_voice = resolve_voice_id(
         work_dir,
-        cfg.dub.configured_voice_id(),
+        cfg.dub.configured_voice_id(lang),
         override_voice_id=voice_id,
+        lang=lang,
     )
-    ensure_speech_doc(work_dir, selected_voice)
+    ensure_speech_doc(work_dir, selected_voice, lang=lang)
     return selected_voice
 
 
@@ -389,7 +392,7 @@ def _synthesize_all(
                     exhausted = True
                 ctx.report(
                     completed / max(len(plan.cues), 1),
-                    f"vi: {completed}/{len(plan.cues)} cue",
+                    f"{plan.lang}: {completed}/{len(plan.cues)} cue",
                 )
     finally:
         client.close()
@@ -414,7 +417,7 @@ def preview_cue(
     force: bool = False,
 ) -> Path:
     """Synthesize one paid preview using the same cache as full rendering."""
-    selected_voice = _persist_selected_voice(work_dir, cfg, voice_id)
+    selected_voice = _persist_selected_voice(work_dir, cfg, voice_id, lang=lang)
     plan = build_plan(work_dir, cfg, lang, voice_id=selected_voice, calibration=calibration)
     cue = next((item for item in plan.cues if item.segment_id == segment_id), None)
     if cue is None:
@@ -439,11 +442,11 @@ def run(
     calibration: TtsCalibration | Mapping[str, Any] | None = None,
     subtitle_approval_signature: str = "",
 ) -> Path:
-    """Render the complete Vietnamese MP3 timeline and persist its report."""
-    if lang != "vi":
-        raise ValueError("TTS currently supports Vietnamese only")
+    """Render the complete MP3 timeline and persist its report."""
+    if lang not in ("vi", "en"):
+        raise ValueError(f"TTS currently supports 'vi' and 'en' only, got: {lang!r}")
     ctx = ensure_context(ctx)
-    selected_voice = _persist_selected_voice(work_dir, cfg, voice_id)
+    selected_voice = _persist_selected_voice(work_dir, cfg, voice_id, lang=lang)
     plan = build_plan(work_dir, cfg, lang, voice_id=selected_voice, calibration=calibration)
     cache_hits = _synthesize_all(plan, cfg, force=force, ctx=ctx)
     ctx.raise_if_cancelled()
@@ -467,7 +470,7 @@ def run(
                 cue.room_sec,
             )
 
-    destination = Path(out_dir) / f"{Path(work_dir).name}.vi.mp3"
+    destination = Path(out_dir) / f"{Path(work_dir).name}.{lang}.mp3"
     placements: list[AudioPlacement] = []
     ctx.raise_if_cancelled()
     # Positional argument keeps compatibility with simple test doubles that accept
@@ -531,10 +534,11 @@ def run(
             )
         )
 
+    provider_prefix = "elevenlabs" if plan.voice_id.startswith("elevenlabs_") else "ai33_vbee"
     report = TtsReport(
         output=str(destination),
         voice_id=plan.voice_id,
-        voice_hash=sha256_text(f"ai33_vbee:{plan.voice_id}"),
+        voice_hash=sha256_text(f"{provider_prefix}:{plan.voice_id}"),
         calibration_hash=calibration_hash(plan.calibration),
         input_hash=plan.input_hash,
         speech_revision=plan.speech_revision,
@@ -543,5 +547,5 @@ def run(
         cues=cue_reports,
         warnings=warnings,
     )
-    write_doc(Path(work_dir) / "tts_report.vi.json", report)
+    write_doc(Path(work_dir) / f"tts_report.{lang}.json", report)
     return destination

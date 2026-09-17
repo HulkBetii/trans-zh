@@ -35,6 +35,26 @@ SEND_BUTTON_SELS = (
 ASSISTANT_MSG_SEL = '[data-message-author-role="assistant"]'
 STOP_BUTTON_SEL = 'button[data-testid="stop-button"], button[aria-label="Stop generating"]'
 
+# Model / thinking effort switcher selectors in composer
+MODEL_SWITCHER_SELS = (
+    'button:has-text("Thinking effort")',
+    'button:has-text("Thinking")',
+    'button:has-text("Instant")',
+    'button[aria-label*="thinking" i]',
+    'button[aria-label*="effort" i]',
+    'button[data-testid*="model-switcher"]',
+    'button[data-testid*="thinking"]',
+)
+
+INSTANT_MENU_ITEM_SELS = (
+    '[role="menuitem"]:has-text("Instant")',
+    '[role="menuitemradio"]:has-text("Instant")',
+    '[role="option"]:has-text("Instant")',
+    '[role="dialog"] button:has-text("Instant")',
+    '[role="dialog"] div:has-text("Instant")',
+    'div[data-radix-popper-content-wrapper] :text-is("Instant")',
+)
+
 POLL_INTERVAL_S = 2
 TEXT_STABLE_SAMPLES = 3
 TEXT_STABLE_INTERVAL_S = 2
@@ -217,7 +237,169 @@ async def _wait_text_stable(page, timeout_s: int, require_stable: bool = False) 
     return last_text
 
 
-async def send_prompt(prompt: str, page, timeout_s: int) -> str:
+async def ensure_instant_mode(page) -> None:
+    """Tự động chuyển chế độ ChatGPT sang 'Instant' (tắt Thinking/Reasoning effort).
+
+    Trên tài khoản ChatGPT Plus, OpenAI hay mặc định 'Thinking effort' khiến mỗi
+    batch dịch sinh ra nhiều reasoning token và kéo dài 1-2 phút thay vì 5-15s.
+    Hàm này tìm nút switcher trên composer: nếu đã ở 'Instant' thì return ngay;
+    nếu đang ở 'Thinking effort' thì bấm mở popover và chọn 'Instant'.
+
+    Nuốt ngoại lệ một cách an toàn (best-effort): nếu OpenAI đổi selector thì log
+    warning chứ không làm crash job dịch.
+    """
+    try:
+        switcher = None
+        for sel in MODEL_SWITCHER_SELS:
+            try:
+                loc = page.locator(sel).first
+                if await loc.is_visible(timeout=1_000):
+                    switcher = loc
+                    break
+            except Exception:
+                continue
+
+        if switcher is None:
+            return
+
+        label = (await switcher.inner_text(timeout=1_000)).strip()
+        if "instant" in label.lower():
+            return
+
+        log.info("Phát hiện ChatGPT đang ở chế độ '%s' — tự động chuyển sang 'Instant'", label)
+        await switcher.click()
+        await asyncio.sleep(0.4)
+
+        picked = False
+        for sel in INSTANT_MENU_ITEM_SELS:
+            try:
+                item = page.locator(sel).first
+                if await item.is_visible(timeout=1_500):
+                    await item.click()
+                    picked = True
+                    break
+            except Exception:
+                continue
+
+        if not picked:
+            try:
+                slider = page.locator('[role="slider"], input[type="range"]').first
+                if await slider.is_visible(timeout=1_000):
+                    await slider.focus()
+                    await page.keyboard.press("Home")
+                    await page.keyboard.press("ArrowLeft")
+                    picked = True
+            except Exception:
+                pass
+
+        if not picked:
+            try:
+                opt = page.get_by_text(re.compile(r"^Instant", re.I)).first
+                if await opt.is_visible(timeout=1_000):
+                    await opt.click()
+                    picked = True
+            except Exception:
+                pass
+
+        await asyncio.sleep(0.3)
+
+        try:
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+
+        if picked:
+            log.info("Đã chuyển thành công sang chế độ Instant")
+        else:
+            log.warning("Không tìm thấy tùy chọn 'Instant' trong menu")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Không thể tự chuyển sang Instant mode: %s", exc)
+
+
+async def _enter_prompt(page, input_el, prompt: str) -> None:
+    # 1. Dismiss any overlay popups/dialogs if present
+    for sel in (
+        'button:has-text("Stay logged out")',
+        'button:has-text("Dismiss")',
+        'button:has-text("Close")',
+        'button:has-text("Not now")',
+        'button:has-text("Done")',
+        'button:has-text("Okay")',
+        'button:has-text("Reject non-essential")',
+        'button:has-text("Accept all")',
+        'button[aria-label="Close"]',
+    ):
+        try:
+            btn = page.locator(sel).first
+            if await btn.is_visible(timeout=300):
+                await btn.click()
+                await asyncio.sleep(0.2)
+        except Exception:
+            pass
+
+    # 2. Click to focus
+    try:
+        await input_el.click(timeout=3_000)
+    except Exception:
+        pass
+    await asyncio.sleep(0.2)
+
+    # 3. Try standard fill first (with reasonable timeout)
+    try:
+        await input_el.fill(prompt, timeout=8_000)
+        return
+    except Exception as exc:
+        log.warning("input_el.fill thất bại (%s), thử fallback keyboard/DOM", exc)
+
+    # 4. Fallback: focus and use page.keyboard.insert_text
+    try:
+        await input_el.focus()
+        await page.evaluate(
+            """(sel) => {
+                const el = document.querySelector(sel);
+                if (!el) return;
+                el.focus();
+                if (el.isContentEditable) {
+                    el.innerText = '';
+                } else if ('value' in el) {
+                    el.value = '';
+                }
+            }""",
+            PROMPT_INPUT_SEL,
+        )
+        await asyncio.sleep(0.2)
+        await page.keyboard.insert_text(prompt)
+        await asyncio.sleep(0.3)
+        val = await input_el.evaluate("(el) => (el.innerText || el.value || '').trim()")
+        if val:
+            return
+    except Exception as exc:
+        log.warning("Keyboard insert_text thất bại (%s), thử DOM dispatch", exc)
+
+    # 5. Fallback 3: DOM execCommand & dispatchEvent
+    await page.evaluate(
+        """([sel, text]) => {
+            const el = document.querySelector(sel);
+            if (!el) throw new Error("Không tìm thấy " + sel);
+            el.focus();
+            if (el.isContentEditable) {
+                el.innerText = '';
+                document.execCommand('insertText', false, text);
+                if (!el.innerText.trim()) {
+                    el.innerText = text;
+                }
+            } else {
+                el.value = text;
+            }
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }""",
+        [PROMPT_INPUT_SEL, prompt],
+    )
+    await asyncio.sleep(0.3)
+
+
+async def send_prompt(prompt: str, page, timeout_s: int, ensure_instant: bool = False) -> str:
     """Send one message on an already-open conversation and return the reply."""
     if not prompt.strip():
         raise ChatGPTResponseError("Prompt rỗng.")
@@ -230,13 +412,17 @@ async def send_prompt(prompt: str, page, timeout_s: int) -> str:
     except Exception as exc:  # noqa: BLE001
         raise ChatGPTResponseError(f"Không thấy ô nhập chat: {exc}") from exc
 
+    if ensure_instant and prev_count == 0:
+        await ensure_instant_mode(page)
+
     log.info("Gửi prompt (%d ký tự)", len(prompt))
-    await input_el.click()
-    await asyncio.sleep(0.2)
-    await input_el.fill(prompt)
-    await asyncio.sleep(0.3)
-    await _click_send(page)
-    await asyncio.sleep(1)
+    try:
+        await _enter_prompt(page, input_el, prompt)
+        await asyncio.sleep(0.3)
+        await _click_send(page)
+        await asyncio.sleep(1)
+    except Exception as exc:
+        raise ChatGPTResponseError(f"Lỗi khi nhập hoặc gửi prompt: {exc}") from exc
 
     deadline = asyncio.get_event_loop().time() + timeout_s
     while asyncio.get_event_loop().time() < deadline:
@@ -275,7 +461,13 @@ async def send_prompt(prompt: str, page, timeout_s: int) -> str:
     return text
 
 
-async def ask(page, prompt: str, timeout_s: int, conversation_url: str | None) -> tuple[str, str | None]:
+async def ask(
+    page,
+    prompt: str,
+    timeout_s: int,
+    conversation_url: str | None,
+    ensure_instant: bool = True,
+) -> tuple[str, str | None]:
     """Send one turn and return ``(answer, conversation_url)``.
 
     Passing back the URL is what lets a caller keep every turn of one stage in a
@@ -290,6 +482,8 @@ async def ask(page, prompt: str, timeout_s: int, conversation_url: str | None) -
     await page.goto(
         conversation_url or NEW_CHAT_URL, wait_until="domcontentloaded", timeout=NAVIGATION_TIMEOUT_MS
     )
-    text = await send_prompt(prompt, page, timeout_s)
+    if ensure_instant and conversation_url is None:
+        await ensure_instant_mode(page)
+    text = await send_prompt(prompt, page, timeout_s, ensure_instant=ensure_instant)
     url = page.url if page.url.startswith(CONVERSATION_URL_PREFIX) else conversation_url
     return text, url

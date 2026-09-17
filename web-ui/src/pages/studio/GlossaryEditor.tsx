@@ -12,16 +12,35 @@ import { errorMessage } from "../../lib/format";
 const emptyTerm: GlossaryTerm = { zh: "", pinyin: "", vi: "", en: "", type: "other", keep_source: false, note: "" };
 const emptyAddress: AddressTerm = { speaker: "", addressee: "", vi_self: "", vi_other: "", basis: "" };
 
-export function GlossaryEditor({ job }: { job: JobDetail }) {
+export function GlossaryEditor({
+  job,
+  onUpdateTranslations,
+}: {
+  job: JobDetail;
+  onUpdateTranslations?: () => Promise<unknown>;
+}) {
   const query = useQuery({ queryKey: queryKeys.glossary(job.job_id), queryFn: () => api.glossary(job.job_id) });
   if (query.isLoading) return <div className="editor-loading"><LoaderCircle className="spin" size={20} />Đang tải glossary…</div>;
   if (query.isError || !query.data) return <EmptyState icon={AlertTriangle} title="Không đọc được glossary" detail={errorMessage(query.error)} action={<button className="secondary-button" onClick={() => void query.refetch()}>Thử lại</button>} />;
   // Khóa theo job, không theo revision: khóa theo revision thì mỗi lần server
   // đổi bản là form remount và bản nháp chưa lưu biến mất không một lời nào.
-  return <GlossaryForm key={job.job_id} job={job} data={query.data} />;
+  return <GlossaryForm
+    key={job.job_id}
+    job={job}
+    data={query.data}
+    onUpdateTranslations={onUpdateTranslations ?? (() => api.retranslate(job.job_id))}
+  />;
 }
 
-function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary }) {
+function GlossaryForm({
+  job,
+  data,
+  onUpdateTranslations,
+}: {
+  job: JobDetail;
+  data: RevisionedGlossary;
+  onUpdateTranslations: () => Promise<unknown>;
+}) {
   const queryClient = useQueryClient();
   const [doc, setDoc] = useState(() => structuredClone(data.document));
   const [baseline, setBaseline] = useState(() => JSON.stringify(data.document));
@@ -57,7 +76,7 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
       const saved = await api.saveGlossary(job.job_id, currentRevision, doc);
       if (!retranslate) return { saved, followUpError: null };
       try {
-        await api.retranslate(job.job_id);
+        await onUpdateTranslations();
         return { saved, followUpError: null };
       } catch (error) {
         return { saved, followUpError: errorMessage(error) };
@@ -159,10 +178,10 @@ function GlossaryForm({ job, data }: { job: JobDetail; data: RevisionedGlossary 
       </fieldset>
 
       {saveMutation.isError && !conflict && <div className="inline-alert error"><AlertTriangle size={16} /><span>{errorMessage(saveMutation.error)}</span></div>}
-      {followUpError && <div className="inline-alert error"><AlertTriangle size={16} /><span>Glossary đã lưu, nhưng chưa thể bắt đầu dịch lại: {followUpError}</span></div>}
+      {followUpError && <div className="inline-alert error"><AlertTriangle size={16} /><span>Glossary đã lưu, nhưng chưa thể cập nhật bản dịch: {followUpError}</span></div>}
       {dirty && <div className="sticky-savebar dirty">
         <span>{dirty ? "Có thay đổi chưa lưu" : "Mọi thay đổi đã được lưu"}</span>
-        <div><button className="secondary-button" disabled={!canSave} onClick={() => saveMutation.mutate(false)}>{saveMutation.isPending ? <LoaderCircle className="spin" size={16} /> : <Save size={16} />}Lưu</button><button className="primary-button" disabled={!canSave} onClick={() => saveMutation.mutate(true)}><Sparkles size={16} />Lưu & dịch lại</button></div>
+        <div><button className="secondary-button" disabled={!canSave} onClick={() => saveMutation.mutate(false)}>{saveMutation.isPending ? <LoaderCircle className="spin" size={16} /> : <Save size={16} />}Lưu</button><button className="primary-button" disabled={!canSave} onClick={() => saveMutation.mutate(true)}><Sparkles size={16} />Lưu & cập nhật bản dịch</button></div>
       </div>}
     </div>
   );

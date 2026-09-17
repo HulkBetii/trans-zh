@@ -13,8 +13,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 from pathlib import Path
+
+from ..jsonio import write_json_atomic
 
 
 class TranslationCache:
@@ -62,6 +63,10 @@ class TranslationCache:
             self.hits += 1
         return value
 
+    def contains(self, key: str) -> bool:
+        """Check an entry without changing runtime hit/miss counters."""
+        return key in self._shard(key)
+
     def put(self, key: str, value: str) -> None:
         self._shard(key)[key] = value
 
@@ -70,17 +75,12 @@ class TranslationCache:
         everything already paid for — which is what makes ``resume`` cheap."""
         for name, data in self._loaded.items():
             path = self.dir / f"{name}.json"
-            tmp = path.with_name(path.name + f".tmp{os.getpid()}")
-            try:
-                # Re-read before writing: another job may have added entries to this
-                # shard since it was loaded, and clobbering them just wastes tokens.
-                merged = dict(data)
-                if path.is_file():
-                    try:
-                        merged = {**json.loads(path.read_text(encoding="utf-8")), **data}
-                    except (json.JSONDecodeError, OSError):
-                        pass
-                tmp.write_text(json.dumps(merged, ensure_ascii=False), encoding="utf-8")
-                os.replace(tmp, path)
-            finally:
-                tmp.unlink(missing_ok=True)
+            # Re-read before writing: another job may have added entries to this
+            # shard since it was loaded, and clobbering them just wastes tokens.
+            merged = dict(data)
+            if path.is_file():
+                try:
+                    merged = {**json.loads(path.read_text(encoding="utf-8")), **data}
+                except (json.JSONDecodeError, OSError):
+                    pass
+            write_json_atomic(path, merged)

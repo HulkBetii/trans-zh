@@ -25,11 +25,16 @@ export function effectiveSpoken(cue: TtsCue, changes: DraftChanges): string {
 }
 
 export function voiceMeta(voice: TtsVoice): string {
-  return [voice.locale, voice.gender, voice.age].filter(Boolean).join(" · ") || "Tiếng Việt";
+  return (
+    [voice.locale, voice.gender, voice.age].filter(Boolean).join(" · ") ||
+    (voice.locale?.toLowerCase().startsWith("en") ? "Tiếng Anh" : "Tiếng Việt")
+  );
 }
 
 export function ttsRenderHint(workspace: TtsWorkspace, state: { dirty: boolean; hasInvalid: boolean; editorLocked: boolean; voiceDirty: boolean }): string {
-  if (!workspace.provider_ready) return "AI33 / Vbee chưa sẵn sàng.";
+  if (!workspace.provider_ready) {
+    return workspace.provider === "elevenlabs" ? "AI33 / ElevenLabs chưa sẵn sàng." : "AI33 / Vbee chưa sẵn sàng.";
+  }
   if (!workspace.voice_id || state.voiceDirty) return "Chọn và lưu một giọng trước khi tạo MP3.";
   if (!workspace.calibration || workspace.calibration.voice_id !== workspace.voice_id || workspace.calibration.sample_count < 8) return "Cần hiệu chuẩn đủ 8 mẫu cho giọng đang chọn.";
   if (!workspace.subtitle_approved) return "Cần duyệt phụ đề trước khi tạo MP3 toàn timeline.";

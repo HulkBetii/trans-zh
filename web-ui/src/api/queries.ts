@@ -23,7 +23,8 @@ export const queryKeys = {
   glossary: (jobId: string) => ["glossary", jobId] as const,
   subtitlesForJob: (jobId: string) => ["subtitles", jobId] as const,
   subtitles: (jobId: string, language: string) => ["subtitles", jobId, language] as const,
-  tts: (jobId: string) => ["tts", jobId, "vi"] as const,
+  tts: (jobId: string, lang = "vi") => ["tts", jobId, lang] as const,
+  ttsForJob: (jobId: string) => ["tts", jobId] as const,
   ttsVoices: (params: object = {}) => ["tts-voices", params] as const,
 };
 
@@ -95,17 +96,24 @@ export function useCreateJob() {
   });
 }
 
-export function useTts(jobId: string) {
+export function useTts(jobId: string, lang = "vi") {
   return useQuery({
-    queryKey: queryKeys.tts(jobId),
-    queryFn: () => api.tts(jobId),
+    queryKey: queryKeys.tts(jobId, lang),
+    queryFn: () => api.tts(jobId, lang),
     enabled: Boolean(jobId),
     refetchInterval: (query) => query.state.data?.active_run ? 4_000 : false,
   });
 }
 
 export function useTtsVoices(
-  params: { search?: string; page?: number; page_size?: number; ownership?: VoiceOwnership },
+  params: {
+    search?: string;
+    page?: number;
+    page_size?: number;
+    ownership?: VoiceOwnership;
+    provider?: string;
+    language?: string;
+  },
   enabled = true,
 ) {
   return useQuery({
@@ -120,11 +128,11 @@ export function useRunEvents(jobId: string, runId?: string | null) {
   return useRunStream(jobId, runId, "pipeline");
 }
 
-export function useTtsRunEvents(jobId: string, runId?: string | null) {
-  return useRunStream(jobId, runId, "tts");
+export function useTtsRunEvents(jobId: string, runId?: string | null, lang = "vi") {
+  return useRunStream(jobId, runId, "tts", lang);
 }
 
-function useRunStream(jobId: string, runId: string | null | undefined, lane: "pipeline" | "tts") {
+function useRunStream(jobId: string, runId: string | null | undefined, lane: "pipeline" | "tts", lang = "vi") {
   const queryClient = useQueryClient();
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("live");
 
@@ -147,7 +155,7 @@ function useRunStream(jobId: string, runId: string | null | undefined, lane: "pi
         refreshJob();
         void queryClient.invalidateQueries({ queryKey: queryKeys.subtitlesForJob(jobId) });
       } else {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId) });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId, lang) });
         refreshJob();
       }
     };
@@ -195,7 +203,7 @@ function useRunStream(jobId: string, runId: string | null | undefined, lane: "pi
       setConnectionStatus("live");
       refreshJob();
       if (lane === "tts") {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId) });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId, lang) });
       }
     };
     source.onmessage = (event) => {
@@ -209,7 +217,7 @@ function useRunStream(jobId: string, runId: string | null | undefined, lane: "pi
             return { ...(current as object), active_run: run, execution_status: run.status };
           });
         } else if (run) {
-          queryClient.setQueryData(queryKeys.tts(jobId), (current: unknown) => {
+          queryClient.setQueryData(queryKeys.tts(jobId, lang), (current: unknown) => {
             if (!current) return current;
             return { ...(current as object), active_run: run, execution_status: run.status };
           });
@@ -226,22 +234,22 @@ function useRunStream(jobId: string, runId: string | null | undefined, lane: "pi
         if (terminal) refreshAfterTerminalRun();
         else if (stageChanged) {
           if (lane === "pipeline") refreshJob();
-          else void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId) });
+          else void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId, lang) });
         }
       } catch {
         if (lane === "pipeline") refreshJob();
-        else void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId) });
+        else void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId, lang) });
       }
     };
     source.onerror = () => {
       setConnectionStatus(navigator.onLine ? "reconnecting" : "offline");
       if (lane === "pipeline") refreshJob();
-      else void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId) });
+      else void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId, lang) });
     };
     const handleOnline = () => {
       setConnectionStatus("reconnecting");
       refreshJob();
-      if (lane === "tts") void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId) });
+      if (lane === "tts") void queryClient.invalidateQueries({ queryKey: queryKeys.tts(jobId, lang) });
     };
     const handleOffline = () => setConnectionStatus("offline");
     window.addEventListener("online", handleOnline);

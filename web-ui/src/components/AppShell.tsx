@@ -70,7 +70,10 @@ export function AppShell() {
           <Settings size={20} strokeWidth={1.8} />
           <span>Cài đặt</span>
         </NavLink>
-        <div className="rail-version">v0.1</div>
+        <div className="rail-meta">
+          <div className="rail-version">v0.1</div>
+          <div className="rail-copyright">© 2026 HulkBeoti</div>
+        </div>
       </aside>
 
       {navigatorOpen && <aside ref={drawerRef} className="navigator-drawer open" role="dialog" aria-modal="true" aria-label="Danh sách công việc">

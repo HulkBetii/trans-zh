@@ -87,11 +87,14 @@ class _StreamClient:
     def __init__(self, response):
         self.response = response
 
-    def stream(self, method, url):
+    def stream(self, method, url, *args, **kwargs):
         return self.response
 
 
-def test_download_replaces_the_cache_only_after_a_complete_stream(tmp_path: Path):
+def test_download_replaces_the_cache_only_after_a_complete_stream(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr("zhsub.dub.client.time.sleep", lambda _: None)
     destination = tmp_path / "cue.mp3"
     destination.write_bytes(b"old")
     client = SpeechClient("https://example.test", "secret")

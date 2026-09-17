@@ -17,6 +17,9 @@ export type JobRequestSnapshot = Schemas["JobRequestSnapshot"];
 export type JobHealth = Schemas["HealthResponse"];
 export type StageState = Schemas["StageState"];
 export type RunRecord = Schemas["RunResponse"] & { lane?: "pipeline" | "tts" };
+export type TranslationCacheMode = Schemas["RetranslateEstimateRequest"]["cache_mode"];
+export type TranslationSummary = Schemas["TranslationSummary"];
+export type RetranslateRequest = Schemas["RetranslateRequest"];
 export type Artifact = Schemas["ArtifactResponse"];
 export type JobLaneSummary = Omit<Schemas["JobLaneSummary"], "active_run" | "latest_run"> & {
   active_run?: RunRecord | null;

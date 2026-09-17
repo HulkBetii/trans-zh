@@ -143,6 +143,31 @@ class CredentialTestResponse(BaseModel):
     latency_ms: int
 
 
+class TranslationLanguageSummary(BaseModel):
+    language: Literal["vi", "en"]
+    total_units: int = Field(ge=0)
+    cache_hits: int = Field(ge=0)
+    gpt_units: int = Field(ge=0)
+
+
+class TranslationSummary(BaseModel):
+    cache_mode: Literal["reuse", "bypass"]
+    estimated: bool = False
+    total_cues: int = Field(ge=0)
+    total_units: int = Field(ge=0)
+    cache_hits: int = Field(ge=0)
+    gpt_units: int = Field(ge=0)
+    by_language: list[TranslationLanguageSummary]
+
+
+class RetranslateEstimateRequest(BaseModel):
+    cache_mode: Literal["reuse", "bypass"] = "reuse"
+
+
+class RetranslateRequest(RetranslateEstimateRequest):
+    confirmed_gpt_units: int = Field(default=0, ge=0)
+
+
 class RunResponse(BaseModel):
     run_id: str
     job_id: str
@@ -159,6 +184,7 @@ class RunResponse(BaseModel):
     started_at: str | None = None
     finished_at: str | None = None
     event_seq: int = 0
+    translation_summary: TranslationSummary | None = None
 
 
 class HealthResponse(BaseModel):
@@ -346,7 +372,7 @@ class TtsVoicePage(BaseModel):
 
 
 class VoiceCalibrationResponse(BaseModel):
-    provider: Literal["vbee"] = "vbee"
+    provider: Literal["vbee", "elevenlabs"] = "vbee"
     voice_id: str
     overhead_sec: float
     sec_per_syllable: float
@@ -395,8 +421,8 @@ TtsAllowedAction = Literal[
 
 class TtsWorkspaceResponse(BaseModel):
     revision: str
-    language: Literal["vi"] = "vi"
-    provider: Literal["vbee"] = "vbee"
+    language: Literal["vi", "en"] = "vi"
+    provider: Literal["vbee", "elevenlabs"] = "vbee"
     provider_ready: bool = False
     voice_id: str | None = None
     selected_voice: TtsVoiceResponse | None = None

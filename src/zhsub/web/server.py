@@ -60,7 +60,7 @@ from ..overrides import (
     get_override_state,
 )
 from ..progress import STAGE_LABELS
-from ..stages import s0_ingest, s5_render
+from ..stages import s0_ingest, s4_translate, s5_render
 from ..timing import cps
 from .runtime import RunEventBroker, RunScheduler, Runner, TtsRunner
 from .schemas import (
@@ -89,6 +89,8 @@ from .schemas import (
     OverrideUpdateRequest,
     QualityStatus,
     ReadinessItem,
+    RetranslateEstimateRequest,
+    RetranslateRequest,
     RunResponse,
     SettingsCredentialResponse,
     SettingsProviderId,
@@ -106,6 +108,8 @@ from .schemas import (
     TtsSettingsUpdateRequest,
     TtsVoicePage,
     TtsWorkspaceResponse,
+    TranslationLanguageSummary,
+    TranslationSummary,
 )
 from .tts_service import LANGUAGE as TTS_LANGUAGE
 from .tts_service import TtsService
@@ -138,12 +142,17 @@ _MASKED_CREDENTIAL = "********"
 _CREDENTIAL_SPECS = {
     CredentialId.openai: ("OpenAI", "OPENAI_API_KEY"),
     CredentialId.anthropic: ("Anthropic", "ANTHROPIC_API_KEY"),
-    CredentialId.ai33: ("AI33 / Vbee", "AI33_API_KEY"),
+    CredentialId.ai33: ("AI33 (Vbee & ElevenLabs)", "AI33_API_KEY"),
 }
 
 
 def _conflict(
-    code: Literal["revision_conflict", "artifact_locked", "action_not_allowed"],
+    code: Literal[
+        "revision_conflict",
+        "artifact_locked",
+        "action_not_allowed",
+        "gpt_confirmation_required",
+    ],
     message: str,
     **context: Any,
 ) -> HTTPException:
@@ -213,12 +222,13 @@ def _snapshot_for(job: Job, output_root: Path) -> JobRequestSnapshot:
         kind="url" if s0_ingest.is_url(job.source_uri) else "local",
         value=job.source_uri,
     )
+    job_out = (output_root / job.job_id).resolve(strict=False)
     return JobRequestSnapshot(
         source=source,
         targets=[target for target in job.targets if target in {"vi", "en"}] or ["vi"],
         formats=["srt", "ass"],
         bilingual=False,
-        output_dir=str(output_root.resolve(strict=False)),
+        output_dir=str(job_out),
     )
 
 
@@ -242,7 +252,19 @@ def _run_response(store: JobStore, run: Run | None) -> RunResponse | None:
         started_at=_utc_iso(run.started_at),
         finished_at=_utc_iso(run.ended_at),
         event_seq=run.event_seq,
+        translation_summary=_translation_summary_from_run(run),
     )
+
+
+def _translation_summary_from_run(run: Run) -> TranslationSummary | None:
+    payload = run.payload or {}
+    raw = payload.get("translation_result") or payload.get("translation_estimate")
+    if not isinstance(raw, dict):
+        return None
+    try:
+        return TranslationSummary.model_validate(raw)
+    except ValueError:
+        return None
 
 
 def _execution_for(job: Job, latest_run: Run | None) -> ExecutionStatus:
@@ -290,15 +312,21 @@ def _override_flags(work_dir: Path, targets: list[str]) -> tuple[bool, bool]:
 
 
 def _artifact_language(name: str) -> str | None:
+    if "youtube_upload_kit" in name.lower():
+        match = re.search(r"\.(vi|en)\.youtube_upload_kit", name, re.IGNORECASE)
+        if match:
+            return match.group(1).lower()
+        return "en" if ".en." in name.lower() else "vi"
     match = re.search(r"\.(vi|en)(?:\.|$)", name, re.IGNORECASE)
     return match.group(1).lower() if match else None
 
 
 def _allowed_output_roots(snapshot: JobRequestSnapshot) -> list[Path]:
-    """Snapshot luôn mang gốc đúng rồi — kể cả job cũ không có request_json, vì
-    `_snapshot_for` dựng nó từ cấu hình. Nhánh fallback thứ hai ở đây từng là bản
-    sao thứ hai của hằng "output", và là chỗ duy nhất còn phớt lờ cấu hình."""
-    return [Path(snapshot.output_dir).resolve(strict=False)]
+    snap_dir = Path(snapshot.output_dir).resolve(strict=False)
+    roots = [snap_dir]
+    if snap_dir.parent not in roots:
+        roots.append(snap_dir.parent)
+    return roots
 
 
 def _render_report(work_dir: Path) -> RenderReport | None:
@@ -311,22 +339,31 @@ def _render_report(work_dir: Path) -> RenderReport | None:
         return None
 
 
-def _tts_report(work_dir: Path) -> TtsReport | None:
-    path = work_dir / "tts_report.vi.json"
-    if not path.is_file():
-        return None
-    try:
-        return read_doc(path, TtsReport)
-    except (OSError, ValueError, json.JSONDecodeError):
-        return None
+def _tts_reports(work_dir: Path) -> dict[str, TtsReport]:
+    result: dict[str, TtsReport] = {}
+    for lang in ("vi", "en"):
+        path = work_dir / f"tts_report.{lang}.json"
+        if path.is_file():
+            try:
+                result[lang] = read_doc(path, TtsReport)
+            except (OSError, ValueError, json.JSONDecodeError):
+                pass
+    return result
 
 
-def _tts_output_stale(job: Job, store: JobStore, report: TtsReport, output_root: Path) -> bool:
+def _tts_output_stale(
+    job: Job,
+    store: JobStore,
+    report: TtsReport,
+    output_root: Path,
+    lang: str = "vi",
+) -> bool:
     try:
-        speech = get_speech_state(job.work_dir, report.voice_id)
+        speech = get_speech_state(job.work_dir, report.voice_id, lang=lang)
     except (OSError, ValueError, json.JSONDecodeError):
         return True
-    calibration_record = store.get_voice_calibration(TTS_PROVIDER, report.voice_id)
+    provider = "elevenlabs" if report.voice_id.startswith("elevenlabs_") else TTS_PROVIDER
+    calibration_record = store.get_voice_calibration(provider, report.voice_id)
     if calibration_record is None:
         return True
     calibration = TtsCalibration(
@@ -416,7 +453,7 @@ def _artifacts_for(job: Job, output_root: Path, store: JobStore | None = None) -
     work_dir = Path(job.work_dir)
     snapshot = _snapshot_for(job, output_root)
     render_report = _render_report(work_dir)
-    tts_report = _tts_report(work_dir)
+    tts_reports = _tts_reports(work_dir)
     roots = _allowed_output_roots(snapshot)
     expected_paths = _expected_subtitle_paths(job, snapshot)
     candidates: list[tuple[Path, str]] = []
@@ -427,13 +464,15 @@ def _artifacts_for(job: Job, output_root: Path, store: JobStore | None = None) -
                 path = Path.cwd() / path
             path = path.resolve(strict=False)
             if _is_inside(path, roots):
-                candidates.append((path, "subtitle"))
-    tts_output_path: Path | None = None
-    if tts_report is not None:
-        tts_output_path = Path(tts_report.output)
+                kind = "other" if path.suffix.lower() == ".txt" else "subtitle"
+                candidates.append((path, kind))
+    tts_output_paths: dict[str, Path] = {}
+    for r_lang, r_report in tts_reports.items():
+        tts_output_path = Path(r_report.output)
         if not tts_output_path.is_absolute():
             tts_output_path = Path.cwd() / tts_output_path
         tts_output_path = tts_output_path.resolve(strict=False)
+        tts_output_paths[r_lang] = tts_output_path
         if _is_inside(tts_output_path, roots):
             candidates.append((tts_output_path, "audio"))
 
@@ -443,6 +482,8 @@ def _artifacts_for(job: Job, output_root: Path, store: JobStore | None = None) -
         pattern = "*.mp3" if job.request is not None else f"{job.job_id}.*.mp3"
         for path in root.glob(pattern):
             candidates.append((path.resolve(strict=False), "audio"))
+        for path in root.glob("*youtube_upload_kit*.txt"):
+            candidates.append((path.resolve(strict=False), "other"))
 
     artifacts: list[ArtifactResponse] = []
     seen: set[Path] = set()
@@ -462,11 +503,13 @@ def _artifacts_for(job: Job, output_root: Path, store: JobStore | None = None) -
             )
         )
         if kind == "audio":
+            report = tts_reports.get(lang) if lang else (next(iter(tts_reports.values()), None) if tts_reports else None)
+            expected_output = tts_output_paths.get(lang) if lang else None
             stale = bool(
-                tts_report is None
-                or tts_output_path != path
+                report is None
+                or (expected_output is not None and expected_output != path)
                 or store is None
-                or _tts_output_stale(job, store, tts_report, output_root)
+                or _tts_output_stale(job, store, report, output_root, lang=lang or "vi")
             )
         state: Literal["current", "stale", "missing"] = (
             "missing" if not exists else "stale" if stale else "current"
@@ -602,10 +645,20 @@ def _job_summary(store: JobStore, job: Job, tts_service: TtsService, output_root
         latest_run=pipeline_latest,
         allowed_actions=["cancel"] if active is not None else [],
     )
-    tts_started = "vi" in snapshot.targets and tts_service.started(job)
-    tts_activity = tts_service.activity_timestamp(job) if tts_started else None
+    tts_started = any(l in snapshot.targets for l in ("vi", "en")) and (
+        tts_service.started(job, "vi") or tts_service.started(job, "en")
+    )
+    tts_activity = max(
+        (
+            ts
+            for l in ("vi", "en")
+            if (ts := tts_service.activity_timestamp(job, l)) is not None
+        ),
+        default=None,
+    )
     if tts_started:
-        workspace = tts_service.workspace(job)
+        target_tts_lang = "en" if "en" in snapshot.targets and tts_service.started(job, "en") and not tts_service.started(job, "vi") else "vi"
+        workspace = tts_service.workspace(job, lang=target_tts_lang)
         tts_latest = workspace.latest_run
         tts_active = workspace.active_run
         tts_lane = JobLaneSummary(
@@ -781,12 +834,12 @@ def _readiness(config: Config) -> list[ReadinessItem]:
     checks.append(
         ReadinessItem(
             id="tts_ai33",
-            label="AI33 / Vbee TTS",
+            label="AI33 TTS (Vbee & ElevenLabs)",
             status="ready" if tts_ready else "warning",
             detail=(
-                "Vietnamese cue preview, calibration, and MP3 timeline rendering."
+                "Vietnamese (Vbee) & English (ElevenLabs) cue preview, calibration, and MP3 rendering."
                 if tts_ready
-                else f"Optional: set {config.dub.api_key_env} to enable Vietnamese TTS."
+                else f"Optional: set {config.dub.api_key_env} to enable AI33 TTS."
             ),
         )
     )
@@ -1265,10 +1318,10 @@ def create_app(
             raise HTTPException(404, f"Unknown job: {job_id}")
         return runtime, job
 
-    def require_tts_job(job_id: str) -> tuple[RunScheduler, Job, TtsService]:
+    def require_tts_job(job_id: str, lang: str = "vi") -> tuple[RunScheduler, Job, TtsService]:
         runtime, job = require_job(job_id)
-        if TTS_LANGUAGE not in _snapshot_for(job, _output_root(get_runtime())).targets:
-            raise HTTPException(404, "Vietnamese TTS is not available for this job")
+        if lang not in _snapshot_for(job, _output_root(get_runtime())).targets:
+            raise HTTPException(404, f"{lang.upper()} TTS is not available for this job")
         return runtime, job, get_tts_service()
 
     def glossary_lock_state(
@@ -1509,11 +1562,18 @@ def create_app(
         page: int = Query(1, ge=1),
         page_size: int = Query(30, ge=1, le=100),
         ownership: Literal["all", "vbee", "community"] = "all",
+        provider: str = Query("vbee"),
+        language: str = Query("Vietnamese"),
     ) -> TtsVoicePage:
         service = get_tts_service()
         try:
             return service.voices(
-                search=search, page=page, page_size=page_size, ownership=ownership
+                search=search,
+                page=page,
+                page_size=page_size,
+                ownership=ownership,
+                provider=provider,
+                language=language,
             )
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
@@ -1624,7 +1684,14 @@ def create_app(
         runtime, job = require_job(job_id)
         return _job_detail(runtime.store, job, get_tts_service(), _output_root(get_runtime()))
 
-    def enqueue_action(job_id: str, kind: str, from_stage: str, *, force: bool = False) -> RunResponse:
+    def enqueue_action(
+        job_id: str,
+        kind: str,
+        from_stage: str,
+        *,
+        force: bool = False,
+        payload: dict[str, Any] | None = None,
+    ) -> RunResponse:
         runtime, job = require_job(job_id)
         if job.request is None:
             runtime.store.set_request(
@@ -1632,7 +1699,7 @@ def create_app(
                 _snapshot_for(job, _output_root(get_runtime())).model_dump(mode="json"),
             )
         try:
-            run = runtime.enqueue(job_id, kind, from_stage, force=force)
+            run = runtime.enqueue(job_id, kind, from_stage, force=force, payload=payload)
         except ValueError as exc:
             raise _conflict("action_not_allowed", str(exc)) from exc
         response = _run_response(runtime.store, run)
@@ -1654,16 +1721,84 @@ def create_app(
         ) or job.stage or "ingest"
         return enqueue_action(job_id, "retry", from_stage)
 
-    @api.post("/api/v1/jobs/{job_id}/retranslate", response_model=RunResponse)
-    def retranslate_job(job_id: str) -> RunResponse:
-        _, job = require_job(job_id)
+    def retranslation_estimate(
+        job: Job,
+        cache_mode: Literal["reuse", "bypass"],
+    ) -> TranslationSummary:
         work_dir = Path(job.work_dir)
         if not (work_dir / "segments.json").is_file() or not (work_dir / "glossary.json").is_file():
             raise _conflict(
                 "action_not_allowed",
                 "Segments and glossary must exist before retranslation",
             )
-        return enqueue_action(job_id, "retranslate", "translate", force=True)
+        snapshot = _snapshot_for(job, _output_root(get_runtime()))
+        stats = s4_translate.estimate_translation_cache(
+            work_dir,
+            get_runtime().config,
+            list(snapshot.targets),
+            cache_mode,
+        )
+        return TranslationSummary(
+            cache_mode=stats.cache_mode,
+            estimated=True,
+            total_cues=stats.total_cues,
+            total_units=stats.total_units,
+            cache_hits=stats.cache_hits,
+            gpt_units=stats.gpt_units,
+            by_language=[
+                TranslationLanguageSummary(
+                    language=item.language,  # type: ignore[arg-type]
+                    total_units=item.total_units,
+                    cache_hits=item.cache_hits,
+                    gpt_units=item.gpt_units,
+                )
+                for item in stats.by_language
+            ],
+        )
+
+    @api.post(
+        "/api/v1/jobs/{job_id}/retranslate/estimate",
+        response_model=TranslationSummary,
+    )
+    def estimate_retranslate(
+        job_id: str,
+        request_body: RetranslateEstimateRequest,
+    ) -> TranslationSummary:
+        _, job = require_job(job_id)
+        return retranslation_estimate(job, request_body.cache_mode)
+
+    @api.post("/api/v1/jobs/{job_id}/retranslate", response_model=RunResponse)
+    def retranslate_job(
+        job_id: str,
+        request_body: RetranslateRequest | None = None,
+    ) -> RunResponse:
+        _, job = require_job(job_id)
+        cache_mode = request_body.cache_mode if request_body is not None else "reuse"
+        estimate = retranslation_estimate(job, cache_mode)
+        if (
+            request_body is not None
+            and estimate.gpt_units > request_body.confirmed_gpt_units
+        ):
+            raise _conflict(
+                "gpt_confirmation_required",
+                "Số lượt dịch bằng GPT đã tăng và cần được xác nhận lại",
+                estimate=estimate.model_dump(mode="json"),
+            )
+        return enqueue_action(
+            job_id,
+            "retranslate",
+            "translate",
+            force=True,
+            payload={
+                "cache_mode": cache_mode,
+                "translation_estimate": estimate.model_dump(mode="json"),
+                **(
+                    {"confirmed_gpt_units": request_body.confirmed_gpt_units}
+                    if request_body is not None
+                    else {}
+                ),
+            },
+        )
 
     @api.post("/api/v1/jobs/{job_id}/render", response_model=RunResponse)
     def render_job(job_id: str) -> RunResponse:
@@ -1897,25 +2032,26 @@ def create_app(
         return subtitle_workspace(runtime, job, lang)
 
     @api.get(
-        "/api/v1/jobs/{job_id}/tts/vi",
+        "/api/v1/jobs/{job_id}/tts/{lang}",
         response_model=TtsWorkspaceResponse,
     )
-    def get_tts_workspace(job_id: str) -> TtsWorkspaceResponse:
-        _, job, service = require_tts_job(job_id)
-        return service.workspace(job)
+    def get_tts_workspace(job_id: str, lang: str = "vi") -> TtsWorkspaceResponse:
+        _, job, service = require_tts_job(job_id, lang=lang)
+        return service.workspace(job, lang=lang)
 
     @api.put(
-        "/api/v1/jobs/{job_id}/tts/vi/settings",
+        "/api/v1/jobs/{job_id}/tts/{lang}/settings",
         response_model=TtsWorkspaceResponse,
     )
     def put_tts_settings(
         job_id: str,
         request_body: TtsSettingsUpdateRequest,
+        lang: str = "vi",
     ) -> TtsWorkspaceResponse:
-        runtime, job, service = require_tts_job(job_id)
+        runtime, job, service = require_tts_job(job_id, lang=lang)
         reject_active_tts_edit(runtime, job_id)
         try:
-            service.apply_settings(job, request_body.revision, request_body.voice_id)
+            service.apply_settings(job, request_body.revision, request_body.voice_id, lang=lang)
         except SpeechConflictError as exc:
             raise HTTPException(
                 409,
@@ -1926,23 +2062,25 @@ def create_app(
             ) from exc
         except SpeechValidationError as exc:
             raise HTTPException(422, str(exc)) from exc
-        return service.workspace(job)
+        return service.workspace(job, lang=lang)
 
     @api.put(
-        "/api/v1/jobs/{job_id}/tts/vi/spoken-overrides",
+        "/api/v1/jobs/{job_id}/tts/{lang}/spoken-overrides",
         response_model=TtsWorkspaceResponse,
     )
     def put_tts_spoken_overrides(
         job_id: str,
         request_body: SpokenOverrideUpdateRequest,
+        lang: str = "vi",
     ) -> TtsWorkspaceResponse:
-        runtime, job, service = require_tts_job(job_id)
+        runtime, job, service = require_tts_job(job_id, lang=lang)
         reject_active_tts_edit(runtime, job_id)
         try:
             service.apply_overrides(
                 job,
                 request_body.revision,
                 [item.model_dump(mode="json") for item in request_body.changes],
+                lang=lang,
             )
         except SpeechConflictError as exc:
             raise HTTPException(
@@ -1954,25 +2092,25 @@ def create_app(
             ) from exc
         except SpeechValidationError as exc:
             raise HTTPException(422, str(exc)) from exc
-        return service.workspace(job)
+        return service.workspace(job, lang=lang)
 
     @api.post(
-        "/api/v1/jobs/{job_id}/tts/vi/preview",
+        "/api/v1/jobs/{job_id}/tts/{lang}/preview",
         response_model=RunResponse,
     )
-    def preview_tts(job_id: str, request_body: TtsPreviewRequest) -> RunResponse:
-        runtime, job, service = require_tts_job(job_id)
-        workspace = service.workspace(job)
+    def preview_tts(job_id: str, request_body: TtsPreviewRequest, lang: str = "vi") -> RunResponse:
+        runtime, job, service = require_tts_job(job_id, lang=lang)
+        workspace = service.workspace(job, lang=lang)
         if "preview" not in workspace.allowed_actions:
             raise _conflict(
                 "action_not_allowed",
                 "TTS preview is not currently allowed",
             )
         if not any(cue.segment_id == request_body.segment_id for cue in workspace.cues):
-            raise HTTPException(404, "Unknown Vietnamese subtitle segment")
+            raise HTTPException(404, f"Unknown {lang} subtitle segment")
         assert workspace.voice_id is not None
         payload: dict[str, Any] = {
-            "lang": TTS_LANGUAGE,
+            "lang": lang,
             "voice_id": workspace.voice_id,
             "speech_revision": workspace.revision,
             "segment_id": request_body.segment_id,
@@ -1982,12 +2120,12 @@ def create_app(
         return enqueue_tts(runtime, job, "tts_preview", payload)
 
     @api.post(
-        "/api/v1/jobs/{job_id}/tts/vi/calibrate",
+        "/api/v1/jobs/{job_id}/tts/{lang}/calibrate",
         response_model=RunResponse,
     )
-    def calibrate_tts(job_id: str) -> RunResponse:
-        runtime, job, service = require_tts_job(job_id)
-        workspace = service.workspace(job)
+    def calibrate_tts(job_id: str, lang: str = "vi") -> RunResponse:
+        runtime, job, service = require_tts_job(job_id, lang=lang)
+        workspace = service.workspace(job, lang=lang)
         if "calibrate" not in workspace.allowed_actions:
             raise _conflict(
                 "action_not_allowed",
@@ -1999,19 +2137,19 @@ def create_app(
             job,
             "tts_calibrate",
             {
-                "lang": TTS_LANGUAGE,
+                "lang": lang,
                 "voice_id": workspace.voice_id,
                 "speech_revision": workspace.revision,
             },
         )
 
     @api.post(
-        "/api/v1/jobs/{job_id}/tts/vi/render",
+        "/api/v1/jobs/{job_id}/tts/{lang}/render",
         response_model=RunResponse,
     )
-    def render_tts(job_id: str) -> RunResponse:
-        runtime, job, service = require_tts_job(job_id)
-        workspace = service.workspace(job)
+    def render_tts(job_id: str, lang: str = "vi") -> RunResponse:
+        runtime, job, service = require_tts_job(job_id, lang=lang)
+        workspace = service.workspace(job, lang=lang)
         if "render" not in workspace.allowed_actions:
             raise _conflict(
                 "action_not_allowed",
@@ -2024,7 +2162,7 @@ def create_app(
             job,
             "tts_render",
             {
-                "lang": TTS_LANGUAGE,
+                "lang": lang,
                 "voice_id": workspace.voice_id,
                 "speech_revision": workspace.revision,
                 "calibration_revision": workspace.calibration.revision,
@@ -2033,13 +2171,13 @@ def create_app(
         )
 
     @api.post(
-        "/api/v1/jobs/{job_id}/tts/vi/approve",
+        "/api/v1/jobs/{job_id}/tts/{lang}/approve",
         response_model=TtsWorkspaceResponse,
     )
-    def approve_tts(job_id: str) -> TtsWorkspaceResponse:
-        runtime, job, service = require_tts_job(job_id)
+    def approve_tts(job_id: str, lang: str = "vi") -> TtsWorkspaceResponse:
+        runtime, job, service = require_tts_job(job_id, lang=lang)
         reject_active_tts_edit(runtime, job_id)
-        signature = service.current_audio_signature(job)
+        signature = service.current_audio_signature(job, lang=lang)
         if signature is None:
             raise _conflict(
                 "action_not_allowed",
@@ -2048,29 +2186,29 @@ def create_app(
         try:
             runtime.store.approve_tts(
                 job_id,
-                TTS_LANGUAGE,
+                lang,
                 signature,
                 expected_signature=signature,
             )
         except ValueError as exc:
             raise _conflict("action_not_allowed", str(exc)) from exc
-        return service.workspace(job)
+        return service.workspace(job, lang=lang)
 
     @api.post(
-        "/api/v1/jobs/{job_id}/tts/vi/unapprove",
+        "/api/v1/jobs/{job_id}/tts/{lang}/unapprove",
         response_model=TtsWorkspaceResponse,
     )
-    def unapprove_tts(job_id: str) -> TtsWorkspaceResponse:
-        runtime, job, service = require_tts_job(job_id)
+    def unapprove_tts(job_id: str, lang: str = "vi") -> TtsWorkspaceResponse:
+        runtime, job, service = require_tts_job(job_id, lang=lang)
         reject_active_tts_edit(runtime, job_id)
-        runtime.store.set_tts_approval(job_id, TTS_LANGUAGE, None)
-        return service.workspace(job)
+        runtime.store.set_tts_approval(job_id, lang, None)
+        return service.workspace(job, lang=lang)
 
-    @api.get("/api/v1/jobs/{job_id}/tts/vi/previews/{segment_id}")
-    def download_tts_preview(job_id: str, segment_id: int) -> FileResponse:
-        _, job, service = require_tts_job(job_id)
+    @api.get("/api/v1/jobs/{job_id}/tts/{lang}/previews/{segment_id}")
+    def download_tts_preview(job_id: str, segment_id: int, lang: str = "vi") -> FileResponse:
+        _, job, service = require_tts_job(job_id, lang=lang)
         try:
-            path = service.preview_path(job, segment_id)
+            path = service.preview_path(job, segment_id, lang=lang)
         except (OSError, ValueError, SpeechValidationError):
             path = None
         if path is None:

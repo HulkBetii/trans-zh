@@ -235,6 +235,26 @@
               "default": "all",
               "title": "Ownership"
             }
+          },
+          {
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "vbee",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Vietnamese",
+              "title": "Language"
+            }
           }
         ],
         "responses": {
@@ -485,6 +505,55 @@
         }
       }
     },
+    "/api/v1/jobs/{job_id}/retranslate/estimate": {
+      "post": {
+        "summary": "Estimate Retranslate",
+        "operationId": "estimate_retranslate_api_v1_jobs__job_id__retranslate_estimate_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetranslateEstimateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslationSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/jobs/{job_id}/retranslate": {
       "post": {
         "summary": "Retranslate Job",
@@ -500,6 +569,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RetranslateRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -833,10 +919,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi": {
+    "/api/v1/jobs/{job_id}/tts/{lang}": {
       "get": {
         "summary": "Get Tts Workspace",
-        "operationId": "get_tts_workspace_api_v1_jobs__job_id__tts_vi_get",
+        "operationId": "get_tts_workspace_api_v1_jobs__job_id__tts__lang__get",
         "parameters": [
           {
             "name": "job_id",
@@ -845,6 +931,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -872,10 +967,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/settings": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/settings": {
       "put": {
         "summary": "Put Tts Settings",
-        "operationId": "put_tts_settings_api_v1_jobs__job_id__tts_vi_settings_put",
+        "operationId": "put_tts_settings_api_v1_jobs__job_id__tts__lang__settings_put",
         "parameters": [
           {
             "name": "job_id",
@@ -884,6 +979,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -921,10 +1025,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/spoken-overrides": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/spoken-overrides": {
       "put": {
         "summary": "Put Tts Spoken Overrides",
-        "operationId": "put_tts_spoken_overrides_api_v1_jobs__job_id__tts_vi_spoken_overrides_put",
+        "operationId": "put_tts_spoken_overrides_api_v1_jobs__job_id__tts__lang__spoken_overrides_put",
         "parameters": [
           {
             "name": "job_id",
@@ -933,6 +1037,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -970,10 +1083,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/preview": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/preview": {
       "post": {
         "summary": "Preview Tts",
-        "operationId": "preview_tts_api_v1_jobs__job_id__tts_vi_preview_post",
+        "operationId": "preview_tts_api_v1_jobs__job_id__tts__lang__preview_post",
         "parameters": [
           {
             "name": "job_id",
@@ -982,6 +1095,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -1019,10 +1141,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/calibrate": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/calibrate": {
       "post": {
         "summary": "Calibrate Tts",
-        "operationId": "calibrate_tts_api_v1_jobs__job_id__tts_vi_calibrate_post",
+        "operationId": "calibrate_tts_api_v1_jobs__job_id__tts__lang__calibrate_post",
         "parameters": [
           {
             "name": "job_id",
@@ -1031,6 +1153,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -1058,10 +1189,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/render": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/render": {
       "post": {
         "summary": "Render Tts",
-        "operationId": "render_tts_api_v1_jobs__job_id__tts_vi_render_post",
+        "operationId": "render_tts_api_v1_jobs__job_id__tts__lang__render_post",
         "parameters": [
           {
             "name": "job_id",
@@ -1070,6 +1201,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -1097,10 +1237,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/approve": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/approve": {
       "post": {
         "summary": "Approve Tts",
-        "operationId": "approve_tts_api_v1_jobs__job_id__tts_vi_approve_post",
+        "operationId": "approve_tts_api_v1_jobs__job_id__tts__lang__approve_post",
         "parameters": [
           {
             "name": "job_id",
@@ -1109,6 +1249,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -1136,10 +1285,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/unapprove": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/unapprove": {
       "post": {
         "summary": "Unapprove Tts",
-        "operationId": "unapprove_tts_api_v1_jobs__job_id__tts_vi_unapprove_post",
+        "operationId": "unapprove_tts_api_v1_jobs__job_id__tts__lang__unapprove_post",
         "parameters": [
           {
             "name": "job_id",
@@ -1148,6 +1297,15 @@
             "schema": {
               "type": "string",
               "title": "Job Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -1175,10 +1333,10 @@
         }
       }
     },
-    "/api/v1/jobs/{job_id}/tts/vi/previews/{segment_id}": {
+    "/api/v1/jobs/{job_id}/tts/{lang}/previews/{segment_id}": {
       "get": {
         "summary": "Download Tts Preview",
-        "operationId": "download_tts_preview_api_v1_jobs__job_id__tts_vi_previews__segment_id__get",
+        "operationId": "download_tts_preview_api_v1_jobs__job_id__tts__lang__previews__segment_id__get",
         "parameters": [
           {
             "name": "job_id",
@@ -1196,6 +1354,15 @@
             "schema": {
               "type": "integer",
               "title": "Segment Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lang"
             }
           }
         ],
@@ -2677,6 +2844,42 @@
         ],
         "title": "ReadinessItem"
       },
+      "RetranslateEstimateRequest": {
+        "properties": {
+          "cache_mode": {
+            "type": "string",
+            "enum": [
+              "reuse",
+              "bypass"
+            ],
+            "title": "Cache Mode",
+            "default": "reuse"
+          }
+        },
+        "type": "object",
+        "title": "RetranslateEstimateRequest"
+      },
+      "RetranslateRequest": {
+        "properties": {
+          "cache_mode": {
+            "type": "string",
+            "enum": [
+              "reuse",
+              "bypass"
+            ],
+            "title": "Cache Mode",
+            "default": "reuse"
+          },
+          "confirmed_gpt_units": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Confirmed Gpt Units",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "RetranslateRequest"
+      },
       "RunResponse": {
         "properties": {
           "run_id": {
@@ -2787,6 +2990,16 @@
             "type": "integer",
             "title": "Event Seq",
             "default": 0
+          },
+          "translation_summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TranslationSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -3318,6 +3531,95 @@
         ],
         "title": "SubtitleWarningResponse"
       },
+      "TranslationLanguageSummary": {
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "vi",
+              "en"
+            ],
+            "title": "Language"
+          },
+          "total_units": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Units"
+          },
+          "cache_hits": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cache Hits"
+          },
+          "gpt_units": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Gpt Units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "language",
+          "total_units",
+          "cache_hits",
+          "gpt_units"
+        ],
+        "title": "TranslationLanguageSummary"
+      },
+      "TranslationSummary": {
+        "properties": {
+          "cache_mode": {
+            "type": "string",
+            "enum": [
+              "reuse",
+              "bypass"
+            ],
+            "title": "Cache Mode"
+          },
+          "estimated": {
+            "type": "boolean",
+            "title": "Estimated",
+            "default": false
+          },
+          "total_cues": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Cues"
+          },
+          "total_units": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Units"
+          },
+          "cache_hits": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cache Hits"
+          },
+          "gpt_units": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Gpt Units"
+          },
+          "by_language": {
+            "items": {
+              "$ref": "#/components/schemas/TranslationLanguageSummary"
+            },
+            "type": "array",
+            "title": "By Language"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cache_mode",
+          "total_cues",
+          "total_units",
+          "cache_hits",
+          "gpt_units",
+          "by_language"
+        ],
+        "title": "TranslationSummary"
+      },
       "TtsCueResponse": {
         "properties": {
           "segment_id": {
@@ -3620,13 +3922,19 @@
           },
           "language": {
             "type": "string",
-            "const": "vi",
+            "enum": [
+              "vi",
+              "en"
+            ],
             "title": "Language",
             "default": "vi"
           },
           "provider": {
             "type": "string",
-            "const": "vbee",
+            "enum": [
+              "vbee",
+              "elevenlabs"
+            ],
             "title": "Provider",
             "default": "vbee"
           },
@@ -3820,7 +4128,10 @@
         "properties": {
           "provider": {
             "type": "string",
-            "const": "vbee",
+            "enum": [
+              "vbee",
+              "elevenlabs"
+            ],
             "title": "Provider",
             "default": "vbee"
           },
