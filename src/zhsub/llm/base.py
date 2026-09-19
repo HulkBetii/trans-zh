@@ -85,12 +85,19 @@ class LLMProvider(ABC):
         """
         last: Exception | None = None
         for attempt in range(self.max_retries + 1):
-            # json_mode constrains decoding where the endpoint supports it. Small
-            # local models otherwise wrap JSON in prose often enough to burn retries.
             raw = self.complete(system, user, cache_system, json_mode=True)
+            extracted = extract_json(raw)
             try:
-                return json.loads(extract_json(raw))
+                return json.loads(extracted)
             except (json.JSONDecodeError, ValueError) as exc:
+                try:
+                    import json_repair
+
+                    repaired = json_repair.loads(extracted)
+                    if repaired is not None and (isinstance(repaired, (dict, list)) or repaired != ""):
+                        return repaired
+                except Exception:
+                    pass
                 last = exc
                 log.warning(
                     "LLM trả về JSON hỏng (lần %d/%d): %s | %r",

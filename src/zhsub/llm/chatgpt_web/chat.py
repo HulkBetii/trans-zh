@@ -30,7 +30,13 @@ PROMPT_INPUT_SEL = "#prompt-textarea"
 SEND_BUTTON_SELS = (
     'button[data-testid="send-button"]',
     'button[data-testid="composer-send-button"]',
-    'button[aria-label*="Send"]',
+    'button[data-testid*="send" i]',
+    'button[aria-label*="send" i]',
+    'button[aria-label*="gửi" i]',
+    'button[aria-label="Send prompt"]',
+    'button[aria-label="Send message"]',
+    'button:has(svg path[d*="M15.192 8.906"])',
+    'form button[type="submit"]',
 )
 ASSISTANT_MSG_SEL = '[data-message-author-role="assistant"]'
 STOP_BUTTON_SEL = 'button[data-testid="stop-button"], button[aria-label="Stop generating"]'
@@ -141,16 +147,22 @@ async def _wait_streaming_done(page, timeout_s: int) -> None:
 
 
 async def _click_send(page) -> None:
-    for sel in SEND_BUTTON_SELS:
-        try:
-            btn = page.locator(sel).first
-            if await btn.is_visible(timeout=2_000) and await btn.is_enabled():
-                await btn.click()
-                return
-        except Exception:  # noqa: BLE001 - try the next selector
-            continue
+    for _ in range(10):
+        for sel in SEND_BUTTON_SELS:
+            try:
+                btn = page.locator(sel).first
+                if await btn.is_visible(timeout=150) and await btn.is_enabled():
+                    await btn.click()
+                    return
+            except Exception:
+                continue
+        await asyncio.sleep(0.15)
     log.warning("Không thấy nút gửi, dùng phím Enter thay thế")
-    await page.locator(PROMPT_INPUT_SEL).first.press("Enter")
+    try:
+        await page.locator(PROMPT_INPUT_SEL).first.focus()
+        await page.keyboard.press("Enter")
+    except Exception as exc:
+        log.warning("Không thể bấm Enter: %s", exc)
 
 
 async def _last_assistant_text(page) -> str:
@@ -337,66 +349,54 @@ async def _enter_prompt(page, input_el, prompt: str) -> None:
         except Exception:
             pass
 
-    # 2. Click to focus
-    try:
-        await input_el.click(timeout=3_000)
-    except Exception:
-        pass
-    await asyncio.sleep(0.2)
-
-    # 3. Try standard fill first (with reasonable timeout)
-    try:
-        await input_el.fill(prompt, timeout=8_000)
-        return
-    except Exception as exc:
-        log.warning("input_el.fill thất bại (%s), thử fallback keyboard/DOM", exc)
-
-    # 4. Fallback: focus and use page.keyboard.insert_text
+    # 2. Focus input
     try:
         await input_el.focus()
-        await page.evaluate(
-            """(sel) => {
+    except Exception:
+        pass
+    await asyncio.sleep(0.1)
+
+    # 3. Fast DOM insertion via execCommand & input events (instant for any length)
+    try:
+        inserted = await page.evaluate(
+            """([sel, text]) => {
                 const el = document.querySelector(sel);
-                if (!el) return;
+                if (!el) return false;
                 el.focus();
                 if (el.isContentEditable) {
                     el.innerText = '';
+                    const ok = document.execCommand('insertText', false, text);
+                    if (!ok || !el.innerText.trim()) {
+                        el.innerText = text;
+                    }
+                    el.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true, inputType: 'insertText', data: text }));
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    return true;
                 } else if ('value' in el) {
-                    el.value = '';
+                    el.value = text;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    return true;
                 }
+                return false;
             }""",
-            PROMPT_INPUT_SEL,
+            [PROMPT_INPUT_SEL, prompt],
         )
-        await asyncio.sleep(0.2)
-        await page.keyboard.insert_text(prompt)
-        await asyncio.sleep(0.3)
-        val = await input_el.evaluate("(el) => (el.innerText || el.value || '').trim()")
-        if val:
-            return
+        if inserted:
+            await asyncio.sleep(0.2)
+            val = await input_el.evaluate("(el) => (el.innerText || el.value || '').trim()")
+            if val:
+                return
     except Exception as exc:
-        log.warning("Keyboard insert_text thất bại (%s), thử DOM dispatch", exc)
+        log.warning("DOM execCommand thất bại (%s), thử fallback", exc)
 
-    # 5. Fallback 3: DOM execCommand & dispatchEvent
-    await page.evaluate(
-        """([sel, text]) => {
-            const el = document.querySelector(sel);
-            if (!el) throw new Error("Không tìm thấy " + sel);
-            el.focus();
-            if (el.isContentEditable) {
-                el.innerText = '';
-                document.execCommand('insertText', false, text);
-                if (!el.innerText.trim()) {
-                    el.innerText = text;
-                }
-            } else {
-                el.value = text;
-            }
-            el.dispatchEvent(new Event('input', { bubbles: true }));
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-        }""",
-        [PROMPT_INPUT_SEL, prompt],
-    )
-    await asyncio.sleep(0.3)
+    # 4. Fallback fill / keyboard
+    try:
+        await input_el.fill(prompt, timeout=2_000)
+    except Exception:
+        await page.keyboard.insert_text(prompt)
+    await asyncio.sleep(0.2)
 
 
 async def send_prompt(prompt: str, page, timeout_s: int, ensure_instant: bool = False) -> str:

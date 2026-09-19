@@ -349,7 +349,7 @@ class SpeechOverride(BaseModel):
 
 
 class SpeechDoc(_Doc):
-    lang: Literal["vi"] = "vi"
+    lang: Literal["vi", "en"] = "vi"
     voice_id: str
     overrides: list[SpeechOverride] = Field(default_factory=list)
 
@@ -387,7 +387,7 @@ class SpeechEvaluation(BaseModel):
 
 
 class SpeechState(BaseModel):
-    lang: Literal["vi"] = "vi"
+    lang: Literal["vi", "en"] = "vi"
     voice_id: str
     revision: str
     overrides: list[SpeechOverride] = Field(default_factory=list)
@@ -411,13 +411,13 @@ class TtsCalibrationPoint(BaseModel):
 
 
 class TtsCalibration(BaseModel):
-    provider: Literal["ai33_vbee"] = "ai33_vbee"
+    provider: str = "ai33_vbee"
     voice_id: str
-    sample_count: Literal[8] = 8
+    sample_count: int = 8
     overhead_sec: float
     sec_per_syllable: float
-    samples_hash: str
-    created_at: str
+    samples_hash: str = ""
+    created_at: str = ""
     points: list[TtsCalibrationPoint] = Field(default_factory=list)
 
 
@@ -442,7 +442,7 @@ class TtsWarning(BaseModel):
 
 
 class TtsReport(_Doc):
-    lang: Literal["vi"] = "vi"
+    lang: Literal["vi", "en"] = "vi"
     output: str
     voice_id: str
     voice_hash: str

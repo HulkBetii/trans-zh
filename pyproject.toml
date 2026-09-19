@@ -23,6 +23,7 @@ dependencies = [
     "rich>=14.0",
     # LLM providers
     "httpx>=0.28",
+    "json-repair>=0.63.0",
     # OS credential vault for API keys managed by the local Studio.
     "keyring>=25.6",
     # Ingest
